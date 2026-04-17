@@ -30,9 +30,12 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "SuperAdmin")]
-    public async Task<IActionResult> Create([FromForm] CreateCategoryRequest request)
+    [Authorize]  
+    public async Task<IActionResult> Create([FromBody] CreateCategoryRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.Name))
+            return BadRequest("Category name is required.");
+
         var category = await _categoryService.CreateAsync(request);
         return CreatedAtAction(nameof(GetActiveCategories), new { id = category.Id }, category);
     }

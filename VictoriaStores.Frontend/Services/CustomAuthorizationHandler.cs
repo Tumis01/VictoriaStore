@@ -1,5 +1,5 @@
-﻿using System.Net.Http.Headers;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
+using System.Net.Http.Headers;
 
 namespace VictoriaStores.Frontend.Services;
 
@@ -12,22 +12,21 @@ public class CustomAuthorizationHandler : DelegatingHandler
         _localStorage = localStorage;
     }
 
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
     {
         try
         {
-            // Attempt to grab the token securely from local storage
-            var token = await _localStorage.GetItemAsync<string>("authToken");
+            var token = await _localStorage.GetItemAsStringAsync("authToken");
 
             if (!string.IsNullOrWhiteSpace(token))
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                request.Headers.Authorization =
+                    new AuthenticationHeaderValue("Bearer", token);
             }
         }
-        catch (InvalidOperationException)
+        catch
         {
-            // Prerendering phase: JavaScript interop is not available yet.
-            // We safely ignore this; the real call will happen once the browser connects.
         }
 
         return await base.SendAsync(request, cancellationToken);

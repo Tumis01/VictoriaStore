@@ -1,0 +1,239 @@
+﻿@page "/admin/orders"
+@layout Layout.AdminLayout
+@using System.Net.Http.Json
+@using System.Linq
+@using VictoriaStores.Frontend.Models
+@inject HttpClient Http
+
+<PageTitle>Orders - Victoria Admin</PageTitle>
+
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 font-serif">Orders</h1>
+        <p class="text-sm text-gray-500 mt-0.5">Manage customer orders and fulfillments.</p>
+    </div>
+</div>
+
+<div class="bg-white rounded-t-xl border border-gray-200 border-b-0 p-4 flex flex-col sm:flex-row gap-4 justify-between items-center shadow-sm">
+    <div class="relative w-full sm:w-96">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search by Order ID or Customer..." class="h-10 w-full pl-10 pr-4 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-colors" />
+    </div>
+    <select @bind="statusFilter" class="h-10 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand bg-white w-full sm:w-auto">
+        <option value="">All Statuses</option>
+        <option value="Pending">Pending</option>
+        <option value="Confirmed">Confirmed</option>
+        <option value="Shipped">Shipped</option>
+        <option value="Delivered">Delivered</option>
+        <option value="Cancelled">Cancelled</option>
+    </select>
+</div>
+
+<div class="bg-white rounded-b-xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Order ID</th>
+                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Customer</th>
+                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @if (isLoading)
+                {
+                    <tr>
+                        <td colspan="6" class="px-5 py-12 text-center">
+                            <svg class="animate-spin h-8 w-8 text-brand mx-auto" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </td>
+                    </tr>
+                }
+                else if (!FilteredOrders.Any())
+                {
+                    <tr><td colspan="6" class="px-5 py-12 text-center text-gray-500">No orders found.</td></tr>
+                }
+                else
+                {
+                    @foreach (var order in FilteredOrders)
+                    {
+                        <tr class="hover:bg-gray-50 transition-colors duration-150 cursor-pointer" @onclick="() => OpenDrawer(order)">
+                            <td class="px-5 py-4 font-bold text-brand">@order.OrderNumber</td>
+                            <td class="px-5 py-4">
+                                <div class="font-bold text-gray-900">@order.CustomerName</div>
+                                <div class="text-xs text-gray-500">@order.CustomerPhone</div>
+                            </td>
+                            <td class="px-5 py-4 text-gray-600">@order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                            <td class="px-5 py-4 font-bold text-gray-900">₦@order.TotalAmount.ToString("N0")</td>
+                            <td class="px-5 py-4">
+                                @if (order.Status == "Pending")
+                                {
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Pending</span>
+                                }
+                                else if (order.Status == "Delivered")
+                                {
+
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Delivered</span>
+                                }
+                                else if (order.Status == "Cancelled")
+                                {
+
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">Cancelled</span>
+                                }
+                                else
+                                {
+
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">@order.Status</span>
+                                }
+                            </td>
+                            <td class="px-5 py-4 text-right">
+                                <button class="text-brand font-semibold hover:underline">View</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (isDrawerOpen && selectedOrder != null)
+{
+    <div class="fixed inset-0 z-[60] flex justify-end">
+        <div class="fixed inset-0 bg-black/40 transition-opacity" @onclick="CloseDrawer"></div>
+
+        <div class="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-left">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+                <h2 class="text-lg font-bold text-gray-900 font-serif">Order @selectedOrder.OrderNumber</h2>
+                <button @onclick="CloseDrawer" class="text-gray-400 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Update Status</label>
+                    <div class="flex gap-2">
+                        <select @bind="selectedOrder.Status" class="h-10 px-3 flex-1 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand">
+                            <option value="Pending">Pending</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                        <button @onclick="UpdateOrderStatus" class="h-10 px-4 bg-brand text-white text-sm font-bold rounded-lg hover:bg-brand-dark transition-colors disabled:bg-gray-400">Save</button>
+                    </div>
+                    @if (updateSuccess)
+                    {
+                        <p class="text-green-600 text-xs mt-1 font-semibold">Status updated successfully.</p>
+                    }
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Customer Details</h3>
+                    <div class="space-y-2 text-sm">
+                        <p><span class="text-gray-500">Name:</span> <span class="font-semibold">@selectedOrder.CustomerName</span></p>
+                        <p><span class="text-gray-500">Phone:</span> <span class="font-semibold">@selectedOrder.CustomerPhone</span></p>
+                        <p><span class="text-gray-500">Email:</span> <span class="font-semibold">@selectedOrder.CustomerEmail</span></p>
+                        <p><span class="text-gray-500">Address:</span> <span class="font-semibold">@selectedOrder.ShippingAddress</span></p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Items Ordered</h3>
+                    <div class="space-y-3">
+                        @foreach (var item in selectedOrder.Items)
+                        {
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-gray-100 rounded flex-shrink-0">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" class="w-full h-full object-cover rounded mix-blend-multiply" />
+                                    }
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-gray-900 line-clamp-1">@item.ProductName</p>
+                                    <p class="text-xs text-gray-500">@item.Quantity x ₦@item.UnitPrice.ToString("N0")</p>
+                                </div>
+                                <p class="text-sm font-bold text-brand">₦@((item.Quantity * item.UnitPrice).ToString("N0"))</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-gray-100 bg-white">
+                <div class="flex justify-between items-center text-lg">
+                    <span class="font-bold text-gray-700">Total</span>
+                    <span class="font-extrabold text-brand text-2xl">₦@selectedOrder.TotalAmount.ToString("N0")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool isLoading = true;
+    private bool isDrawerOpen = false;
+    private bool updateSuccess = false;
+    private string searchTerm = string.Empty;
+    private string statusFilter = string.Empty;
+    
+    private List<OrderDto> orders = new();
+    private OrderDto? selectedOrder;
+
+    private IEnumerable<OrderDto> FilteredOrders => orders.Where(o =>
+        (string.IsNullOrWhiteSpace(searchTerm) || o.OrderNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || o.CustomerName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(statusFilter) || o.Status == statusFilter)
+    );
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrders();
+    }
+
+    private async Task LoadOrders()
+    {
+        isLoading = true;
+        try
+        {
+            orders = await Http.GetFromJsonAsync<List<OrderDto>>("api/order") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        isLoading = false;
+    }
+
+    private void OpenDrawer(OrderDto order)
+    {
+        selectedOrder = order;
+        updateSuccess = false;
+        isDrawerOpen = true;
+    }
+
+    private void CloseDrawer()
+    {
+        isDrawerOpen = false;
+        selectedOrder = null;
+    }
+
+    private async Task UpdateOrderStatus()
+    {
+        if (selectedOrder == null) return;
+        try
+        {
+            // Requires an endpoint like PUT api/order/{id}/status
+            var response = await Http.PutAsJsonAsync($"api/order/{selectedOrder.Id}/status", selectedOrder.Status);
+            if (response.IsSuccessStatusCode)
+            {
+                updateSuccess = true;
+                await LoadOrders(); // Refresh table
+            }
+        }
+        catch { /* Handle error */ }
+    }
+}

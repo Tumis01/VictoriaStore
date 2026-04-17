@@ -74,34 +74,19 @@ public class CategoryService : ICategoryService
             IsActive = category.IsActive
         };
     }
-
     public async Task<CategoryDto> CreateAsync(CreateCategoryRequest request)
     {
         var category = new Category
         {
             Name = request.Name,
-            Slug = request.Slug,
+            // Auto-generate the slug (e.g., "Household Items" -> "household-items")
+            Slug = request.Slug ?? request.Name.ToLower().Replace(" ", "-").Replace("'", ""),
             Description = request.Description,
             DisplayOrder = request.DisplayOrder,
             IsActive = request.IsActive
         };
 
-        // Handle File Upload to wwwroot/uploads/categories
-        if (request.BannerImage != null && request.BannerImage.Length > 0)
-        {
-            var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads", "categories");
-            Directory.CreateDirectory(uploadsFolder); // Ensure folder exists
-
-            var uniqueFileName = Guid.NewGuid().ToString() + "_" + request.BannerImage.FileName;
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await request.BannerImage.CopyToAsync(fileStream);
-            }
-
-            category.BannerImageUrl = $"/uploads/categories/{uniqueFileName}";
-        }
+        // We removed the BannerImage handling here since we removed it from the DTO
 
         _context.Categories.Add(category);
         await _context.SaveChangesAsync();

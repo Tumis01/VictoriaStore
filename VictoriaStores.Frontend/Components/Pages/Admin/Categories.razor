@@ -174,19 +174,30 @@
             if (response.IsSuccessStatusCode)
             {
                 successMessage = "Category added successfully!";
-                newCategory = new CreateCategoryRequest(); // Reset form
+                newCategory = new CreateCategoryRequest();
                 showAddForm = false;
-                await LoadCategories(); // Refresh the grid
+                await LoadCategories();
             }
             else
             {
-                errorMessage = "Failed to add category. Please verify your details.";
+                // Read the actual error from the API for diagnosis
+                var body = await response.Content.ReadAsStringAsync();
+
+                errorMessage = (int)response.StatusCode switch
+                {
+                    401 => "Not authorised. Please log out and log back in.",
+                    403 => "Access denied. Only Super Admin can manage categories.",
+                    400 => $"Validation error: {body}",
+                    _ => $"Failed to add category (HTTP {(int)response.StatusCode})."
+                };
+
+                Console.WriteLine($"[Category POST] {(int)response.StatusCode}: {body}");
             }
         }
         catch (Exception ex)
         {
-            errorMessage = "An error occurred while saving the category.";
-            Console.WriteLine(ex.Message);
+            errorMessage = "A network error occurred while saving the category.";
+            Console.WriteLine($"[Category POST] Exception: {ex.Message}");
         }
         finally
         {

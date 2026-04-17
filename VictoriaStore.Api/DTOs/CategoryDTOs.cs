@@ -14,9 +14,9 @@ public class CategoryDto
 public class CreateCategoryRequest
 {
     public required string Name { get; set; }
-    public required string Slug { get; set; }
+    public string? Slug { get; set; } // Made optional
     public string? Description { get; set; }
     public int DisplayOrder { get; set; }
     public bool IsActive { get; set; } = true;
-    public IFormFile? BannerImage { get; set; } // For handling the file upload
+
 }
