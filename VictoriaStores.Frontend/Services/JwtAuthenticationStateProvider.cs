@@ -26,10 +26,7 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 
             var claims = ParseClaimsFromJwt(token);
 
-            // CRUCIAL: Tell Blazor exactly which claim key represents the user's Role
             var identity = new ClaimsIdentity(claims, "jwt", "name", "role");
-
-            // Fallback for standard Microsoft identity schemas
             if (!claims.Any(c => c.Type == "role") && claims.Any(c => c.Type == ClaimTypes.Role))
             {
                 identity = new ClaimsIdentity(claims, "jwt", ClaimTypes.Name, ClaimTypes.Role);
@@ -47,6 +44,7 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
     public async Task MarkUserAsAuthenticated(string token)
     {
         await _localStorage.SetItemAsync(TokenKey, token);
+
         var claims = ParseClaimsFromJwt(token);
 
         var identity = new ClaimsIdentity(claims, "jwt", "name", "role");
@@ -69,28 +67,36 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
     private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
     {
         var claims = new List<Claim>();
-        var payload = jwt.Split('.')[1];
-        var jsonBytes = ParseBase64WithoutPadding(payload);
-        var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
 
-        if (keyValuePairs != null)
+        if (string.IsNullOrWhiteSpace(jwt))
+            return claims;
+
+        var parts = jwt.Split('.');
+        if (parts.Length < 2)
+            return claims;
+
+        var payload = parts[1];
+        var jsonBytes = ParseBase64WithoutPadding(payload);
+        var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(jsonBytes);
+
+        if (keyValuePairs is null)
+            return claims;
+
+        foreach (var kvp in keyValuePairs)
         {
-            foreach (var kvp in keyValuePairs)
+            if (kvp.Value.ValueKind == JsonValueKind.Array)
             {
-                // CRUCIAL: If the role is an array (e.g., ["SuperAdmin", "User"]), we must extract them individually
-                if (kvp.Value is JsonElement element && element.ValueKind == JsonValueKind.Array)
+                foreach (var item in kvp.Value.EnumerateArray())
                 {
-                    foreach (var item in element.EnumerateArray())
-                    {
-                        claims.Add(new Claim(kvp.Key, item.ToString()));
-                    }
-                }
-                else
-                {
-                    claims.Add(new Claim(kvp.Key, kvp.Value.ToString()!));
+                    claims.Add(new Claim(kvp.Key, item.ToString()));
                 }
             }
+            else
+            {
+                claims.Add(new Claim(kvp.Key, kvp.Value.ToString()));
+            }
         }
+
         return claims;
     }
 
@@ -98,9 +104,14 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
     {
         switch (base64.Length % 4)
         {
-            case 2: base64 += "=="; break;
-            case 3: base64 += "="; break;
+            case 2:
+                base64 += "==";
+                break;
+            case 3:
+                base64 += "=";
+                break;
         }
+
         return Convert.FromBase64String(base64);
     }
 }

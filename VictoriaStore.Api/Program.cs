@@ -17,6 +17,7 @@ builder.Services.AddSwaggerGen();
 // Configure Entity Framework and SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
 {
     options.Password.RequireDigit = true;
@@ -43,13 +44,16 @@ builder.Services.AddAuthentication(options =>
 {
     options.SaveToken = true;
     options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters()
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
         ValidAudience = builder.Configuration["JwtSettings:ValidAudience"],
         ValidIssuer = builder.Configuration["JwtSettings:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!))
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!))
     };
 });
 
@@ -58,7 +62,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorFrontend", policy =>
     {
-        policy.WithOrigins("https://localhost:7222", "http://localhost:5113") // We will adjust ports later
+        policy.WithOrigins("https://localhost:7222", "http://localhost:5113")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -77,6 +81,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowBlazorFrontend");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

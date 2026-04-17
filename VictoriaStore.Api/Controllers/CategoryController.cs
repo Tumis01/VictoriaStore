@@ -16,7 +16,7 @@ public class CategoryController : ControllerBase
         _categoryService = categoryService;
     }
 
-    [HttpGet] // Public - for the storefront
+    [HttpGet]
     public async Task<IActionResult> GetActiveCategories()
     {
         return Ok(await _categoryService.GetAllActiveAsync());
@@ -30,7 +30,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]  
+    [Authorize(Roles = "SuperAdmin")]
     public async Task<IActionResult> Create([FromBody] CreateCategoryRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
@@ -39,4 +39,4 @@ public class CategoryController : ControllerBase
         var category = await _categoryService.CreateAsync(request);
         return CreatedAtAction(nameof(GetActiveCategories), new { id = category.Id }, category);
     }
-}   
+}
