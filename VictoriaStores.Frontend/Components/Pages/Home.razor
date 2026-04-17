@@ -1,0 +1,257 @@
+﻿@page "/"
+@using VictoriaStores.Frontend.Services
+@inject ProductApiClient ProductApi
+@inject CartService CartService
+
+<PageTitle>Home - Victoria James Store</PageTitle>
+
+<section class="relative bg-gradient-to-r from-brand to-blue-700 py-16 lg:py-24 overflow-hidden rounded-b-[2.5rem] mb-12 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <span class="inline-block bg-white/20 text-white text-xs font-bold px-4 py-1.5 rounded-full mb-6 backdrop-blur-sm border border-white/30">
+                    ✨ Quality You Can Trust
+                </span>
+                <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 drop-shadow-sm">
+                    Shop Fresh, Modern & Affordable Products
+                </h1>
+                <p class="text-white/90 text-lg mb-8 max-w-lg leading-relaxed">
+                    From household essentials to fashion gifts — delivered straight to your doorstep across Nigeria. Place your order and we'll confirm via WhatsApp.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <button class="h-13 px-8 bg-white text-brand font-extrabold rounded-xl shadow-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        Shop Now
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                    <button class="h-13 px-8 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white/10 transition-colors">
+                        Track My Order
+                    </button>
+                </div>
+                <div class="mt-10 flex items-center gap-6 text-sm font-medium text-white/80">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">📦</span>
+                        <span>500+ Products</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">⭐</span>
+                        <span>4.9/5 Rating</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden lg:block relative h-[450px] bg-gradient-to-tr from-white/10 to-white/5 rounded-3xl border border-white/20 backdrop-blur-sm flex items-center justify-center shadow-2xl p-6">
+                <div class="text-center">
+                    <div class="w-24 h-24 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center backdrop-blur-md">
+                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    </div>
+                    <span class="text-white text-lg font-bold font-serif">Victoria James Collection</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+    <div class="text-center mb-10">
+        <h2 class="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-3">Shop By Category</h2>
+        <p class="text-gray-500 font-medium">Find everything you need for your home and lifestyle</p>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        <a href="#" class="group relative h-64 rounded-2xl overflow-hidden bg-blue-100 flex items-end">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent z-10"></div>
+            <div class="relative z-20 p-6 w-full transform transition-transform duration-300 group-hover:-translate-y-2">
+                <h3 class="text-white font-serif font-bold text-xl mb-1">Household Items</h3>
+                <p class="text-white/80 text-sm font-medium">120 Products</p>
+            </div>
+        </a>
+        <a href="#" class="group relative h-64 rounded-2xl overflow-hidden bg-orange-100 flex items-end">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent z-10"></div>
+            <div class="relative z-20 p-6 w-full transform transition-transform duration-300 group-hover:-translate-y-2">
+                <h3 class="text-white font-serif font-bold text-xl mb-1">Kitchen Utensils</h3>
+                <p class="text-white/80 text-sm font-medium">85 Products</p>
+            </div>
+        </a>
+        <a href="#" class="group relative h-64 rounded-2xl overflow-hidden bg-pink-100 flex items-end">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent z-10"></div>
+            <div class="relative z-20 p-6 w-full transform transition-transform duration-300 group-hover:-translate-y-2">
+                <h3 class="text-white font-serif font-bold text-xl mb-1">Fashion & Gifts</h3>
+                <p class="text-white/80 text-sm font-medium">45 Products</p>
+            </div>
+        </a>
+        <a href="#" class="group relative h-64 rounded-2xl overflow-hidden bg-purple-100 flex items-end">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent z-10"></div>
+            <div class="relative z-20 p-6 w-full transform transition-transform duration-300 group-hover:-translate-y-2">
+                <h3 class="text-white font-serif font-bold text-xl mb-1">Accessories</h3>
+                <p class="text-white/80 text-sm font-medium">210 Products</p>
+            </div>
+        </a>
+    </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+    <div class="bg-brand-light rounded-3xl overflow-hidden flex flex-col md:flex-row border border-brand/10">
+        <div class="p-10 md:p-16 flex-1 flex flex-col justify-center">
+            <span class="inline-block bg-accent text-white text-xs font-bold px-3 py-1 rounded-md mb-4 w-max">LIMITED OFFER</span>
+            <h2 class="font-serif text-3xl md:text-5xl font-bold text-gray-900 mb-4">50% Off Kitchen Sets This Week</h2>
+            <p class="text-gray-600 mb-8 max-w-md">Upgrade your cooking experience with our premium non-stick kitchenware bundles.</p>
+            <button class="bg-brand text-white font-bold h-12 px-8 rounded-xl w-max hover:bg-brand-dark transition-colors">Shop Kitchen Utensils</button>
+        </div>
+        <div class="hidden md:flex flex-1 bg-blue-100 relative items-center justify-center">
+            <span class="text-blue-400 font-bold text-xl">Promo Image Area</span>
+        </div>
+    </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+    <div class="flex justify-between items-end mb-8">
+        <div>
+            <h2 class="font-serif text-3xl font-bold text-gray-900 mb-2">New Arrivals</h2>
+            <p class="text-gray-500 font-medium">Fresh additions to our catalog</p>
+        </div>
+        <button class="text-brand font-bold text-sm hover:underline flex items-center gap-1">
+            View All <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+    </div>
+
+    @if (products == null)
+    {
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 animate-pulse">
+            @for (int i = 0; i < 4; i++)
+            {
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="bg-gray-200 h-48 w-full rounded-xl mb-4"></div>
+                    <div class="bg-gray-200 h-4 w-3/4 rounded mb-2"></div>
+                    <div class="bg-gray-200 h-4 w-1/2 rounded"></div>
+                </div>
+            }
+        </div>
+    }
+    else if (!products.Any())
+    {
+        <div class="text-center py-16 bg-white rounded-2xl border border-gray-200 border-dashed">
+            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            <p class="text-gray-500 font-bold text-lg">No products available at the moment.</p>
+            <p class="text-gray-400 text-sm mt-1">Please check back later!</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            @foreach (var product in products)
+            {
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full overflow-hidden">
+                    <div class="aspect-square bg-gray-50/50 relative p-6 flex items-center justify-center border-b border-gray-50">
+                        @if (product.StockQuantity <= 0)
+                        {
+                            <span class="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded shadow-sm z-10 tracking-widest">SOLD OUT</span>
+                        }
+                        else
+                        {
+                            <span class="absolute top-4 left-4 bg-accent text-white text-[10px] font-black px-2 py-1 rounded shadow-sm z-10 tracking-widest">NEW</span>
+                        }
+                        <button class="absolute top-4 right-4 bg-white p-2 rounded-full shadow-sm text-gray-400 hover:text-red-500 transition-colors z-10">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        </button>
+                        
+                        <img src="https://localhost:7042@(product.MainImageUrl)" class="object-contain w-full h-full mix-blend-multiply transition-transform duration-500 group-hover:scale-110" alt="@product.Name" />
+                    </div>
+                    
+                    <div class="p-5 flex flex-col flex-grow">
+                        <span class="text-[10px] font-black text-brand uppercase tracking-widest mb-1">Victoria Store</span>
+                        <h3 class="text-sm md:text-base font-bold text-gray-900 line-clamp-2 mb-2 leading-tight">@product.Name</h3>
+                        
+                        <div class="flex text-amber-400 text-xs mb-3">
+                            ★★★★★ <span class="text-gray-400 ml-1">(12)</span>
+                        </div>
+                        
+                        <div class="mt-auto pt-2">
+                            <div class="flex items-end justify-between mb-4">
+                                <div>
+                                    <span class="text-accent font-extrabold text-xl leading-none block">₦@product.Price.ToString("N0")</span>
+                                    @if (product.SalePrice != null)
+                                    {
+                                        <span class="text-gray-400 text-sm line-through">₦@product.SalePrice?.ToString("N0")</span>
+                                    }
+                                </div>
+                            </div>
+                            <button @onclick="() => AddToCart(product)" disabled="@(product.StockQuantity == 0)" class="w-full h-11 flex items-center justify-center gap-2 bg-brand text-white font-bold text-sm rounded-xl hover:bg-brand-dark active:scale-95 transition-all duration-150 shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 border-t border-gray-200 pt-16">
+    <div class="text-center mb-12">
+        <h2 class="font-serif text-3xl font-bold text-gray-900 mb-3">Why Choose Victoria James?</h2>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+        <div class="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:-translate-y-1 transition-transform">
+            <div class="w-16 h-16 bg-brand-light text-brand rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </div>
+            <h3 class="font-bold text-gray-900 mb-2">Trusted Quality</h3>
+            <p class="text-gray-500 text-sm">We source only the best products for your home.</p>
+        </div>
+        
+        <div class="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:-translate-y-1 transition-transform">
+            <div class="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+            </div>
+            <h3 class="font-bold text-gray-900 mb-2">WhatsApp Support</h3>
+            <p class="text-gray-500 text-sm">Real human assistance for every order.</p>
+        </div>
+        
+        <div class="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:-translate-y-1 transition-transform">
+            <div class="w-16 h-16 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+            </div>
+            <h3 class="font-bold text-gray-900 mb-2">Easy Bank Transfer</h3>
+            <p class="text-gray-500 text-sm">Secure and fast payment confirmations.</p>
+        </div>
+        
+        <div class="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:-translate-y-1 transition-transform">
+            <div class="w-16 h-16 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
+            </div>
+            <h3 class="font-bold text-gray-900 mb-2">Nigeria-Wide Delivery</h3>
+            <p class="text-gray-500 text-sm">We ship to all 36 states safely and quickly.</p>
+        </div>
+    </div>
+</section>
+
+@code {
+    private List<ProductDto>? products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            products = await ProductApi.GetActiveProductsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading products: {ex.Message}");
+            products = new List<ProductDto>();
+        }
+    }
+
+    private async Task AddToCart(ProductDto product)
+    {
+        var item = new CartItemDto
+        {
+            ProductId = product.Id,
+            ProductName = product.Name,
+            UnitPrice = product.SalePrice ?? product.Price,
+            Quantity = 1,
+            ImageUrl = product.MainImageUrl
+        };
+        await CartService.AddToCartAsync(item);
+    }
+}

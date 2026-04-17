@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <ResourcePreloader />
+    <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["VictoriaStores.Frontend.styles.css"]" />
+    <ImportMap />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    
+    <HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)" />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+        corePlugins: {
+        preflight: false,
+        }
+        }
+    </script>
+</head>
+<body>
+    <Routes @rendermode="new InteractiveServerRenderMode(prerender: false)" />
+    <ReconnectModal />
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+        theme: {
+        extend: {
+        colors: {
+        brand: { DEFAULT: '#1A56DB', dark: '#1E40AF', light: '#EFF6FF' },
+        accent: { DEFAULT: '#F97316', dark: '#EA580C', light: '#FFF7ED' },
+        }
+        }
+        },
+        corePlugins: {
+        preflight: false,
+        }
+        }
+    </script>
+</body>
+</html>

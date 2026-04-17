@@ -1,0 +1,180 @@
+﻿@page "/admin"
+@layout Layout.AdminLayout
+@inject HttpClient Http
+@using VictoriaStores.Frontend.Models
+@using VictoriaStores.Frontend.Services
+@inject VictoriaStores.Frontend.Services.ProductApiClient ProductApi
+
+<PageTitle>Admin Dashboard - Victoria James Store</PageTitle>
+
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 font-serif">Dashboard</h1>
+    <p class="text-sm text-gray-500 mt-0.5">Welcome back, here is what's happening today.</p>
+</div>
+
+@if (isLoading)
+{
+    <div class="flex h-64 items-center justify-center">
+        <svg class="animate-spin h-10 w-10 text-brand" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+    </div>
+}
+else
+{
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Total Revenue</span>
+                <span class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center text-green-600">₦</span>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-900">₦@totalRevenue.ToString("N0")</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Total Orders</span>
+                <span class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">📦</span>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-900">@orders.Count</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Pending</span>
+                <span class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">⚠</span>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-900">@pendingOrdersCount</p>
+            @if (pendingOrdersCount > 0)
+            {
+                <p class="text-xs text-amber-600 font-semibold mt-1">Action needed</p>
+            }
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Out of Stock</span>
+                <span class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-red-600">✕</span>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-900">@outOfStockCount</p>
+            <p class="text-xs text-gray-500 font-semibold mt-1">Total Catalog: @products.Count</p>
+        </div>
+    </div>
+
+    @if (outOfStockCount > 0)
+    {
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between mb-8">
+            <div class="flex items-center gap-3">
+                <span class="text-amber-600 text-xl">⚠</span>
+                <p class="text-sm font-medium text-amber-800">@outOfStockCount products are out of stock.</p>
+            </div>
+            <a href="/admin/products" class="text-sm font-bold text-amber-700 hover:underline">View Products</a>
+        </div>
+    }
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="flex justify-between items-center p-5 border-b border-gray-100">
+            <h3 class="text-lg font-bold text-gray-900 font-serif">Recent Orders</h3>
+            <a href="/admin/orders" class="text-sm font-semibold text-brand hover:underline">View All</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-5 py-3.5 text-xs font-bold text-gray-500 uppercase tracking-wider">Order #</th>
+                        <th class="px-5 py-3.5 text-xs font-bold text-gray-500 uppercase tracking-wider">Customer</th>
+                        <th class="px-5 py-3.5 text-xs font-bold text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-5 py-3.5 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-5 py-3.5 text-xs font-bold text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th class="px-5 py-3.5 text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach (var order in recentOrders)
+                    {
+                        <tr class="hover:bg-brand-light/30 transition-colors duration-100">
+                            <td class="px-5 py-4 font-bold text-brand whitespace-nowrap">@order.OrderNumber</td>
+                            <td class="px-5 py-4">
+                                <div class="font-semibold text-gray-900">@order.CustomerName</div>
+                                <div class="text-xs text-gray-500 mt-0.5">@order.CustomerPhone</div>
+                            </td>
+                            <td class="px-5 py-4 text-gray-600">@order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
+                            <td class="px-5 py-4">
+                                @if (order.Status == "Pending")
+                                {
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Pending</span>
+                                }
+                                else if (order.Status == "Confirmed" || order.Status == "Shipped")
+                                {
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">@order.Status</span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">@order.Status</span>
+                                }
+                            </td>
+                            <td class="px-5 py-4 font-bold text-gray-900">₦@order.TotalAmount.ToString("N2")</td>
+                            <td class="px-5 py-4">
+                                <a href="/admin/orders/@order.Id" class="text-brand font-semibold hover:underline">View</a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!recentOrders.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="px-5 py-8 text-center text-gray-500">No recent orders found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@code {
+    // ... keep exact same @code block as you currently have
+    private bool isLoading = true;
+    private List<OrderResponseDto> orders = new();
+    private List<OrderResponseDto> recentOrders = new();
+    private List<ProductDto> products = new();
+    
+    private decimal totalRevenue = 0;
+    private int pendingOrdersCount = 0;
+    private int outOfStockCount = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                orders = await Http.GetFromJsonAsync<List<OrderResponseDto>>("api/order") ?? new List<OrderResponseDto>();
+                products = await ProductApi.GetActiveProductsAsync() ?? new List<ProductDto>();
+
+                totalRevenue = orders.Where(o => o.Status != "Cancelled").Sum(o => o.TotalAmount);
+                pendingOrdersCount = orders.Count(o => o.Status == "Pending");
+                recentOrders = orders.OrderByDescending(o => o.CreatedAt).Take(10).ToList();
+                outOfStockCount = products.Count(p => p.StockQuantity <= 0);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading dashboard data: {ex.Message}");
+            }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    public class OrderResponseDto
+    {
+        public Guid Id { get; set; }
+        public string OrderNumber { get; set; } = string.Empty;
+        public string CustomerName { get; set; } = string.Empty;
+        public string CustomerPhone { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public decimal TotalAmount { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+}

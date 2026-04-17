@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="VictoriaStore.Api/VictoriaStore.Api.csproj" />
+  <Project Path="VictoriaStores.Frontend/VictoriaStores.Frontend.csproj" />
+</Solution>
