@@ -5,6 +5,7 @@
 @inject NavigationManager NavManager
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @using System.Globalization
+@using System.IO
 @using System.Linq
 @using System.Net.Http.Headers
 @using System.Net.Http.Json
@@ -81,7 +82,7 @@ else
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-900 font-serif">Media</h3>
-                    <span class="text-xs font-semibold text-gray-500">Up to @MaxFileCount images, auto-resized before upload</span>
+                    <span class="text-xs font-semibold text-gray-500">Up to @MaxFileCount images, optimized before upload</span>
                 </div>
 
                 <label for="product-images" class="block border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer">
@@ -90,7 +91,7 @@ else
                     </div>
                     <p class="text-sm font-bold text-brand">Click to upload <span class="text-gray-500 font-normal">product image(s)</span></p>
                     <p class="text-xs text-gray-400 mt-1">PNG, JPG, JPEG, WEBP, GIF or SVG</p>
-                    <p class="text-xs text-gray-400 mt-1">Large images are compressed to speed up saving</p>
+                    <p class="text-xs text-gray-400 mt-1">Images are resized to 1024px and converted to JPEG before upload</p>
                 </label>
 
                 <InputFile id="product-images" OnChange="HandleFilesSelected" accept="image/*" multiple class="hidden" />
@@ -105,13 +106,13 @@ else
                 @if (selectedFiles.Any())
                 {
                     <div class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
-                        <p class="text-sm font-semibold text-green-800 mb-3">Selected files</p>
+                        <p class="text-sm font-semibold text-green-800 mb-3">Prepared files</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             @foreach (var file in selectedFiles)
                             {
                                 <div class="rounded-lg border border-green-200 bg-white px-3 py-2">
-                                    <p class="text-sm font-medium text-gray-800 truncate">@file.Name</p>
-                                    <p class="text-xs text-gray-500">@FormatFileSize(file.Size)</p>
+                                    <p class="text-sm font-medium text-gray-800 truncate">@file.UploadName</p>
+                                    <p class="text-xs text-gray-500">@FormatFileSize(file.Content.Length)</p>
                                 </div>
                             }
                         </div>
@@ -219,11 +220,11 @@ else
     private string? uploadStatus;
 
     private const int MaxFileCount = 5;
-    private const long MaxFileSize = 2 * 1024 * 1024;
+    private const long MaxFileSize = 1_500_000;
 
     private ProductDto productModel = new() { IsActive = true };
     private List<CategoryDto> categories = new();
-    private List<IBrowserFile> selectedFiles = new();
+    private List<PreparedUploadFile> selectedFiles = new();
 
     private readonly List<string> predefinedColors = new()
     {
@@ -277,6 +278,7 @@ else
     {
         errorMessage = null;
         uploadStatus = null;
+        selectedFiles.Clear();
 
         IReadOnlyList<IBrowserFile> files;
 
@@ -287,35 +289,50 @@ else
         catch (InvalidOperationException)
         {
             errorMessage = $"Please select no more than {MaxFileCount} images.";
-            selectedFiles.Clear();
             return;
         }
 
-        var processedFiles = new List<IBrowserFile>();
+        var preparedFiles = new List<PreparedUploadFile>();
+        var current = 0;
 
         foreach (var file in files)
         {
+            current++;
+            uploadStatus = $"Preparing image {current} of {files.Count}...";
+
             if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
             {
                 errorMessage = $"'{file.Name}' is not a valid image file.";
                 selectedFiles.Clear();
+                uploadStatus = null;
                 return;
             }
 
-            var resizedFile = await file.RequestImageFileAsync("image/jpeg", 1280, 1280);
+            var resizedFile = await file.RequestImageFileAsync("image/jpeg", 1024, 1024);
 
             if (resizedFile.Size > MaxFileSize)
             {
-                errorMessage = $"'{file.Name}' is still too large after compression. Please use a smaller image.";
+                errorMessage = $"'{file.Name}' is still too large after optimization. Please use a smaller image.";
                 selectedFiles.Clear();
+                uploadStatus = null;
                 return;
             }
 
-            processedFiles.Add(resizedFile);
+            await using var inputStream = resizedFile.OpenReadStream(MaxFileSize);
+            using var memoryStream = new MemoryStream();
+            await inputStream.CopyToAsync(memoryStream);
+
+            var safeBaseName = Path.GetFileNameWithoutExtension(file.Name);
+            preparedFiles.Add(new PreparedUploadFile
+            {
+                UploadName = $"{safeBaseName}.jpg",
+                ContentType = "image/jpeg",
+                Content = memoryStream.ToArray()
+            });
         }
 
-        selectedFiles = processedFiles;
-        uploadStatus = $"{selectedFiles.Count} image(s) ready to upload.";
+        selectedFiles = preparedFiles;
+        uploadStatus = $"{selectedFiles.Count} optimized image(s) ready to upload.";
     }
 
     private async Task<HttpRequestMessage> CreateAuthorizedRequest(HttpMethod method, string url, HttpContent content)
@@ -388,9 +405,9 @@ else
 
             foreach (var file in selectedFiles)
             {
-                var streamContent = new StreamContent(file.OpenReadStream(MaxFileSize));
-                streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
-                content.Add(streamContent, "Images", file.Name);
+                var byteArrayContent = new ByteArrayContent(file.Content);
+                byteArrayContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+                content.Add(byteArrayContent, "Images", file.UploadName);
             }
 
             var method = IsEditMode ? HttpMethod.Put : HttpMethod.Post;
@@ -416,6 +433,10 @@ else
                     _ => $"Failed to save product (HTTP {(int)response.StatusCode}). {body}"
                 };
             }
+        }
+        catch (TaskCanceledException)
+        {
+            errorMessage = "The upload took too long and was cancelled. Try fewer images or smaller files.";
         }
         catch (Exception ex)
         {
@@ -462,5 +483,12 @@ else
             return $"{Math.Round(bytes / 1024d, 1)} KB";
 
         return $"{Math.Round(bytes / 1024d / 1024d, 1)} MB";
+    }
+
+    private sealed class PreparedUploadFile
+    {
+        public string UploadName { get; set; } = string.Empty;
+        public string ContentType { get; set; } = string.Empty;
+        public byte[] Content { get; set; } = Array.Empty<byte>();
     }
 }

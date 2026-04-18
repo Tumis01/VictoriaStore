@@ -7,25 +7,25 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents(); // Enables real-time UI updates
+    .AddInteractiveServerComponents();
 
-// 1. Register the custom authorization handler
+// Register the custom authorization handler
 builder.Services.AddScoped<CustomAuthorizationHandler>();
 
-// 2. Configure a named HttpClient that uses our handler
+// Configure a named HttpClient for the API
 builder.Services.AddHttpClient("VictoriaApi", client =>
 {
-    // Make sure this matches your API port
     client.BaseAddress = new Uri("https://localhost:7145/");
+    client.Timeout = TimeSpan.FromMinutes(10);
 }).AddHttpMessageHandler<CustomAuthorizationHandler>();
 
-// 3. Set it as the default HttpClient for the entire app
+// Set it as the default HttpClient for the app
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("VictoriaApi"));
 
-// 4. Register Local Storage for the Shopping Cart
+// Local storage
 builder.Services.AddBlazoredLocalStorage();
 
-// 5. Register our Custom Services and Authentication
+// Custom services and authentication
 builder.Services.AddScoped<ProductApiClient>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddAuthenticationCore();
