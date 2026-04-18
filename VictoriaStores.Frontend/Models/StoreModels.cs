@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace VictoriaStores.Frontend.Models;
 
@@ -56,6 +56,7 @@ public class CreateCategoryRequest
     public string Name { get; set; } = string.Empty;
     public string? Slug { get; set; }
     public string? Description { get; set; }
+    public string? BannerImageUrl { get; set; }
     public int DisplayOrder { get; set; } = 0;
     public bool IsActive { get; set; } = true;
 }

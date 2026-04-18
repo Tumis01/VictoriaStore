@@ -28,6 +28,7 @@ builder.Services.AddBlazoredLocalStorage();
 // Custom services and authentication
 builder.Services.AddScoped<ProductApiClient>();
 builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<ToastService>();
 builder.Services.AddAuthenticationCore();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();

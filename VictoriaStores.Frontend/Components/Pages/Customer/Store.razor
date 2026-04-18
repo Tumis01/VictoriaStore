@@ -1,4 +1,4 @@
-﻿@page "/store"
+@page "/store"
 @page "/category/{CategorySlug}"
 @layout Layout.StoreLayout
 @inject HttpClient Http
@@ -135,9 +135,18 @@
         <div class="flex-1 w-full">
             
             <div class="hidden lg:flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <span class="text-sm font-semibold text-gray-500">Showing @FilteredProducts.Count() products</span>
+                <span class="text-sm font-semibold text-gray-500">Showing @DisplayedProducts.Count() of @FilteredProducts.Count() products</span>
                 
                 <div class="flex items-center gap-4">
+                    <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden mr-2">
+                        <button class="@(isGridView ? "bg-gray-100 text-brand" : "bg-white text-gray-400 hover:text-gray-600") px-3 py-2 transition-colors" @onclick="() => ToggleView(true)">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        </button>
+                        <button class="@(!isGridView ? "bg-gray-100 text-brand" : "bg-white text-gray-400 hover:text-gray-600") px-3 py-2 transition-colors" @onclick="() => ToggleView(false)">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </button>
+                    </div>
+
                     <label class="text-sm font-bold text-gray-700">Sort By:</label>
                     <select @bind="sortOrder" class="h-10 px-4 rounded-lg border border-gray-300 text-sm bg-white focus:outline-none focus:border-brand">
                         <option value="newest">Newest Arrivals</option>
@@ -195,17 +204,17 @@
             }
             else
             {
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                    @foreach (var product in FilteredProducts)
+                <div class="@(isGridView ? "grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6" : "flex flex-col gap-4")">
+                    @foreach (var product in DisplayedProducts)
                     {
-                        <VictoriaStores.Frontend.Components.ProductCard Product="product" />
+                        <VictoriaStores.Frontend.Components.ProductCard Product="product" IsListView="!isGridView" />
                     }
                 </div>
                 
-                @if (FilteredProducts.Count() >= 20)
+                @if (FilteredProducts.Count() > DisplayedProducts.Count())
                 {
                     <div class="mt-12 flex justify-center">
-                        <button class="h-12 px-8 bg-gray-100 text-gray-700 font-bold text-sm rounded-xl hover:bg-gray-200 transition-colors shadow-sm">
+                        <button @onclick="LoadMore" class="h-12 px-8 bg-gray-100 text-gray-700 font-bold text-sm rounded-xl hover:bg-gray-200 transition-colors shadow-sm">
                             Load More Products
                         </button>
                     </div>
@@ -227,11 +236,16 @@
     private bool inStockOnly = false;
     private string sortOrder = "newest";
 
+    private int visibleCount = 20;
+    private bool isGridView = true;
+
     private List<ProductDto> allProducts = new();
     private List<CategoryDto> allCategories = new();
     private CategoryDto? CurrentCategory;
 
     // Computed property for dynamic filtering & sorting
+    private IEnumerable<ProductDto> DisplayedProducts => FilteredProducts.Take(visibleCount);
+
     private IEnumerable<ProductDto> FilteredProducts
     {
         get
@@ -317,5 +331,10 @@
         ClearPriceFilter();
         inStockOnly = false;
         sortOrder = "newest";
+        visibleCount = 20;
     }
+
+    private void ToggleView(bool grid) => isGridView = grid;
+
+    private void LoadMore() => visibleCount += 20;
 }

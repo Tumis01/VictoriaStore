@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using VictoriaStore.Api.Data;
 using VictoriaStore.Api.DTOs;
 using VictoriaStore.Api.Models;
@@ -12,6 +12,7 @@ public interface ICategoryService
     Task<CategoryDto?> GetByIdAsync(Guid id);
     Task<CategoryDto> CreateAsync(CreateCategoryRequest request);
     Task<CategoryDto> UpdateAsync(Guid id, CreateCategoryRequest request);
+    Task<CategoryDto> UpdateImageAsync(Guid id, string imageUrl);
     Task DeleteAsync(Guid id);
 }
 
@@ -93,6 +94,18 @@ public class CategoryService : ICategoryService
 
         _context.Categories.Remove(category);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<CategoryDto> UpdateImageAsync(Guid id, string imageUrl)
+    {
+        var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+        if (category == null)
+            throw new KeyNotFoundException("Category not found.");
+
+        category.BannerImageUrl = imageUrl;
+        await _context.SaveChangesAsync();
+
+        return MapToDto(category);
     }
 
     private static CategoryDto MapToDto(Category c)

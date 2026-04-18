@@ -1,4 +1,4 @@
-﻿@page "/admin/products"
+@page "/admin/products"
 @layout Layout.AdminLayout
 @inject HttpClient Http
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
@@ -37,11 +37,24 @@
 }
 
 <div class="bg-white rounded-t-xl border border-gray-200 border-b-0 p-4 flex flex-col sm:flex-row gap-4 justify-between items-center shadow-sm">
-    <div class="relative w-full sm:w-96">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search products by name..." class="h-10 w-full pl-10 pr-4 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-colors" />
-    </div>
     <div class="flex items-center gap-3 w-full sm:w-auto">
+        <div class="relative flex-1 sm:w-80">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search products by name..." class="h-10 w-full pl-10 pr-4 rounded-lg bg-gray-50 border border-transparent focus:border-brand focus:bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 transition-colors" />
+        </div>
+    </div>
+    <div class="flex items-center gap-3 w-full sm:w-auto overflow-x-auto custom-scrollbar">
+        @if (selectedProductIds.Any())
+        {
+            <div class="flex items-center bg-brand/10 text-brand px-3 h-10 rounded-lg text-sm font-bold border border-brand/20 whitespace-nowrap">
+                <span>@selectedProductIds.Count selected</span>
+                <div class="w-px h-5 bg-brand/20 mx-3"></div>
+                <button @onclick="DeleteSelected" class="hover:text-red-600 transition-colors flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Delete
+                </button>
+            </div>
+        }
         <select @bind="statusFilter" class="h-10 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand bg-white flex-1 sm:flex-none">
             <option value="">All Statuses</option>
             <option value="in_stock">In Stock</option>
@@ -53,9 +66,11 @@
 <div class="bg-white rounded-b-xl border border-gray-200 shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
-            <thead class="bg-gray-50">
+            <thead class="bg-gray-50 border-b border-gray-100">
                 <tr>
-                    <th class="w-12 px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">#</th>
+                    <th class="w-12 px-5 py-3 text-center">
+                        <input type="checkbox" checked="@IsAllSelected" @onchange="ToggleSelectAll" class="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand transition-colors" />
+                    </th>
                     <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Product</th>
                     <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Price</th>
                     <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Stock</th>
@@ -78,11 +93,12 @@
                 }
                 else
                 {
-                    var index = 1;
-                    @foreach (var product in FilteredProducts)
+                    @foreach (var product in PagedProducts)
                     {
-                        <tr class="hover:bg-gray-50 transition-colors duration-150 group">
-                            <td class="px-5 py-4 text-center font-semibold text-gray-500">@(index++)</td>
+                        <tr class="hover:bg-gray-50 transition-colors duration-150 group cursor-pointer" @onclick="() => ToggleSelection(product.Id, !selectedProductIds.Contains(product.Id))">
+                            <td class="px-5 py-4 text-center select-none" @onclick:stopPropagation="true">
+                                <input type="checkbox" checked="@selectedProductIds.Contains(product.Id)" @onchange="@(e => ToggleSelection(product.Id, e.Value))" class="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand" />
+                            </td>
                             <td class="px-5 py-4">
                                 <div class="flex items-center gap-4">
                                     <div class="h-12 w-12 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden flex-shrink-0">
@@ -113,15 +129,21 @@
                             <td class="px-5 py-4">
                                 @if (product.StockQuantity > 10)
                                 {
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">In Stock</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200 shadow-sm">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-600 mr-1.5"></span> In Stock
+                                    </span>
                                 }
                                 else if (product.StockQuantity > 0)
                                 {
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">Low Stock</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 shadow-sm">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-600 mr-1.5 animate-pulse"></span> Low Stock
+                                    </span>
                                 }
                                 else
                                 {
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">Out of Stock</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200 shadow-sm">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-red-600 mr-1.5"></span> Out of Stock
+                                    </span>
                                 }
                             </td>
                             <td class="px-5 py-4 text-right">
@@ -136,6 +158,38 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination -->
+    @if (FilteredProducts.Any() && totalPages > 1)
+    {
+        <div class="px-5 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+            <span class="text-sm font-medium text-gray-500">Showing @(((currentPage - 1) * pageSize) + 1) to @Math.Min(currentPage * pageSize, FilteredProducts.Count()) of <span class="font-bold text-gray-900">@FilteredProducts.Count()</span></span>
+            <div class="flex gap-2">
+                <button disabled="@(currentPage == 1)" @onclick="() => currentPage--" class="h-9 px-4 border border-gray-300 rounded-lg text-sm font-bold bg-white text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    Prev
+                </button>
+                <div class="hidden sm:flex items-center gap-1">
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        var pageNum = i;
+                        if (totalPages <= 5 || i == 1 || i == totalPages || Math.Abs(i - currentPage) <= 1)
+                        {
+                            <button @onclick="() => currentPage = pageNum" class="w-9 h-9 flex items-center justify-center border font-bold text-sm rounded-lg transition-colors @(currentPage == pageNum ? "bg-brand text-white border-brand shadow-sm" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50")">@pageNum</button>
+                        }
+                        else if (Math.Abs(i - currentPage) == 2)
+                        {
+                            <span class="px-1 text-gray-400">...</span>
+                        }
+                    }
+                </div>
+                <button disabled="@(currentPage == totalPages)" @onclick="() => currentPage++" class="h-9 px-4 border border-gray-300 rounded-lg text-sm font-bold bg-white text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center gap-1">
+                    Next
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
@@ -145,6 +199,10 @@
     private string statusFilter = string.Empty;
     private string? errorMessage;
     private string? successMessage;
+    
+    private int currentPage = 1;
+    private int pageSize = 10;
+    private HashSet<Guid> selectedProductIds = new();
 
     private IEnumerable<ProductDto> FilteredProducts => products.Where(p =>
         (string.IsNullOrWhiteSpace(searchTerm) || p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) &&
@@ -152,6 +210,43 @@
             (statusFilter == "in_stock" && p.StockQuantity > 0) ||
             (statusFilter == "out_of_stock" && p.StockQuantity <= 0))
     );
+
+    private IEnumerable<ProductDto> PagedProducts => FilteredProducts.Skip((currentPage - 1) * pageSize).Take(pageSize);
+    private int totalPages => Math.Max(1, (int)Math.Ceiling(FilteredProducts.Count() / (double)pageSize));
+
+    private bool IsAllSelected => PagedProducts.Any() && PagedProducts.All(p => selectedProductIds.Contains(p.Id));
+
+    private void ToggleSelectAll(ChangeEventArgs e)
+    {
+        bool isChecked = (bool)(e.Value ?? false);
+        if (isChecked)
+        {
+            foreach (var p in PagedProducts) selectedProductIds.Add(p.Id);
+        }
+        else
+        {
+            foreach (var p in PagedProducts) selectedProductIds.Remove(p.Id);
+        }
+    }
+
+    private void ToggleSelection(Guid id, object? isChecked)
+    {
+        if ((bool)(isChecked ?? false)) selectedProductIds.Add(id);
+        else selectedProductIds.Remove(id);
+    }
+
+    private async Task DeleteSelected()
+    {
+        if (!selectedProductIds.Any()) return;
+        var idsToDelete = selectedProductIds.ToList();
+        foreach (var id in idsToDelete)
+        {
+            await DeleteProduct(id);
+        }
+        selectedProductIds.Clear();
+        // Adjust pagination if necessary
+        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+    }
 
     protected override async Task OnInitializedAsync()
     {

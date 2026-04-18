@@ -1,7 +1,8 @@
-﻿@page "/cart"
+@page "/cart"
 @layout Layout.StoreLayout
 @inject VictoriaStores.Frontend.Services.CartService CartService
 @inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
 @using VictoriaStores.Frontend.Models
 @implements IDisposable
 
@@ -159,12 +160,20 @@
 
     private async Task RemoveItem(Guid productId)
     {
-        await CartService.RemoveFromCartAsync(productId);
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to remove this item?");
+        if (confirmed)
+        {
+            await CartService.RemoveFromCartAsync(productId);
+        }
     }
 
     private async Task ClearCart()
     {
-        await CartService.ClearCartAsync();
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to clear your entire cart?");
+        if (confirmed)
+        {
+            await CartService.ClearCartAsync();
+        }
     }
 
     public void Dispose()

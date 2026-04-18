@@ -1,9 +1,10 @@
-﻿@using VictoriaStores.Frontend.Models
+@using VictoriaStores.Frontend.Models
 @inject NavigationManager NavManager
+@inject VictoriaStores.Frontend.Services.CartService Cart
 
-<div class="group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 overflow-hidden flex flex-col relative cursor-pointer" @onclick="GoToDetails">
+<div class="group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 overflow-hidden relative cursor-pointer @(IsListView ? "flex flex-row" : "flex flex-col")" @onclick="GoToDetails">
     
-    <div class="aspect-square bg-gray-50 relative overflow-hidden flex-shrink-0">
+    <div class="@(IsListView ? "w-1/3 sm:w-1/4" : "aspect-square") bg-gray-50 relative overflow-hidden flex-shrink-0">
         @if (!string.IsNullOrEmpty(Product.MainImageUrl))
         {
             <img src="https://localhost:7145@(Product.MainImageUrl)" alt="@Product.Name" class="w-full h-full object-cover p-4 group-hover:scale-105 transition-transform duration-500 mix-blend-multiply" loading="lazy" decoding="async" />
@@ -61,7 +62,7 @@
                 }
             </div>
             
-            <button class="w-full h-10 bg-brand text-white font-semibold text-sm rounded-lg hover:bg-brand-dark active:scale-95 transition-all flex items-center justify-center gap-2" @onclick:stopPropagation="true">
+            <button class="w-full h-10 bg-brand text-white font-semibold text-sm rounded-lg hover:bg-brand-dark active:scale-95 transition-all flex items-center justify-center gap-2" @onclick="AddToCart" @onclick:stopPropagation="true">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                 Add to Cart
             </button>
@@ -71,9 +72,22 @@
 
 @code {
     [Parameter] public ProductDto Product { get; set; } = default!;
+    [Parameter] public bool IsListView { get; set; } = false;
 
     private void GoToDetails()
     {
         NavManager.NavigateTo($"/product/{Product.Slug ?? Product.Id.ToString()}");
+    }
+
+    private async Task AddToCart()
+    {
+        var item = new CartItemDto {
+            ProductId = Product.Id,
+            Name = Product.Name,
+            Price = Product.SalePrice ?? Product.Price,
+            MainImageUrl = Product.MainImageUrl,
+            Quantity = 1
+        };
+        await Cart.AddToCartAsync(item);
     }
 }

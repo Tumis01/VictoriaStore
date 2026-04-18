@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VictoriaStore.Api.DTOs;
@@ -21,6 +21,25 @@ public class ProductController : ControllerBase
     public async Task<IActionResult> GetActiveProducts()
     {
         return Ok(await _productService.GetAllActiveAsync());
+    }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchProducts([FromQuery] string q, [FromQuery] string? category)
+    {
+        var products = await _productService.GetAllActiveAsync();
+        
+        if (!string.IsNullOrEmpty(q))
+        {
+            products = products.Where(p => p.Name.Contains(q, StringComparison.OrdinalIgnoreCase) || 
+                                           (p.Description != null && p.Description.Contains(q, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        if (!string.IsNullOrEmpty(category) && !string.Equals(category, "all", StringComparison.OrdinalIgnoreCase))
+        {
+            products = products.Where(p => p.CategoryName != null && p.CategoryName.Equals(category, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return Ok(products);
     }
 
     [HttpGet("{id:guid}")]

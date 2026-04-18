@@ -1,4 +1,4 @@
-﻿@page "/product/{Id:guid}"
+@page "/product/{Id:guid}"
 @layout Layout.StoreLayout
 @inject HttpClient Http
 @inject VictoriaStores.Frontend.Services.CartService CartService
@@ -150,7 +150,7 @@ else
                     </div>
 
                     <a href="https://wa.me/2348162809886?text=Hi! I have a question about @product.Name" target="_blank" class="flex items-center justify-center w-full h-12 rounded-xl border-2 border-green-500 text-green-600 font-bold hover:bg-green-50 transition-colors gap-2">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.183-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.765-5.77z..." /></svg>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.183-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.765-5.77zM12.031 0C5.385 0 0 5.388 0 12.036c0 2.125.556 4.195 1.611 6.02L.055 24l6.096-1.599c1.787.973 3.82 1.486 5.88 1.487 6.645-.001 12.031-5.388 12.031-12.036S18.676 0 12.031 0zM15.54 13.911c-.193-.097-1.14-.563-1.317-.627-.176-.065-.304-.097-.432.097-.129.194-.497.627-.609.756-.112.129-.224.146-.417.049-.193-.097-.813-.3-1.55-961-.572-.515-.957-1.15-1.07-1.344-.112-.194-.012-.298.085-.395.088-.088.193-.226.29-.339.097-.113.129-.194.193-.323.065-.129.032-.242-.016-.339-.048-.097-.432-1.042-.591-1.427-.156-.375-.315-.325-.432-.331-.112-.006-.241-.007-.37-.007-.129 0-.339.048-.516.242-.177.194-.676.662-.676 1.615s.692 1.874.788 2.003c.097.129 1.365 2.083 3.308 2.923 1.547.668 2.106.711 2.89.596.536-.078 1.14-.467 1.3-918.16-.452.16-.84.112-.918z"/></svg>
                         Ask on WhatsApp
                     </a>
                 </div>
@@ -181,6 +181,23 @@ else
                 @((MarkupString)(product.Description?.Replace("\n", "<br/>") ?? "No additional description available."))
             </div>
         </div>
+
+        <div class="border-t border-gray-200 pt-12 pb-8">
+            <h2 class="font-serif text-2xl font-bold text-gray-900 mb-8">Related Products</h2>
+            @if (relatedProducts.Any())
+            {
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                    @foreach (var related in relatedProducts.Take(4))
+                    {
+                        <VictoriaStores.Frontend.Components.ProductCard Product="related" />
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-gray-500">No related products found.</p>
+            }
+        </div>
     </div>
 }
 
@@ -189,6 +206,7 @@ else
 
     private bool isLoading = true;
     private ProductDto? product;
+    private List<ProductDto> relatedProducts = new();
     private string activeImageUrl = string.Empty;
     private string? selectedColor;
     private int quantity = 1;
@@ -209,6 +227,10 @@ else
                 {
                     selectedColor = product.Colors.First(); // Default to first color
                 }
+
+                // Fetch related products (using all products for demo purposes)
+                var allProducts = await Http.GetFromJsonAsync<List<ProductDto>>("api/product") ?? new();
+                relatedProducts = allProducts.Where(p => p.CategoryId == product.CategoryId && p.Id != product.Id).ToList();
             }
         }
         catch (Exception ex)
@@ -237,18 +259,16 @@ else
     {
         if (product == null) return;
 
-        // Construct cart item (You might need to adjust this depending on your CartItemDto in StoreModels.cs)
         var cartItem = new CartItemDto
         {
             ProductId = product.Id,
-            ProductName = product.Name + (string.IsNullOrEmpty(selectedColor) ? "" : $" - {selectedColor}"),
-            UnitPrice = product.SalePrice ?? product.Price,
+            Name = product.Name + (string.IsNullOrEmpty(selectedColor) ? "" : $" - {selectedColor}"),
+            Price = product.SalePrice ?? product.Price,
             Quantity = quantity,
-            ImageUrl = product.MainImageUrl
+            MainImageUrl = product.MainImageUrl
         };
 
-        // You have a CartService.cs in your project! Call its Add method here.
-        // E.g., await CartService.AddToCartAsync(cartItem);
+        await CartService.AddToCartAsync(cartItem);
         
         showAddedToCartToast = true;
         

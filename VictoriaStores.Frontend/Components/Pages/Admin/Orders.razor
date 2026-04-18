@@ -1,4 +1,4 @@
-﻿@page "/admin/orders"
+@page "/admin/orders"
 @layout Layout.AdminLayout
 @using System.Net.Http.Json
 @using System.Linq
@@ -14,19 +14,37 @@
     </div>
 </div>
 
-<div class="bg-white rounded-t-xl border border-gray-200 border-b-0 p-4 flex flex-col sm:flex-row gap-4 justify-between items-center shadow-sm">
-    <div class="relative w-full sm:w-96">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search by Order ID or Customer..." class="h-10 w-full pl-10 pr-4 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-colors" />
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 animate-fade-in">
+    <!-- Filter Tabs -->
+    <div class="flex bg-white rounded-lg p-1 border border-gray-200 shadow-sm self-stretch sm:self-auto overflow-x-auto custom-scrollbar">
+        @foreach (var tab in new[] {"All", "Pending", "Confirmed", "Shipped", "Delivered", "Cancelled"})
+        {
+            var value = tab == "All" ? "" : tab;
+            <button @onclick="() => statusFilter = value" class="px-4 py-1.5 text-sm font-semibold rounded-md whitespace-nowrap transition-all @(statusFilter == value ? "bg-brand text-white shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50")">
+                @tab
+            </button>
+        }
     </div>
-    <select @bind="statusFilter" class="h-10 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand bg-white w-full sm:w-auto">
-        <option value="">All Statuses</option>
-        <option value="Pending">Pending</option>
-        <option value="Confirmed">Confirmed</option>
-        <option value="Shipped">Shipped</option>
-        <option value="Delivered">Delivered</option>
-        <option value="Cancelled">Cancelled</option>
-    </select>
+
+    <!-- Date Range & Export -->
+    <div class="flex gap-3 w-full sm:w-auto">
+        <div class="relative flex-1 sm:flex-none flex items-center bg-white rounded-md border border-gray-300 shadow-sm px-2">
+            <input type="date" @bind="startDate" class="h-9 px-1 text-xs focus:outline-none bg-transparent" />
+            <span class="mx-1 text-gray-400 font-bold">-</span>
+            <input type="date" @bind="endDate" class="h-9 px-1 text-xs focus:outline-none bg-transparent" />
+        </div>
+        <button @onclick="ExportOrders" class="h-9 px-4 bg-white border border-gray-300 text-gray-700 font-bold text-xs rounded-md shadow-sm hover:bg-gray-50 transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            Export
+        </button>
+    </div>
+</div>
+
+<div class="bg-white rounded-t-xl border border-gray-200 border-b-0 p-4 shadow-sm relative z-10 animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="relative w-full max-w-md">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search by Order ID or Customer..." class="h-10 w-full pl-10 pr-4 rounded-lg bg-gray-50 border border-transparent focus:border-brand focus:bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all font-medium" />
+    </div>
 </div>
 
 <div class="bg-white rounded-b-xl border border-gray-200 shadow-sm overflow-hidden mb-8">
@@ -105,11 +123,19 @@
         <div class="fixed inset-0 bg-black/40 transition-opacity" @onclick="CloseDrawer"></div>
 
         <div class="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-left">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
-                <h2 class="text-lg font-bold text-gray-900 font-serif">Order @selectedOrder.OrderNumber</h2>
-                <button @onclick="CloseDrawer" class="text-gray-400 hover:text-gray-700">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white shadow-sm z-10 shrink-0">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900 font-serif">Order @selectedOrder.OrderNumber</h2>
+                    <p class="text-xs text-gray-500 font-semibold mt-0.5">@selectedOrder.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy • HH:mm tt")</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="https://wa.me/@(selectedOrder.CustomerPhone.Replace("+",""))" target="_blank" title="Chat on WhatsApp" class="w-8 h-8 flex items-center justify-center rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition-colors">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.183-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.765-5.77z..."/></svg>
+                    </a>
+                    <button @onclick="CloseDrawer" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
             </div>
 
             <div class="flex-1 overflow-y-auto p-6 space-y-6">
@@ -180,13 +206,17 @@
     private bool updateSuccess = false;
     private string searchTerm = string.Empty;
     private string statusFilter = string.Empty;
+    private DateTime? startDate;
+    private DateTime? endDate;
     
     private List<OrderDto> orders = new();
     private OrderDto? selectedOrder;
 
     private IEnumerable<OrderDto> FilteredOrders => orders.Where(o =>
         (string.IsNullOrWhiteSpace(searchTerm) || o.OrderNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || o.CustomerName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(statusFilter) || o.Status == statusFilter)
+        (string.IsNullOrWhiteSpace(statusFilter) || o.Status == statusFilter) &&
+        (!startDate.HasValue || o.CreatedAt.Date >= startDate.Value.Date) &&
+        (!endDate.HasValue || o.CreatedAt.Date <= endDate.Value.Date)
     );
 
     protected override async Task OnInitializedAsync()
@@ -235,5 +265,12 @@
             }
         }
         catch { /* Handle error */ }
+    }
+
+    private void ExportOrders()
+    {
+        // Simple mock for export notification
+        updateSuccess = true;
+        // In a real implementation this would generate CSV matching FilteredOrders and save to client
     }
 }

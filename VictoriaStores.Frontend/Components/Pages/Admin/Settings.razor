@@ -1,4 +1,4 @@
-﻿@page "/admin/settings"
+@page "/admin/settings"
 @layout Layout.AdminLayout
 
 <PageTitle>Store Settings - Victoria Admin</PageTitle>
@@ -24,6 +24,10 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                 Notifications
             </button>
+            <button @onclick='() => activeTab = "seo"' class="@GetTabClass("seo") w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors text-left">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                SEO Settings
+            </button>
         </nav>
     </div>
 
@@ -33,26 +37,27 @@
         {
             <div class="max-w-2xl animate-fade-in">
                 <h2 class="text-xl font-bold text-gray-900 font-serif mb-6">Store Profile</h2>
-                <form class="space-y-6">
+                <form class="space-y-6" @onsubmit='() => SaveSettings("profile")'>
+                    @if(savedStatus == "profile") { <div class="p-3 bg-green-50 text-green-700 text-sm font-bold border border-green-200 rounded-lg">Profile settings saved!</div> }
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Store Name</label>
-                        <input type="text" value="Victoria James Store" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
+                        <input type="text" @bind="Settings.StoreName" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Support Email</label>
-                            <input type="email" value="support@victoriajames.com" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
+                            <input type="email" @bind="Settings.SupportEmail" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">WhatsApp Number</label>
-                            <input type="text" value="+234 816 280 9886" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
+                            <input type="text" @bind="Settings.WhatsAppNumber" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
                         </div>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Physical Address</label>
-                        <textarea rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none">Lagos, Nigeria</textarea>
+                        <textarea rows="3" @bind="Settings.Address" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none"></textarea>
                     </div>
-                    <button type="button" class="h-11 px-6 bg-brand text-white font-bold rounded-lg shadow-sm hover:bg-brand-dark transition-colors">Save Profile</button>
+                    <button type="submit" disabled="@isSaving" class="h-11 px-6 bg-brand text-white font-bold rounded-lg shadow-sm hover:bg-brand-dark transition-colors disabled:bg-gray-400">Save Profile</button>
                 </form>
             </div>
         }
@@ -61,20 +66,21 @@
             <div class="max-w-2xl animate-fade-in">
                 <h2 class="text-xl font-bold text-gray-900 font-serif mb-2">Bank Details</h2>
                 <p class="text-sm text-gray-500 mb-6">This information is displayed to customers at checkout for bank transfer payments.</p>
-                <form class="space-y-6">
+                <form class="space-y-6" @onsubmit='() => SaveSettings("bank")'>
+                    @if(savedStatus == "bank") { <div class="p-3 bg-green-50 text-green-700 text-sm font-bold border border-green-200 rounded-lg">Bank details saved!</div> }
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Bank Name</label>
-                        <input type="text" placeholder="e.g. Guarantee Trust Bank (GTB)" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
+                        <input type="text" @bind="Settings.BankName" placeholder="e.g. Guarantee Trust Bank (GTB)" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Account Number</label>
-                        <input type="text" placeholder="0123456789" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
+                        <input type="text" @bind="Settings.AccountNumber" placeholder="0123456789" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Account Name</label>
-                        <input type="text" placeholder="Victoria James Enterprise" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
+                        <input type="text" @bind="Settings.AccountName" placeholder="Victoria James Enterprise" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
                     </div>
-                    <button type="button" class="h-11 px-6 bg-brand text-white font-bold rounded-lg shadow-sm hover:bg-brand-dark transition-colors">Save Bank Details</button>
+                    <button type="submit" disabled="@isSaving" class="h-11 px-6 bg-brand text-white font-bold rounded-lg shadow-sm hover:bg-brand-dark transition-colors disabled:bg-gray-400">Save Bank Details</button>
                 </form>
             </div>
         }
@@ -82,22 +88,49 @@
         {
             <div class="max-w-2xl animate-fade-in">
                 <h2 class="text-xl font-bold text-gray-900 font-serif mb-6">Notification Preferences</h2>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <form class="space-y-4" @onsubmit='() => SaveSettings("notifications")'>
+                    @if(savedStatus == "notifications") { <div class="p-3 bg-green-50 text-green-700 text-sm font-bold border border-green-200 rounded-lg mb-4">Notifications saved!</div> }
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-brand transition-colors cursor-pointer" @onclick="() => Settings.NewOrderEmail = !Settings.NewOrderEmail">
                         <div>
                             <p class="font-bold text-gray-900 text-sm">New Order Email</p>
                             <p class="text-xs text-gray-500 mt-0.5">Receive an email when a customer places an order.</p>
                         </div>
-                        <input type="checkbox" checked class="w-5 h-5 text-brand border-gray-300 rounded focus:ring-brand" />
+                        <input type="checkbox" @bind="Settings.NewOrderEmail" class="w-5 h-5 text-brand border-gray-300 rounded focus:ring-brand pointer-events-none" />
                     </div>
-                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-brand transition-colors cursor-pointer" @onclick="() => Settings.LowStockAlert = !Settings.LowStockAlert">
                         <div>
                             <p class="font-bold text-gray-900 text-sm">Low Stock Alert</p>
                             <p class="text-xs text-gray-500 mt-0.5">Notify me when a product's stock drops below 5.</p>
                         </div>
-                        <input type="checkbox" checked class="w-5 h-5 text-brand border-gray-300 rounded focus:ring-brand" />
+                        <input type="checkbox" @bind="Settings.LowStockAlert" class="w-5 h-5 text-brand border-gray-300 rounded focus:ring-brand pointer-events-none" />
                     </div>
-                </div>
+                    <div class="pt-4">
+                        <button type="submit" disabled="@isSaving" class="h-11 px-6 bg-brand text-white font-bold rounded-lg shadow-sm hover:bg-brand-dark transition-colors disabled:bg-gray-400">Save Preferences</button>
+                    </div>
+                </form>
+            </div>
+        }
+        else if (activeTab == "seo")
+        {
+            <div class="max-w-2xl animate-fade-in">
+                <h2 class="text-xl font-bold text-gray-900 font-serif mb-2">Search Engine Optimization</h2>
+                <p class="text-sm text-gray-500 mb-6">Improve your store's visibility on Google and other search engines.</p>
+                <form class="space-y-6" @onsubmit='() => SaveSettings("seo")'>
+                    @if(savedStatus == "seo") { <div class="p-3 bg-green-50 text-green-700 text-sm font-bold border border-green-200 rounded-lg">SEO settings saved!</div> }
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Global Meta Title</label>
+                        <input type="text" @bind="Settings.SeoTitle" placeholder="e.g. Victoria James | Premium Fashion" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Global Meta Description</label>
+                        <textarea rows="3" @bind="Settings.SeoDescription" placeholder="Shop the latest fashion..." class="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Meta Keywords (Comma separated)</label>
+                        <input type="text" @bind="Settings.SeoKeywords" placeholder="fashion, dresses, premium" class="h-11 w-full px-4 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-brand outline-none" />
+                    </div>
+                    <button type="submit" disabled="@isSaving" class="h-11 px-6 bg-brand text-white font-bold rounded-lg shadow-sm hover:bg-brand-dark transition-colors disabled:bg-gray-400">Save SEO Data</button>
+                </form>
             </div>
         }
     </div>
@@ -105,11 +138,72 @@
 
 @code {
     private string activeTab = "profile";
+    private bool isSaving = false;
+    private string? savedStatus = null;
+    
+    private StoreConfig Settings = new StoreConfig();
+
+    protected override void OnInitialized()
+    {
+        // Mock load
+        Settings = new StoreConfig
+        {
+            StoreName = "Victoria James Store",
+            SupportEmail = "support@victoriajames.com",
+            WhatsAppNumber = "08162809886",
+            Address = "Lagos, Nigeria",
+            BankName = "First Bank Nigeria",
+            AccountNumber = "1234567890",
+            AccountName = "VICTORIA JAMES",
+            NewOrderEmail = true,
+            LowStockAlert = true,
+            SeoTitle = "Victoria James | Premium Fashion",
+            SeoKeywords = "fashion, clothing, premium"
+        };
+    }
 
     private string GetTabClass(string tabName)
     {
         return activeTab == tabName
             ? "bg-brand/10 text-brand"
             : "text-gray-600 hover:bg-gray-100";
+    }
+
+    private async Task SaveSettings(string tab)
+    {
+        isSaving = true;
+        savedStatus = null;
+        
+        // Mock save delay assuming no API endpoint exists yet
+        await Task.Delay(800);
+        
+        savedStatus = tab;
+        isSaving = false;
+
+        // Clear status after 3 secs
+        _ = Task.Run(async () => {
+            await Task.Delay(3000);
+            savedStatus = null;
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+
+    public class StoreConfig
+    {
+        public string StoreName { get; set; } = string.Empty;
+        public string SupportEmail { get; set; } = string.Empty;
+        public string WhatsAppNumber { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        
+        public string BankName { get; set; } = string.Empty;
+        public string AccountNumber { get; set; } = string.Empty;
+        public string AccountName { get; set; } = string.Empty;
+
+        public bool NewOrderEmail { get; set; } = true;
+        public bool LowStockAlert { get; set; } = true;
+
+        public string SeoTitle { get; set; } = string.Empty;
+        public string SeoDescription { get; set; } = string.Empty;
+        public string SeoKeywords { get; set; } = string.Empty;
     }
 }

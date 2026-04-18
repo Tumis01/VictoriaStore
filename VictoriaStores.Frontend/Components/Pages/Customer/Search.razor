@@ -1,0 +1,112 @@
+@page "/search"
+@layout Layout.StoreLayout
+@inject NavigationManager NavManager
+@inject VictoriaStores.Frontend.Services.ProductApiClient ProductApi
+@using VictoriaStores.Frontend.Models
+
+<PageTitle>Search Results for "@Query" - Victoria James Store</PageTitle>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 min-h-[70vh]">
+    <div class="mb-8">
+        <h1 class="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-2">Search Results</h1>
+        @if (!string.IsNullOrEmpty(Query))
+        {
+            <p class="text-gray-500">Showing @FilteredProducts.Count() results for <span class="font-bold text-gray-900">"@Query"</span> @(!string.IsNullOrEmpty(Category) && Category != "all" ? $"in {Category}" : "")</p>
+        }
+        else if(FilteredProducts.Any())
+        {
+             <p class="text-gray-500">Showing @FilteredProducts.Count() all products</p>
+        }
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 animate-pulse">
+            @for (int i = 0; i < 4; i++)
+            {
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 h-80 flex flex-col p-4">
+                    <div class="bg-gray-200 rounded-lg w-full h-40 mb-4"></div>
+                    <div class="bg-gray-200 rounded h-4 w-3/4 mb-2"></div>
+                    <div class="bg-gray-200 rounded h-4 w-1/2 mb-4"></div>
+                    <div class="mt-auto bg-gray-200 rounded h-10 w-full"></div>
+                </div>
+            }
+        </div>
+    }
+    else if (!FilteredProducts.Any())
+    {
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center max-w-2xl mx-auto">
+            <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">No products found</h3>
+            <p class="text-gray-500 mb-6">We couldn't find anything matching your search. Try adjusting your keywords or category.</p>
+            <a href="/store" class="text-brand font-bold hover:underline">View all products</a>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            @foreach (var product in FilteredProducts)
+            {
+                <!-- Since store and home reference ProductCard in Components ns, we use it directly -->
+                <VictoriaStores.Frontend.Components.Pages.Customer.ProductCard Product="product" />
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? Query { get; set; }
+
+    [SupplyParameterFromQuery(Name = "cat")]
+    public string? Category { get; set; }
+
+    private bool isLoading = true;
+    private List<ProductDto> allProducts = new();
+    
+    private IEnumerable<ProductDto> FilteredProducts
+    {
+        get
+        {
+            var result = allProducts.AsEnumerable();
+            
+            if (!string.IsNullOrEmpty(Query))
+            {
+                result = result.Where(p => p.Name.Contains(Query, StringComparison.OrdinalIgnoreCase) || 
+                                           (p.Description != null && p.Description.Contains(Query, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            if (!string.IsNullOrEmpty(Category) && Category.ToLower() != "all")
+            {
+                // Simple string match on CategoryName
+                result = result.Where(p => p.CategoryName != null && p.CategoryName.Equals(Category, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return result;
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadProductsAsync();
+    }
+
+    private async Task LoadProductsAsync()
+    {
+        isLoading = true;
+        try
+        {
+            allProducts = await ProductApi.GetActiveProductsAsync() ?? new();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Search error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

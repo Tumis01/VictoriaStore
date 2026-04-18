@@ -1,101 +1,320 @@
-﻿@page "/"
+@page "/"
 @layout Layout.StoreLayout
 @inject VictoriaStores.Frontend.Services.ProductApiClient ProductApi
 @inject HttpClient Http
 @using VictoriaStores.Frontend.Models
 
-<PageTitle>Victoria James Store - Modern & Affordable Lifestyle</PageTitle>
+<PageTitle>Victoria James Store – Modern & Affordable Lifestyle</PageTitle>
 
-<section class="bg-gradient-to-r from-brand to-blue-700 relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 24px 24px;"></div>
-    
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 flex flex-col md:flex-row items-center gap-10 relative z-10">
-        <div class="w-full md:w-3/5 text-center md:text-left">
-            <span class="inline-block bg-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-full mb-6 shadow-sm backdrop-blur-sm">
-                ✨ Quality You Can Trust
-            </span>
-            <h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
-                Shop Fresh, Modern & <br class="hidden md:block" /> Affordable Products
-            </h1>
-            <p class="text-white/80 text-base lg:text-lg mb-8 max-w-xl mx-auto md:mx-0">
-                From household essentials to fashion gifts — delivered across Nigeria. Place your order and we'll confirm via WhatsApp.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 mb-8">
-                <a href="/store" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-8 bg-white text-brand font-bold text-sm rounded-lg hover:bg-gray-50 active:scale-95 transition-all shadow-md">
-                    Shop Now
-                </a>
-                <a href="/track" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-8 bg-transparent text-white font-bold text-sm rounded-lg border-2 border-white/30 hover:border-white hover:bg-white/10 active:scale-95 transition-all">
-                    Track My Order
-                </a>
-            </div>
-            <div class="flex items-center justify-center md:justify-start gap-4 text-white/70 text-xs sm:text-sm font-semibold divide-x divide-white/20">
-                <span class="pr-4">500+ Products</span>
-                <span class="px-4">1,000+ Happy Customers</span>
-                <span class="pl-4 text-yellow-400">4.9★ Rating</span>
-            </div>
-        </div>
-        
-        <div class="w-full md:w-2/5 hidden md:block">
-            <div class="grid grid-cols-2 gap-4 transform rotate-3">
-                <div class="bg-white/10 backdrop-blur-sm p-3 rounded-2xl shadow-xl animate-fade-in" style="animation-delay: 0.1s;">
-                    <img src="/images/hero-1.jpg" alt="Kitchen" class="rounded-xl w-full h-40 object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%23f3f4f6\'/></svg>'" />
+<!-- ═══════════════════════════════════════════════
+     ANNOUNCEMENT BAR
+════════════════════════════════════════════════ -->
+<div id="vj-announcement" class="relative bg-brand text-white text-xs font-semibold py-2.5 px-4 text-center overflow-hidden"
+     style="display:block">
+    <div class="absolute inset-0 pointer-events-none"
+         style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,0.08) 1px,transparent 0);background-size:20px 20px;">
+    </div>
+    <span class="relative z-10">🇳🇬&nbsp; Free WhatsApp Support &nbsp;·&nbsp; Call 08162809886 &nbsp;·&nbsp; Fast delivery across Nigeria</span>
+    <button onclick="document.getElementById('vj-announcement').style.display='none';localStorage.setItem('vj_ann','0')"
+            class="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-6 h-6 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 rounded-full transition-all duration-150 text-sm leading-none"
+            aria-label="Dismiss announcement">
+        ✕
+    </button>
+</div>
+<script>
+    if (localStorage.getItem('vj_ann') === '0') {
+        var el = document.getElementById('vj-announcement');
+        if (el) el.style.display = 'none';
+    }
+</script>
+
+<!-- ═══════════════════════════════════════════════
+     HERO SECTION
+════════════════════════════════════════════════ -->
+<section class="relative overflow-hidden bg-gradient-to-br from-[#0d2d6b] via-brand to-blue-500 min-h-[560px] flex items-center">
+    <!-- Dot-grid pattern overlay -->
+    <div class="absolute inset-0 pointer-events-none"
+         style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,0.10) 1px,transparent 0);background-size:28px 28px;">
+    </div>
+    <!-- Atmospheric blur blobs -->
+    <div class="absolute -top-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-72 h-72 bg-accent/10 rounded-full blur-3xl pointer-events-none -translate-x-1/3 translate-y-1/3"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 w-full relative z-10">
+        <div class="flex flex-col md:flex-row items-center gap-10 lg:gap-16">
+
+            <!-- ── Left: Text content ── -->
+            <div class="w-full md:w-3/5 text-center md:text-left">
+                <!-- Eyebrow badge -->
+                <span class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs font-bold px-4 py-2 rounded-full mb-6 border border-white/20 shadow-sm">
+                    <span class="w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span>
+                    ✨ Quality You Can Trust
+                </span>
+
+                <!-- Headline -->
+                <h1 class="font-serif text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-white leading-[1.15] mb-5 tracking-tight">
+                    Shop Fresh, Modern &amp;<br class="hidden md:block" />
+                    <span class="relative inline-block">
+                        Affordable Products
+                        <svg class="absolute -bottom-1.5 left-0 w-full h-[6px]" viewBox="0 0 320 6"
+                             fill="none" preserveAspectRatio="none" aria-hidden="true">
+                            <path d="M0 5 Q80 1 160 4 Q240 7 320 3"
+                                  stroke="#F97316" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </h1>
+
+                <!-- Sub-copy -->
+                <p class="text-white/75 text-base lg:text-lg mb-8 max-w-md mx-auto md:mx-0 leading-relaxed">
+                    From household essentials to fashion gifts — delivered across Nigeria.
+                    Place your order and we'll confirm via WhatsApp.
+                </p>
+
+                <!-- CTA buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3 mb-10">
+                    <a href="/store"
+                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-8
+                              bg-white text-brand font-extrabold text-sm rounded-xl
+                              hover:bg-gray-50 hover:shadow-xl active:scale-95 transition-all duration-200 shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        Shop Now
+                    </a>
+                    <a href="/track"
+                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-8
+                              bg-white/10 backdrop-blur-sm text-white font-bold text-sm rounded-xl
+                              border border-white/30 hover:bg-white/20 hover:border-white/60 active:scale-95 transition-all duration-200">
+                        Track My Order
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
                 </div>
-                <div class="bg-white/10 backdrop-blur-sm p-3 rounded-2xl shadow-xl translate-y-8 animate-fade-in" style="animation-delay: 0.2s;">
-                    <img src="/images/hero-2.jpg" alt="Fashion" class="rounded-xl w-full h-40 object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%23e5e7eb\'/></svg>'" />
+
+                <!-- Stats row -->
+                <div class="inline-flex items-stretch divide-x divide-white/20 rounded-xl overflow-hidden bg-white/10 backdrop-blur-sm border border-white/15">
+                    <div class="text-center px-5 py-3">
+                        <p class="text-white font-extrabold text-2xl leading-none">500+</p>
+                        <p class="text-white/60 text-xs mt-1 font-medium">Products</p>
+                    </div>
+                    <div class="text-center px-5 py-3">
+                        <p class="text-white font-extrabold text-2xl leading-none">1,000+</p>
+                        <p class="text-white/60 text-xs mt-1 font-medium">Customers</p>
+                    </div>
+                    <div class="text-center px-5 py-3">
+                        <p class="text-yellow-400 font-extrabold text-2xl leading-none">4.9★</p>
+                        <p class="text-white/60 text-xs mt-1 font-medium">Rating</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Right: Product card collage ── -->
+            <div class="w-full md:w-2/5 hidden md:flex items-center justify-center" aria-hidden="true">
+                <div class="relative w-[320px] h-[320px]">
+
+                    <!-- Card 1: top-left, tilted left -->
+                    <div class="absolute top-0 left-0 w-[148px] group"
+                         style="transform:rotate(-4deg);transition:transform .4s ease">
+                        <div class="bg-white/12 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl border border-white/20 hover:rotate-0 transition-transform duration-500 hover:scale-105">
+                            <div class="w-full aspect-square bg-white/10 rounded-xl overflow-hidden flex items-center justify-center">
+                                <img src="/images/hero-kitchen.jpg" alt="Kitchen Utensils"
+                                     class="w-full h-full object-cover rounded-xl"
+                                     loading="eager"
+                                     onerror="this.parentElement.innerHTML='<span style=\'font-size:3rem;line-height:1\'>🍳</span>'" />
+                            </div>
+                            <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Kitchen Utensils</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: top-right, tilted right, offset down -->
+                    <div class="absolute top-0 right-0 w-[136px] translate-y-6"
+                         style="transform:rotate(4deg) translateY(24px);transition:transform .4s ease">
+                        <div class="bg-white/12 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl border border-white/20 hover:rotate-0 transition-transform duration-500 hover:scale-105">
+                            <div class="w-full aspect-square bg-white/10 rounded-xl overflow-hidden flex items-center justify-center">
+                                <img src="/images/hero-fashion.jpg" alt="Fashion &amp; Giftpacks"
+                                     class="w-full h-full object-cover rounded-xl"
+                                     loading="eager"
+                                     onerror="this.parentElement.innerHTML='<span style=\'font-size:3rem;line-height:1\'>👗</span>'" />
+                            </div>
+                            <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Fashion &amp; Gifts</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: bottom-left, slight tilt -->
+                    <div class="absolute bottom-0 left-4 w-[136px]"
+                         style="transform:rotate(2.5deg);transition:transform .4s ease">
+                        <div class="bg-white/12 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl border border-white/20 hover:rotate-0 transition-transform duration-500 hover:scale-105">
+                            <div class="w-full aspect-square bg-white/10 rounded-xl overflow-hidden flex items-center justify-center">
+                                <img src="/images/hero-household.jpg" alt="Household Items"
+                                     class="w-full h-full object-cover rounded-xl"
+                                     loading="eager"
+                                     onerror="this.parentElement.innerHTML='<span style=\'font-size:3rem;line-height:1\'>🏠</span>'" />
+                            </div>
+                            <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Household Items</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: bottom-right, slight tilt -->
+                    <div class="absolute bottom-2 right-0 w-[148px]"
+                         style="transform:rotate(-2deg);transition:transform .4s ease">
+                        <div class="bg-white/12 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl border border-white/20 hover:rotate-0 transition-transform duration-500 hover:scale-105">
+                            <div class="w-full aspect-square bg-white/10 rounded-xl overflow-hidden flex items-center justify-center">
+                                <img src="/images/hero-accessories.jpg" alt="Accessories"
+                                     class="w-full h-full object-cover rounded-xl"
+                                     loading="eager"
+                                     onerror="this.parentElement.innerHTML='<span style=\'font-size:3rem;line-height:1\'>💍</span>'" />
+                            </div>
+                            <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Accessories</p>
+                        </div>
+                    </div>
+
+                    <!-- Floating sale badge -->
+                    <div class="absolute -top-4 -right-4 w-[58px] h-[58px] bg-accent rounded-full shadow-xl flex flex-col items-center justify-center z-20 border-2 border-white/30"
+                         style="animation:bounce 3s ease-in-out infinite">
+                        <span class="text-white text-xs font-extrabold leading-none">50%</span>
+                        <span class="text-white/80 text-[9px] font-bold leading-none mt-0.5">OFF</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Wave divider -->
+    <div class="absolute bottom-0 left-0 right-0 pointer-events-none" aria-hidden="true">
+        <svg viewBox="0 0 1440 48" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="w-full h-10">
+            <path d="M0 48 L0 28 Q360 0 720 24 Q1080 48 1440 20 L1440 48 Z" fill="white"/>
+        </svg>
+    </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════
+     SHOP BY CATEGORY
+════════════════════════════════════════════════ -->
 <section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10">
+            <p class="text-brand text-xs font-extrabold uppercase tracking-widest mb-2">Browse the Store</p>
             <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900 mb-3">Shop By Category</h2>
-            <p class="text-gray-500">Find everything you need for your home and lifestyle</p>
+            <p class="text-gray-500 text-sm max-w-md mx-auto">Find everything you need for your home and lifestyle</p>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            @foreach (var cat in featuredCategories)
-            {
-                <a href="/category/@cat.Slug" class="group relative rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 block aspect-[3/4]">
-                    <img src="@(string.IsNullOrEmpty(cat.BannerImageUrl) ? "/images/placeholder.jpg" : cat.BannerImageUrl)" alt="@cat.Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%231A56DB\' opacity=\'0.1\'/></svg>'" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/20 to-transparent"></div>
-                    <div class="absolute bottom-0 left-0 p-4 w-full">
-                        <h3 class="text-white font-bold text-lg mb-1 group-hover:text-brand-light transition-colors">@cat.Name</h3>
-                    </div>
-                </a>
-            }
-        </div>
+        @if (categoriesLoading)
+        {
+            <!-- Skeleton state -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                @for (int i = 0; i < 4; i++)
+                {
+                    <div class="skeleton aspect-[3/4] rounded-2xl"></div>
+                }
+            </div>
+        }
+        else if (featuredCategories.Any())
+        {
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                @foreach (var cat in featuredCategories.Take(4))
+                {
+                    <a href="/category/@(cat.Slug ?? cat.Name.ToLower().Replace(" ", "-"))"
+                       class="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 block aspect-[3/4] bg-brand-light focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2">
+                        @if (!string.IsNullOrEmpty(cat.BannerImageUrl))
+                        {
+                            <img src="@cat.BannerImageUrl" alt="@cat.Name"
+                                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                                 loading="lazy" decoding="async"
+                                 onerror="this.style.display='none'" />
+                        }
+                        <!-- Emoji fallback layer (always present, hidden by image if loaded) -->
+                        <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-brand-light to-blue-100">
+                            <span class="text-7xl opacity-30 select-none">
+                                @(cat.Name.Contains("Kitchen") ? "🍳"
+                                  : (cat.Name.Contains("Fashion") || cat.Name.Contains("Gift")) ? "👗"
+                                  : (cat.Name.Contains("Accessor")) ? "💍"
+                                  : "🏠")
+                            </span>
+                        </div>
+                        <!-- Gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-950/85 via-gray-900/20 to-transparent group-hover:from-brand/80 group-hover:via-brand/25 transition-all duration-500"></div>
+                        <!-- Bottom content -->
+                        <div class="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
+                            <h3 class="text-white font-bold text-base md:text-lg leading-tight drop-shadow-sm">@cat.Name</h3>
+                            <!-- Arrow: slides in from right on hover -->
+                            <span class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center
+                                         translate-x-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 flex-shrink-0">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </span>
+                        </div>
+                        <!-- Shop Now ribbon (appears on hover) -->
+                        <div class="absolute top-3 right-3
+                                    bg-white text-brand text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-sm
+                                    opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
+                            Shop Now
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <!-- Hardcoded fallback when API returns empty -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                @foreach (var (name, slug, emoji, from, to) in _defaultCategories)
+                {
+                    <a href="/category/@slug"
+                       class="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 block aspect-[3/4]">
+                        <div class="absolute inset-0 bg-gradient-to-br @from @to flex items-center justify-center">
+                            <span class="text-7xl opacity-40 group-hover:scale-110 transition-transform duration-500">@emoji</span>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-950/75 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-white font-bold text-base md:text-lg">@name</h3>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
     </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════
+     NEW ARRIVALS
+════════════════════════════════════════════════ -->
 <section class="py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-end justify-between mb-8">
             <div>
+                <p class="text-brand text-xs font-extrabold uppercase tracking-widest mb-1.5">Just In</p>
                 <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900">New Arrivals</h2>
             </div>
-            <a href="/store" class="hidden sm:inline-flex items-center gap-1 text-brand font-semibold text-sm hover:underline">
-                View All →
+            <a href="/store"
+               class="hidden sm:inline-flex items-center gap-1.5 text-brand font-semibold text-sm group hover:gap-3 transition-all duration-200">
+                View All
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                </svg>
             </a>
         </div>
 
         @if (isLoading)
         {
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 animate-pulse">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 @for (int i = 0; i < 4; i++)
                 {
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 h-80 flex flex-col p-4">
-                        <div class="bg-gray-200 rounded-lg w-full h-40 mb-4"></div>
-                        <div class="bg-gray-200 rounded h-4 w-3/4 mb-2"></div>
-                        <div class="bg-gray-200 rounded h-4 w-1/2 mb-4"></div>
-                        <div class="mt-auto bg-gray-200 rounded h-10 w-full"></div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="skeleton aspect-square w-full"></div>
+                        <div class="p-4 space-y-2.5">
+                            <div class="skeleton h-3 w-1/3 rounded-full"></div>
+                            <div class="skeleton h-4 w-3/4 rounded-md"></div>
+                            <div class="skeleton h-4 w-1/2 rounded-md"></div>
+                            <div class="skeleton h-10 w-full rounded-xl mt-3"></div>
+                        </div>
                     </div>
                 }
             </div>
         }
-        else
+        else if (newArrivals.Any())
         {
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 @foreach (var product in newArrivals.Take(4))
@@ -103,101 +322,349 @@
                     <VictoriaStores.Frontend.Components.ProductCard Product="product" />
                 }
             </div>
+            <!-- Mobile-only view all button -->
             <div class="mt-8 text-center sm:hidden">
-                <a href="/store" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-white border border-gray-300 text-gray-700 font-bold text-sm rounded-lg shadow-sm">View All Products</a>
+                <a href="/store"
+                   class="inline-flex items-center justify-center gap-2 h-11 px-8 bg-brand text-white font-bold text-sm rounded-xl shadow-sm">
+                    View All Products
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
             </div>
+        }
+        else
+        {
+            <p class="text-center text-gray-400 py-12">Products are being added — check back soon!</p>
         }
     </div>
 </section>
 
-<section class="py-12 bg-white">
+<!-- ═══════════════════════════════════════════════
+     PROMOTIONAL BANNER
+════════════════════════════════════════════════ -->
+<section class="py-10 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-brand-light rounded-2xl overflow-hidden flex flex-col md:flex-row items-center border border-brand/10">
-            <div class="w-full md:w-1/2 p-8 md:p-12 text-center md:text-left">
-                <span class="inline-block bg-accent text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full mb-4">Limited Offer</span>
-                <h2 class="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">50% Off Kitchen Sets <br class="hidden md:block" /> This Week</h2>
-                <p class="text-gray-600 mb-8 max-w-md mx-auto md:mx-0">Upgrade your cooking experience with our premium non-stick kitchen collections.</p>
-                <a href="/category/kitchen" class="inline-flex items-center justify-center gap-2 h-12 px-8 bg-accent text-white font-bold text-sm rounded-lg hover:bg-accent-dark active:scale-95 transition-all shadow-sm">
-                    Shop Kitchen Utensils
+        <div class="relative rounded-3xl overflow-hidden border border-brand/10 shadow-sm bg-gradient-to-br from-brand-light via-white to-accent/5">
+            <!-- Decorative circles -->
+            <div class="absolute -top-16 -right-16 w-56 h-56 bg-brand/5 rounded-full pointer-events-none"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-accent/5 rounded-full pointer-events-none"></div>
+
+            <div class="relative flex flex-col md:flex-row items-stretch">
+                <!-- Text side -->
+                <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center text-center md:text-left z-10">
+                    <span class="inline-flex items-center gap-1.5 bg-accent text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full mb-5 self-center md:self-start">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
+                        </svg>
+                        Limited Time Offer
+                    </span>
+                    <h2 class="font-serif text-3xl md:text-[2.25rem] font-bold text-gray-900 mb-4 leading-tight">
+                        50% Off Kitchen Sets<br class="hidden md:block" />
+                        <span class="text-accent">This Week Only!</span>
+                    </h2>
+                    <p class="text-gray-500 text-sm md:text-base mb-8 max-w-sm mx-auto md:mx-0 leading-relaxed">
+                        Upgrade your cooking experience with our premium non-stick collections. Limited stock — act fast!
+                    </p>
+                    <div>
+                        <a href="/category/kitchen-utensils"
+                           class="inline-flex items-center justify-center gap-2 h-12 px-8 bg-accent text-white font-extrabold text-sm rounded-xl hover:bg-accent-dark active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg">
+                            Shop Kitchen Utensils
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Visual side -->
+                <div class="w-full md:w-1/2 relative min-h-[200px] md:min-h-[280px] overflow-hidden flex items-center justify-center">
+                    <img src="/images/promo-kitchen.jpg" alt="Kitchen promotion"
+                         class="absolute inset-0 w-full h-full object-cover"
+                         loading="lazy"
+                         onerror="this.style.display='none'" />
+                    <!-- Emoji fallback when no image -->
+                    <div class="relative z-0 text-center py-8 md:py-0">
+                        <div class="text-8xl mb-2 drop-shadow-sm select-none">🍳</div>
+                        <p class="text-brand font-bold text-base opacity-50">Kitchen Collection</p>
+                    </div>
+                    <!-- Floating price tag -->
+                    <div class="absolute top-5 right-5 z-10 bg-white rounded-2xl shadow-xl p-4 text-center border border-gray-100 min-w-[90px]">
+                        <p class="text-gray-400 line-through text-xs font-semibold leading-none">₦20,000</p>
+                        <p class="text-accent font-extrabold text-2xl leading-tight mt-0.5">₦10,000</p>
+                        <span class="inline-block mt-1 bg-green-100 text-green-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">Save 50%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     BEST SELLERS
+════════════════════════════════════════════════ -->
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <p class="text-brand text-xs font-extrabold uppercase tracking-widest mb-1.5 flex items-center gap-1"><span>⭐</span> Top Weekly</p>
+                <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900">Best Sellers</h2>
+            </div>
+            <a href="/store" class="hidden sm:inline-flex items-center gap-1.5 text-brand font-semibold text-sm group hover:gap-3 transition-all duration-200">
+                View All
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                @for (int i = 0; i < 4; i++)
+                {
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="skeleton aspect-square w-full"></div>
+                        <div class="p-4 space-y-2.5">
+                            <div class="skeleton h-3 w-1/3 rounded-full"></div>
+                            <div class="skeleton h-4 w-3/4 rounded-md"></div>
+                            <div class="skeleton h-4 w-1/2 rounded-md"></div>
+                            <div class="skeleton h-10 w-full rounded-xl mt-3"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else if (bestSellers.Any())
+        {
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                @foreach (var product in bestSellers.Take(4))
+                {
+                    <VictoriaStores.Frontend.Components.ProductCard Product="product" />
+                }
+            </div>
+            <div class="mt-8 text-center sm:hidden">
+                <a href="/store" class="inline-flex items-center justify-center gap-2 h-11 px-8 bg-brand text-white font-bold text-sm rounded-xl shadow-sm">
+                    View All Products
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                 </a>
             </div>
-            <div class="w-full md:w-1/2 bg-brand/5 h-64 md:h-full relative">
-                <div class="absolute inset-0 flex items-center justify-center text-brand/20">
-                    <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" /></svg>
-                </div>
-            </div>
-        </div>
+        }
+        else
+        {
+            <p class="text-center text-gray-400 py-12">Products are being added — check back soon!</p>
+        }
     </div>
 </section>
 
-<section class="py-16 bg-white border-t border-gray-100">
+<!-- ═══════════════════════════════════════════════
+     HOW TO ORDER
+════════════════════════════════════════════════ -->
+<section class="py-16 bg-gray-50 border-y border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="text-center p-6 rounded-xl hover:shadow-md transition-shadow duration-200 border border-transparent hover:border-gray-100">
-                <div class="w-16 h-16 bg-brand-light text-brand rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                </div>
-                <h3 class="font-bold text-gray-900 mb-2">Trusted Quality</h3>
-                <p class="text-sm text-gray-500">Premium products verified before shipping.</p>
+        <div class="text-center mb-12">
+            <p class="text-brand text-xs font-extrabold uppercase tracking-widest mb-2">Simple Process</p>
+            <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900">How to Order</h2>
+        </div>
+
+        <div class="relative">
+            <!-- Connecting dotted line (desktop only) -->
+            <div class="hidden lg:block absolute top-10 left-[calc(12.5%-8px)] right-[calc(12.5%-8px)] h-px pointer-events-none z-0"
+                 style="background-image:repeating-linear-gradient(90deg,#1A56DB 0,#1A56DB 10px,transparent 10px,transparent 20px);opacity:0.25">
             </div>
-            <div class="text-center p-6 rounded-xl hover:shadow-md transition-shadow duration-200 border border-transparent hover:border-gray-100">
-                <div class="w-16 h-16 bg-brand-light text-brand rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
-                </div>
-                <h3 class="font-bold text-gray-900 mb-2">Nationwide Delivery</h3>
-                <p class="text-sm text-gray-500">Fast logistics to anywhere in Nigeria.</p>
-            </div>
-            <div class="text-center p-6 rounded-xl hover:shadow-md transition-shadow duration-200 border border-transparent hover:border-gray-100">
-                <div class="w-16 h-16 bg-brand-light text-brand rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                </div>
-                <h3 class="font-bold text-gray-900 mb-2">WhatsApp Support</h3>
-                <p class="text-sm text-gray-500">Real-time human assistance 12 hours a day.</p>
-            </div>
-            <div class="text-center p-6 rounded-xl hover:shadow-md transition-shadow duration-200 border border-transparent hover:border-gray-100">
-                <div class="w-16 h-16 bg-brand-light text-brand rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                </div>
-                <h3 class="font-bold text-gray-900 mb-2">Easy Bank Transfer</h3>
-                <p class="text-sm text-gray-500">Secure checkout via direct local transfers.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 relative z-10">
+                @foreach (var step in _orderSteps)
+                {
+                    <div class="text-center group cursor-default">
+                        <div class="relative inline-flex mb-5">
+                            <div class="w-20 h-20 rounded-2xl bg-white border-2 border-gray-200 flex items-center justify-center mx-auto shadow-sm
+                                        group-hover:border-brand group-hover:shadow-md group-hover:bg-brand-light transition-all duration-300">
+                                <span class="text-3xl select-none" aria-hidden="true">@step.Icon</span>
+                            </div>
+                            <span class="absolute -top-2.5 -right-2.5 w-6 h-6 bg-brand text-white text-xs font-extrabold rounded-full flex items-center justify-center shadow-sm ring-2 ring-white">
+                                @step.Number
+                            </span>
+                        </div>
+                        <h3 class="font-bold text-gray-900 mb-2 text-[15px] group-hover:text-brand transition-colors duration-200">@step.Title</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed max-w-[200px] mx-auto">@step.Description</p>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </section>
 
-<section class="bg-gradient-to-r from-green-600 to-green-700 py-16">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-        <h2 class="font-serif text-3xl font-bold text-white mb-4">Get exclusive deals on WhatsApp!</h2>
-        <p class="text-green-100 mb-8">Join our WhatsApp broadcast for flash sales and new arrivals.</p>
-        <a href="https://wa.me/2348162809886" class="inline-flex items-center justify-center gap-3 h-14 px-8 bg-transparent text-white font-bold text-base rounded-full border-2 border-white hover:bg-white hover:text-green-700 active:scale-95 transition-all">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.183-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.765-5.77z..." /></svg>
-            Chat on WhatsApp
-        </a>
+<!-- ═══════════════════════════════════════════════
+     WHY CHOOSE US
+════════════════════════════════════════════════ -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <p class="text-brand text-xs font-extrabold uppercase tracking-widest mb-2">Why Victoria James</p>
+            <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900">Your Trusted Nigerian Store</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            @foreach (var v in _whyChooseUs)
+            {
+                <div class="group p-6 rounded-2xl border border-gray-100 bg-white
+                            hover:border-brand/25 hover:shadow-lg hover:bg-brand-light/20 transition-all duration-300 cursor-default">
+                    <div class="w-12 h-12 @v.IconBg rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        @((MarkupString)v.IconSvg)
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-2 text-[15px] group-hover:text-brand transition-colors duration-200">@v.Title</h3>
+                    <p class="text-sm text-gray-500 leading-relaxed">@v.Description</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     WHATSAPP CTA
+════════════════════════════════════════════════ -->
+<section class="relative overflow-hidden py-16 bg-gradient-to-br from-green-700 via-green-600 to-emerald-500">
+    <!-- Dot pattern -->
+    <div class="absolute inset-0 pointer-events-none"
+         style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,0.07) 1px,transparent 0);background-size:24px 24px;">
+    </div>
+    <!-- Blur bubbles -->
+    <div class="absolute top-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl -translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+    <div class="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-2xl translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
+        <!-- Icon block -->
+        <div class="w-16 h-16 bg-white/15 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/20 shadow-lg">
+            <svg class="w-9 h-9 text-white" fill="currentColor" viewBox="0 0 24 24" aria-label="WhatsApp">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+        </div>
+
+        <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
+            Get Exclusive Deals on WhatsApp!
+        </h2>
+        <p class="text-green-100 text-base mb-8 max-w-lg mx-auto leading-relaxed">
+            Join our WhatsApp broadcast and be the first to know about flash sales, new arrivals, and exclusive offers.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="https://wa.me/2348162809886?text=Hi%20Victoria%20James%20Store!%20I%27d%20like%20to%20join%20your%20deals%20broadcast."
+               target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center justify-center gap-3 h-14 px-10
+                      bg-white text-green-700 font-extrabold text-base rounded-2xl
+                      hover:bg-green-50 active:scale-95 transition-all duration-200 shadow-xl hover:shadow-2xl">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                Join WhatsApp Broadcast
+            </a>
+            <a href="/store"
+               class="inline-flex items-center justify-center gap-2 h-14 px-8
+                      bg-white/10 backdrop-blur-sm text-white font-bold text-base rounded-2xl
+                      border-2 border-white/30 hover:bg-white/20 hover:border-white/60 active:scale-95 transition-all duration-200">
+                Browse Products
+            </a>
+        </div>
     </div>
 </section>
 
 @code {
+    // ── State ──────────────────────────────────────────────────────
     private bool isLoading = true;
+    private bool categoriesLoading = true;
     private List<ProductDto> newArrivals = new();
+    private List<ProductDto> bestSellers = new();
     private List<CategoryDto> featuredCategories = new();
 
+    // ── Static data ────────────────────────────────────────────────
+    private static readonly (string name, string slug, string emoji, string from, string to)[] _defaultCategories =
+    {
+        ("Household Items",    "household-items",    "🏠", "from-blue-50",   "to-blue-100"),
+        ("Kitchen Utensils",   "kitchen-utensils",   "🍳", "from-orange-50", "to-orange-100"),
+        ("Fashion & Giftpacks","fashion-giftpacks",  "👗", "from-pink-50",   "to-pink-100"),
+        ("Accessories",        "accessories",         "💍", "from-purple-50", "to-purple-100"),
+    };
+
+    private static readonly (int Number, string Icon, string Title, string Description)[] _orderSteps =
+    {
+        (1, "🛍️", "Browse & Choose",    "Explore our categories and find the products you love."),
+        (2, "📋", "Place Your Order",   "Fill in your details at checkout — takes under 2 minutes."),
+        (3, "🏦", "Make Bank Transfer", "Transfer the total to our bank account shown at checkout."),
+        (4, "🚚", "We Deliver to You",  "We confirm via WhatsApp and deliver right to your door."),
+    };
+
+    private static readonly (string Title, string Description, string IconBg, string IconSvg)[] _whyChooseUs =
+    {
+        (
+            "Trusted Quality",
+            "Every product is verified for quality before it reaches your doorstep.",
+            "bg-blue-50",
+            "<svg class=\"w-6 h-6 text-brand\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z\"/></svg>"
+        ),
+        (
+            "Nationwide Delivery",
+            "Fast, reliable logistics to anywhere across Nigeria.",
+            "bg-green-50",
+            "<svg class=\"w-6 h-6 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4\"/></svg>"
+        ),
+        (
+            "WhatsApp Support",
+            "Real-time human support on WhatsApp, available 12 hours a day.",
+            "bg-emerald-50",
+            "<svg class=\"w-6 h-6 text-emerald-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z\"/></svg>"
+        ),
+        (
+            "Easy Bank Transfer",
+            "Simple, secure checkout via direct local bank transfers. No card needed.",
+            "bg-amber-50",
+            "<svg class=\"w-6 h-6 text-amber-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z\"/></svg>"
+        ),
+    };
+
+    // ── Lifecycle ──────────────────────────────────────────────────
     protected override async Task OnInitializedAsync()
+    {
+        // Parallel fetch for faster initial load
+        await Task.WhenAll(LoadCategoriesAsync(), LoadProductsAsync());
+    }
+
+    private async Task LoadCategoriesAsync()
+    {
+        try
+        {
+            categoriesLoading = true;
+            featuredCategories = await Http.GetFromJsonAsync<List<CategoryDto>>("api/category") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Home] Categories load error: {ex.Message}");
+            featuredCategories = new(); // fall through to default cards
+        }
+        finally
+        {
+            categoriesLoading = false;
+        }
+    }
+
+    private async Task LoadProductsAsync()
     {
         try
         {
             isLoading = true;
-            // Fetch categories
-            featuredCategories = await Http.GetFromJsonAsync<List<CategoryDto>>("api/category") ?? new();
+            var all = await ProductApi.GetActiveProductsAsync() ?? new();
+            // Sort by CreatedAt if available, otherwise fall back to Id ordering
+            newArrivals = all
+                .OrderByDescending(p => p.CreatedAt != default ? (object)p.CreatedAt : p.Id)
+                .ToList();
             
-            // Fetch active products
-            var allProducts = await ProductApi.GetActiveProductsAsync() ?? new();
-            
-            // Order by newest for the "New Arrivals" section
-            newArrivals = allProducts.OrderByDescending(p => p.Id).ToList(); // Assuming ID sequential or use CreatedAt if in Dto
+            // For now, pseudo-randomize or sort differently to simulate best sellers
+            bestSellers = all
+                .OrderBy(p => p.Name) 
+                .ToList();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading homepage data: {ex.Message}");
+            Console.WriteLine($"[Home] Products load error: {ex.Message}");
+            newArrivals = new();
         }
         finally
         {

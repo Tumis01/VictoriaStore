@@ -1,8 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Victoria James Store — Your trusted Nigerian store for affordable household items, kitchen utensils, fashion, accessories, and beauty products. Fast nationwide delivery." />
     <base href="/" />
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
@@ -10,37 +11,38 @@
     <link rel="stylesheet" href="@Assets["VictoriaStores.Frontend.styles.css"]" />
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
-    
+
+    <!-- Google Fonts: Nunito Sans (body) + Playfair Display (headings) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800;900&family=Playfair+Display:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
     <HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)" />
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-        corePlugins: {
-        preflight: false,
-        }
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { DEFAULT: '#1A56DB', dark: '#1E40AF', light: '#EFF6FF' },
+                        accent: { DEFAULT: '#F97316', dark: '#EA580C', light: '#FFF7ED' },
+                    },
+                    fontFamily: {
+                        sans: ['Nunito Sans', 'system-ui', 'sans-serif'],
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                    },
+                }
+            },
+            corePlugins: {
+                preflight: false,
+            }
         }
     </script>
 </head>
-<body>
+<body class="font-sans antialiased text-gray-900">
     <Routes @rendermode="new InteractiveServerRenderMode(prerender: false)" />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-        theme: {
-        extend: {
-        colors: {
-        brand: { DEFAULT: '#1A56DB', dark: '#1E40AF', light: '#EFF6FF' },
-        accent: { DEFAULT: '#F97316', dark: '#EA580C', light: '#FFF7ED' },
-        }
-        }
-        },
-        corePlugins: {
-        preflight: false,
-        }
-        }
-    </script>
 </body>
 </html>

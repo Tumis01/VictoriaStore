@@ -1,0 +1,51 @@
+<div class="fixed inset-0 z-[100] flex items-center justify-center @(IsVisible ? "" : "hidden")">
+    <div class="fixed inset-0 bg-black/40 transition-opacity" @onclick="Cancel"></div>
+    <div class="relative bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm mx-4 animate-scale-in">
+        <h2 class="text-xl font-bold text-gray-900 mb-2">@Title</h2>
+        <p class="text-sm text-gray-500 mb-6">@Message</p>
+        <div class="flex items-center justify-end gap-3">
+            <button @onclick="Cancel" class="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+            <button @onclick="Confirm" class="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm transition-colors">@ConfirmText</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Confirm Action";
+    [Parameter] public string Message { get; set; } = "Are you sure you want to proceed?";
+    [Parameter] public string ConfirmText { get; set; } = "Confirm";
+    
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    public bool IsVisible { get; private set; } = false;
+
+    public void Show(string title = "Confirm Action", string message = "Are you sure?", string confirmText = "Confirm")
+    {
+        Title = title;
+        Message = message;
+        ConfirmText = confirmText;
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void Hide()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+    private async Task Confirm()
+    {
+        Hide();
+        if (OnConfirm.HasDelegate)
+            await OnConfirm.InvokeAsync();
+    }
+
+    private async Task Cancel()
+    {
+        Hide();
+        if (OnCancel.HasDelegate)
+            await OnCancel.InvokeAsync();
+    }
+}

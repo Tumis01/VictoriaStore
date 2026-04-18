@@ -1,4 +1,4 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @inject NavigationManager NavManager
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @using Microsoft.AspNetCore.Components.Authorization
@@ -12,7 +12,8 @@
         </div>
     }
 
-    <header class="sticky top-0 z-40 shadow-sm w-full">
+    <header class="sticky top-0 z-40 shadow-sm w-full bg-white">
+        <!-- Desktop Utility Bar -->
         <div class="hidden md:flex justify-between items-center bg-gray-900 text-gray-400 text-xs py-1.5 px-6">
             <div class="flex gap-4">
                 <a href="/about" class="hover:text-white transition-colors">About Us</a>
@@ -22,29 +23,39 @@
             <div>Welcome to Victoria James Store</div>
         </div>
 
+        <!-- Main Header Row -->
         <div class="bg-white border-b border-gray-100 py-4 px-4 sm:px-6 flex justify-between items-center gap-4 lg:gap-8">
-            <a href="/" class="flex items-center gap-2 flex-shrink-0">
-                <div class="bg-brand rounded-lg w-10 h-10 text-white font-black text-xl flex items-center justify-center">VJ</div>
-                <div class="hidden sm:block">
-                    <div class="font-serif font-bold text-gray-900 leading-tight">Victoria James</div>
-                    <div class="text-brand text-sm font-semibold leading-tight">Store</div>
-                </div>
-            </a>
+            <div class="flex items-center gap-3">
+                <!-- Mobile hamburger -->
+                <button class="lg:hidden text-gray-600 hover:text-brand" @onclick="ToggleMobileDrawer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <a href="/" class="flex items-center gap-2 flex-shrink-0">
+                    <div class="bg-brand rounded-lg w-10 h-10 text-white font-black text-xl flex items-center justify-center">VJ</div>
+                    <div class="hidden sm:block">
+                        <div class="font-serif font-bold text-gray-900 leading-tight">Victoria James</div>
+                        <div class="text-brand text-sm font-semibold leading-tight">Store</div>
+                    </div>
+                </a>
+            </div>
 
+            <!-- Desktop Search -->
             <div class="hidden lg:flex flex-1 max-w-xl relative">
-                <select class="absolute left-0 top-0 h-11 bg-gray-50 border border-r-0 border-gray-300 rounded-l-lg text-sm px-3 text-gray-600 focus:outline-none">
-                    <option>All</option>
-                    <option>Household</option>
-                    <option>Kitchen</option>
-                    <option>Fashion</option>
+                <select @bind="searchCategory" class="absolute left-0 top-0 h-11 bg-gray-50 border border-r-0 border-gray-300 rounded-l-lg text-sm px-3 text-gray-600 focus:outline-none">
+                    <option value="All">All</option>
+                    <option value="Household">Household</option>
+                    <option value="Kitchen">Kitchen</option>
+                    <option value="Fashion">Fashion</option>
                 </select>
-                <input type="search" placeholder="Search for products..." class="h-11 w-full pl-28 pr-12 rounded-lg border border-gray-300 text-sm focus:outline-none focus:border-brand" />
-                <button class="absolute right-0 top-0 h-11 px-4 bg-brand text-white rounded-r-lg hover:bg-brand-dark transition-colors">
+                <input type="search" @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearchKey" placeholder="Search for products..." class="h-11 w-full pl-36 pr-12 rounded-lg border border-gray-300 text-sm focus:outline-none focus:border-brand" />
+                <button @onclick="PerformSearch" class="absolute right-0 top-0 h-11 px-4 bg-brand text-white rounded-r-lg hover:bg-brand-dark transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </button>
             </div>
 
+            <!-- Icons -->
             <div class="flex items-center gap-4 sm:gap-6">
+                <!-- WhatsApp Desktop -->
                 <a href="https://wa.me/2348162809886" target="_blank" class="hidden sm:flex text-green-500 hover:text-green-600 transition-colors">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.183-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.765-5.77zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824zm-3.423-14.416c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm.029 18.88c-1.161 0-2.305-.292-3.318-.844l-3.677.964.984-3.595c-.607-1.052-.927-2.246-.926-3.468.001-3.825 3.113-6.937 6.937-6.937 3.825 0 6.938 3.112 6.938 6.937 0 3.825-3.113 6.938-6.938 6.938z" /></svg>
                 </a>
@@ -72,13 +83,82 @@
             </div>
         </div>
 
+        <!-- Mobile Search Bar -->
+        <div class="lg:hidden p-3 bg-white border-b border-gray-100">
+            <div class="relative w-full">
+                <input type="search" @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearchKey" placeholder="Search for products..." class="h-11 w-full pl-10 pr-4 rounded-lg border border-gray-300 text-sm focus:outline-none focus:border-brand" />
+                <span class="absolute left-3 top-3 text-gray-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </span>
+            </div>
+        </div>
+
+        <!-- Desktop Category Nav & Mega Menu -->
         <div class="hidden lg:block bg-white border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+            <div class="max-w-7xl mx-auto px-6 flex items-center justify-between relative">
                 <div class="flex items-center gap-6 text-sm font-bold text-gray-700">
-                    <button class="flex items-center gap-2 bg-brand text-white px-5 py-3 hover:bg-brand-dark transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                        All Categories
-                    </button>
+                    <div class="relative" @onfocusout="HandleFocusOut">
+                        <button @onclick="ToggleMegaMenu" class="flex items-center gap-2 bg-brand text-white px-5 py-3 hover:bg-brand-dark transition-colors focus:outline-none">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                            All Categories
+                        </button>
+
+                        @if (isMegaMenuOpen)
+                        {
+                            <!-- Mega Menu Dropdown -->
+                            <div class="absolute top-full left-0 w-[600px] bg-white border border-gray-200 shadow-xl rounded-b-xl z-50 flex overflow-hidden -mt-px outline-none" tabindex="-1">
+                                <div class="w-1/2 border-r border-gray-100">
+                                    <ul class="py-2">
+                                        <li>
+                                            <a href="/category/household" class="flex items-center justify-between px-6 py-3 hover:bg-brand-light hover:text-brand transition-colors group">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="text-xl">🏠</span>
+                                                    <span class="font-semibold text-gray-800 group-hover:text-brand">Household Items</span>
+                                                </div>
+                                                <svg class="w-4 h-4 text-gray-400 group-hover:text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="/category/kitchen" class="flex items-center justify-between px-6 py-3 hover:bg-brand-light hover:text-brand transition-colors group">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="text-xl">🍳</span>
+                                                    <span class="font-semibold text-gray-800 group-hover:text-brand">Kitchen Utensils</span>
+                                                </div>
+                                                <svg class="w-4 h-4 text-gray-400 group-hover:text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="/category/fashion" class="flex items-center justify-between px-6 py-3 hover:bg-brand-light hover:text-brand transition-colors group">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="text-xl">👗</span>
+                                                    <span class="font-semibold text-gray-800 group-hover:text-brand">Fashion & Giftpacks</span>
+                                                </div>
+                                                <svg class="w-4 h-4 text-gray-400 group-hover:text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="/category/accessories" class="flex items-center justify-between px-6 py-3 hover:bg-brand-light hover:text-brand transition-colors group">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="text-xl">💍</span>
+                                                    <span class="font-semibold text-gray-800 group-hover:text-brand">Accessories</span>
+                                                </div>
+                                                <svg class="w-4 h-4 text-gray-400 group-hover:text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="w-1/2 p-6 bg-gray-50 flex items-center justify-center">
+                                    <div class="text-center w-full">
+                                        <div class="bg-gray-200 w-full aspect-[4/3] rounded-xl flex items-center justify-center mb-4">
+                                            <span class="text-gray-400 font-semibold p-4">Featured Image</span>
+                                        </div>
+                                        <a href="/deals" class="inline-block bg-accent text-white px-4 py-2 rounded font-bold text-sm hover:bg-accent-dark transition-colors">Shop Deals</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
                     <a href="/" class="hover:text-brand transition-colors">Home</a>
                     <a href="/category/household" class="hover:text-brand transition-colors">Household Items</a>
                     <a href="/category/kitchen" class="hover:text-brand transition-colors">Kitchen Utensils</a>
@@ -91,6 +171,65 @@
             </div>
         </div>
     </header>
+
+    <!-- Mobile Drawer Overlay -->
+    @if (isMobileDrawerOpen)
+    {
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 transition-opacity" @onclick="ToggleMobileDrawer"></div>
+        
+        <!-- Mobile Drawer Sidebar -->
+        <div class="fixed inset-y-0 left-0 max-w-xs w-full bg-white z-50 shadow-2xl flex flex-col transform transition-transform">
+            <div class="flex items-center justify-between p-4 border-b border-gray-100">
+                <a href="/" class="flex items-center gap-2" @onclick="ToggleMobileDrawer">
+                    <div class="bg-brand rounded-lg w-8 h-8 text-white font-black text-lg flex items-center justify-center">VJ</div>
+                    <div>
+                        <div class="font-serif font-bold text-gray-900 text-sm leading-tight">Victoria James</div>
+                    </div>
+                </a>
+                <button @onclick="ToggleMobileDrawer" class="p-2 text-gray-400 hover:text-gray-600 bg-gray-50 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="overflow-y-auto flex-1 py-4">
+                <ul class="px-2 space-y-1">
+                    <li>
+                        <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-brand-light hover:text-brand font-semibold text-gray-700" @onclick="ToggleMobileDrawer">
+                            <span class="text-lg">🏠</span> Home
+                        </a>
+                    </li>
+                    <li class="px-4 py-2 mt-4 mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Categories</li>
+                    <li>
+                        <a href="/category/household" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-brand-light hover:text-brand font-semibold text-gray-700" @onclick="ToggleMobileDrawer">
+                            <span class="text-lg">🚪</span> Household Items
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/category/kitchen" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-brand-light hover:text-brand font-semibold text-gray-700" @onclick="ToggleMobileDrawer">
+                            <span class="text-lg">🍳</span> Kitchen Utensils
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/category/fashion" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-brand-light hover:text-brand font-semibold text-gray-700" @onclick="ToggleMobileDrawer">
+                            <span class="text-lg">👗</span> Fashion
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/category/accessories" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-brand-light hover:text-brand font-semibold text-gray-700" @onclick="ToggleMobileDrawer">
+                            <span class="text-lg">💍</span> Accessories
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="border-t border-gray-100 p-4 bg-gray-50">
+                <a href="https://wa.me/2348162809886" class="flex items-center justify-center gap-2 w-full py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-5.768 0-5.768 5.766 0 5.766s5.768-5.766 0-5.766zm-5.768 5.766c0-3.18 2.587-5.766 5.768-5.766 3.181 0 5.768 2.586 5.768 5.766 0 3.18-2.587 5.766-5.768 5.766-3.181 0-5.768-2.586-5.768-5.766z" /></svg>
+                    WhatsApp Support
+                </a>
+            </div>
+        </div>
+    }
 
     <main class="flex-1">
         @Body
@@ -105,7 +244,7 @@
                         <div class="font-serif font-bold text-gray-900">Victoria James</div>
                     </div>
                     <p class="text-sm text-gray-500 mb-6 leading-relaxed">Quality products delivered to your doorstep across Nigeria.</p>
-                    <a href="https://wa.me/2348162809886" class="inline-flex items-center gap-2 text-sm font-bold text-green-600 bg-green-50 px-4 py-2 rounded-lg hover:bg-green-100 transition-colors">
+                    <a href="https://wa.me/2348162809886" target="_blank" class="inline-flex items-center gap-2 text-sm font-bold text-green-600 bg-green-50 px-4 py-2 rounded-lg hover:bg-green-100 transition-colors">
                         Chat on WhatsApp
                     </a>
                 </div>
@@ -148,6 +287,7 @@
         </div>
     </footer>
 
+    <!-- Floating WhatsApp Button -->
     <a href="https://wa.me/2348162809886" target="_blank" class="fixed bottom-6 right-6 z-50 group">
         <div class="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-30"></div>
         <div class="relative w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-200">
@@ -156,12 +296,17 @@
     </a>
 </div>
 
+<ToastContainer />
+
 @code {
     private bool showAnnouncement = true;
+    private bool isMegaMenuOpen = false;
+    private bool isMobileDrawerOpen = false;
+    private string searchQuery = "";
+    private string searchCategory = "All";
 
     protected override async Task OnInitializedAsync()
     {
-        // Check if user dismissed the bar previously
         var dismissed = await LocalStorage.GetItemAsync<bool>("hideAnnouncement");
         showAnnouncement = !dismissed;
     }
@@ -170,5 +315,47 @@
     {
         showAnnouncement = false;
         await LocalStorage.SetItemAsync("hideAnnouncement", true);
+    }
+
+    private void ToggleMegaMenu()
+    {
+        isMegaMenuOpen = !isMegaMenuOpen;
+    }
+
+    private void HandleFocusOut(FocusEventArgs e)
+    {
+        Task.Delay(150).ContinueWith(_ => {
+            if (isMegaMenuOpen) {
+                isMegaMenuOpen = false;
+                InvokeAsync(StateHasChanged);
+            }
+        });
+    }
+
+    private void ToggleMobileDrawer()
+    {
+        isMobileDrawerOpen = !isMobileDrawerOpen;
+    }
+
+    private void HandleSearchKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            PerformSearch();
+        }
+    }
+
+    private void PerformSearch()
+    {
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            var url = $"/search?q={Uri.EscapeDataString(searchQuery)}";
+            if (searchCategory != "All")
+            {
+                url += $"&cat={searchCategory}";
+            }
+            NavManager.NavigateTo(url);
+            isMobileDrawerOpen = false;
+        }
     }
 }

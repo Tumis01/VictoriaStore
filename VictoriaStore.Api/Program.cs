@@ -80,11 +80,18 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+// Serve uploaded images from /uploads directory
+var uploadsPath = Path.Combine(app.Environment.WebRootPath ?? "wwwroot", "uploads");
+if (!Directory.Exists(uploadsPath)) Directory.CreateDirectory(uploadsPath);
+
 app.UseCors("AllowBlazorFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Seed roles, admin user, and sample data on first run
+await SeedData.InitializeAsync(app.Services);
 
 app.Run();
