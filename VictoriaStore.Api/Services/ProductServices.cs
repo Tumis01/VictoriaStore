@@ -12,6 +12,7 @@ public interface IProductService
     Task<ProductDto?> GetByIdAsync(Guid id);
     Task<ProductDto> CreateAsync(CreateProductRequest request);
     Task<bool> SoftDeleteAsync(Guid id);
+    Task<ProductDto> UpdateAsync(Guid id, CreateProductRequest request);
 }
 
 public class ProductService : IProductService
@@ -68,10 +69,10 @@ public class ProductService : IProductService
             StockQuantity = request.StockQuantity,
             CategoryId = request.CategoryId,
             IsActive = request.IsActive,
+            Colors = request.Colors ?? new List<string>(), // Add colors
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-
         if (request.Images != null && request.Images.Any())
         {
             var uploadsFolder = Path.Combine(
@@ -119,7 +120,62 @@ public class ProductService : IProductService
 
         return await GetByIdAsync(product.Id) ?? throw new Exception("Failed to retrieve created product.");
     }
+    public async Task<ProductDto> UpdateAsync(Guid id, CreateProductRequest request)
+    {
+        // 1. Fetch the existing product directly from the database (EF starts tracking it here)
+        var product = await _context.Products
+            .Include(p => p.Images)
+            .FirstOrDefaultAsync(p => p.Id == id);
 
+        if (product == null || product.IsDeleted)
+            throw new Exception("Product not found.");
+
+        // 2. Update ONLY the scalar properties (EF automatically notices these changes)
+        product.Name = request.Name;
+        product.Slug = request.Slug;
+        product.Description = request.Description;
+        product.Price = request.Price;
+        product.SalePrice = request.SalePrice;
+        product.SKU = request.SKU;
+        product.StockQuantity = request.StockQuantity;
+        product.CategoryId = request.CategoryId;
+        product.IsActive = request.IsActive;
+        product.Colors = request.Colors ?? new List<string>();
+        product.UpdatedAt = DateTime.UtcNow;
+
+        // 3. Handle Images IF new ones are uploaded
+        if (request.Images != null && request.Images.Any())
+        {
+            var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "images", "products");
+            Directory.CreateDirectory(uploadsFolder);
+
+            int displayOrder = product.Images.Count + 1;
+
+            foreach (var file in request.Images)
+            {
+                if (file.Length <= 0) continue;
+
+                var uniqueFileName = $"{Guid.NewGuid():N}{Path.GetExtension(file.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                await using var fileStream = new FileStream(filePath, FileMode.Create);
+                await file.CopyToAsync(fileStream);
+
+                product.Images.Add(new ProductImage
+                {
+                    ImageUrl = $"/images/products/{uniqueFileName}",
+                    DisplayOrder = displayOrder,
+                    IsMain = !product.Images.Any() // Make main if it's the very first image
+                });
+                displayOrder++;
+            }
+        }
+
+        // 4. Save changes directly. We DO NOT call _context.Products.Update() here!
+        await _context.SaveChangesAsync();
+
+        return await GetByIdAsync(product.Id) ?? throw new Exception("Failed to update product.");
+    }
     public async Task<bool> SoftDeleteAsync(Guid id)
     {
         var product = await _context.Products.FindAsync(id);

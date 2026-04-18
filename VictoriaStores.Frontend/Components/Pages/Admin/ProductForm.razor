@@ -42,6 +42,7 @@ else
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Product Name <span class="text-red-500">*</span></label>
                         <InputText @bind-Value="productModel.Name" class="h-11 w-full px-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-colors" placeholder="e.g. Premium Non-Stick Frying Pan" />
+                        <ValidationMessage For="@(() => productModel.Name)" class="text-xs text-red-500 mt-1" />
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -59,32 +60,30 @@ else
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
                         <InputTextArea @bind-Value="productModel.Description" rows="5" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-colors" placeholder="Detailed product description..."></InputTextArea>
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Available Colors</label>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach (var color in predefinedColors)
+                            {
+                                <button type="button" @onclick="() => ToggleColor(color)" class="@(productModel.Colors.Contains(color) ? "bg-brand text-white border-brand" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50") px-4 py-1.5 rounded-full border text-sm font-semibold transition-colors shadow-sm">
+                                    @color
+                                </button>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h3 class="text-lg font-bold text-gray-900 font-serif mb-4">Media</h3>
-
                 <label for="product-images" class="block border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer">
                     <div class="mx-auto w-12 h-12 bg-brand-light text-brand rounded-full flex items-center justify-center mb-3">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
                     <p class="text-sm font-bold text-brand">Click to upload <span class="text-gray-500 font-normal">product image(s)</span></p>
-                    <p class="text-xs text-gray-400 mt-1">PNG, JPG, JPEG, WEBP, GIF or SVG. Images are saved to `wwwroot/images/products`.</p>
                 </label>
-
                 <InputFile id="product-images" OnChange="HandleFilesSelected" accept="image/*" multiple class="hidden" />
-
-                @if (selectedFiles.Any())
-                {
-                    <div class="mt-4 rounded-lg bg-gray-50 border border-gray-200 p-4">
-                        <p class="text-sm font-semibold text-gray-700 mb-2">Selected files</p>
-                        @foreach (var file in selectedFiles)
-                        {
-                            <div class="text-sm text-gray-600">@file.Name (@(file.Size / 1024) KB)</div>
-                        }
-                    </div>
-                }
 
                 @if (!string.IsNullOrWhiteSpace(productModel.MainImageUrl))
                 {
@@ -99,11 +98,11 @@ else
         <div class="space-y-6">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h3 class="text-lg font-bold text-gray-900 font-serif mb-4">Pricing</h3>
-
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Regular Price (₦) <span class="text-red-500">*</span></label>
                         <InputNumber @bind-Value="productModel.Price" class="h-11 w-full px-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand outline-none" />
+                        <ValidationMessage For="@(() => productModel.Price)" class="text-xs text-red-500 mt-1" />
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Sale Price (₦)</label>
@@ -114,7 +113,6 @@ else
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h3 class="text-lg font-bold text-gray-900 font-serif mb-4">Organization</h3>
-
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Category <span class="text-red-500">*</span></label>
@@ -125,13 +123,13 @@ else
                                 <option value="@cat.Id">@cat.Name</option>
                             }
                         </InputSelect>
+                        <ValidationMessage For="@(() => productModel.CategoryId)" class="text-xs text-red-500 mt-1" />
                     </div>
-
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Stock Quantity <span class="text-red-500">*</span></label>
                         <InputNumber @bind-Value="productModel.StockQuantity" class="h-11 w-full px-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand outline-none" />
+                        <ValidationMessage For="@(() => productModel.StockQuantity)" class="text-xs text-red-500 mt-1" />
                     </div>
-
                     <div class="flex items-center gap-3 pt-2">
                         <InputCheckbox @bind-Value="productModel.IsActive" id="isActive" class="w-5 h-5 text-brand border-gray-300 rounded focus:ring-brand" />
                         <label for="isActive" class="text-sm font-semibold text-gray-700 cursor-pointer">Product is Active</label>
@@ -145,10 +143,7 @@ else
                     <div class="p-3 text-sm text-red-700 bg-red-100 rounded-lg">@errorMessage</div>
                 }
                 <button type="submit" disabled="@isSubmitting" class="h-12 w-full bg-brand text-white font-bold rounded-xl shadow-sm hover:bg-brand-dark transition-colors disabled:bg-gray-400">
-                    @(isSubmitting ? "Saving..." : "Save Product")
-                </button>
-                <button type="button" @onclick='() => NavManager.NavigateTo("/admin/products")' class="h-12 w-full bg-white border border-gray-300 text-gray-700 font-bold rounded-xl shadow-sm hover:bg-gray-50 transition-colors">
-                    Discard Changes
+                    @(isSubmitting ? "Saving..." : (IsEditMode ? "Update Product" : "Save Product"))
                 </button>
             </div>
         </div>
@@ -167,6 +162,9 @@ else
     private List<CategoryDto> categories = new();
     private IReadOnlyList<IBrowserFile> selectedFiles = Array.Empty<IBrowserFile>();
 
+    // Standard list of colors for the admin to choose from
+    private List<string> predefinedColors = new() { "Black", "White", "Red", "Blue", "Green", "Yellow", "Silver", "Gold", "Pink", "Brown", "Grey" };
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -177,19 +175,25 @@ else
             if (IsEditMode)
             {
                 var fetched = await Http.GetFromJsonAsync<ProductDto>($"api/product/{Id}");
-                if (fetched != null)
-                {
-                    productModel = fetched;
-                }
+                if (fetched != null) productModel = fetched;
             }
         }
         catch (Exception ex)
         {
             errorMessage = "Failed to load required data. " + ex.Message;
         }
-        finally
+        finally { isLoading = false; }
+    }
+
+    private void ToggleColor(string color)
+    {
+        if (productModel.Colors.Contains(color))
         {
-            isLoading = false;
+            productModel.Colors.Remove(color);
+        }
+        else
+        {
+            productModel.Colors.Add(color);
         }
     }
 
@@ -201,16 +205,8 @@ else
     private async Task<HttpRequestMessage> CreateAuthorizedRequest(HttpMethod method, string url, HttpContent content)
     {
         var token = await LocalStorage.GetItemAsync<string>("authToken");
-        var request = new HttpRequestMessage(method, url)
-        {
-            Content = content
-        };
-
-        if (!string.IsNullOrWhiteSpace(token))
-        {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        }
-
+        var request = new HttpRequestMessage(method, url) { Content = content };
+        if (!string.IsNullOrWhiteSpace(token)) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return request;
     }
 
@@ -221,31 +217,8 @@ else
 
         try
         {
-            if (IsEditMode)
-            {
-                errorMessage = "Product editing is not wired up on the API yet. This fix covers creating new products with image upload.";
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(productModel.Name))
-            {
-                errorMessage = "Product name is required.";
-                return;
-            }
-
-            if (productModel.CategoryId == Guid.Empty)
-            {
-                errorMessage = "Please select a category.";
-                return;
-            }
-
-            var slug = string.IsNullOrWhiteSpace(productModel.Slug)
-                ? BuildSlug(productModel.Name)
-                : BuildSlug(productModel.Slug);
-
-            var sku = string.IsNullOrWhiteSpace(productModel.SKU)
-                ? $"VJS-{DateTime.UtcNow:yyyyMMddHHmmss}"
-                : productModel.SKU.Trim().ToUpperInvariant();
+            var slug = string.IsNullOrWhiteSpace(productModel.Slug) ? BuildSlug(productModel.Name) : BuildSlug(productModel.Slug);
+            var sku = string.IsNullOrWhiteSpace(productModel.SKU) ? $"VJS-{DateTime.UtcNow:yyyyMMddHHmmss}" : productModel.SKU.Trim().ToUpperInvariant();
 
             using var content = new MultipartFormDataContent
             {
@@ -260,8 +233,12 @@ else
             };
 
             if (productModel.SalePrice.HasValue)
-            {
                 content.Add(new StringContent(productModel.SalePrice.Value.ToString(CultureInfo.InvariantCulture)), "SalePrice");
+
+            // Attach selected colors
+            foreach (var color in productModel.Colors)
+            {
+                content.Add(new StringContent(color), "Colors");
             }
 
             foreach (var file in selectedFiles)
@@ -271,7 +248,11 @@ else
                 content.Add(streamContent, "Images", file.Name);
             }
 
-            using var request = await CreateAuthorizedRequest(HttpMethod.Post, "api/product", content);
+            // Execute PUT for Edit, POST for New
+            HttpMethod method = IsEditMode ? HttpMethod.Put : HttpMethod.Post;
+            string url = IsEditMode ? $"api/product/{Id}" : "api/product";
+
+            using var request = await CreateAuthorizedRequest(method, url, content);
             using var response = await Http.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
@@ -281,47 +262,26 @@ else
             else
             {
                 var body = await response.Content.ReadAsStringAsync();
-                errorMessage = (int)response.StatusCode switch
-                {
-                    401 => "Not authorised. Please log out and log back in.",
-                    403 => "Access denied. Only Super Admin can manage products.",
-                    400 => $"Validation error: {body}",
-                    _ => $"Failed to save product (HTTP {(int)response.StatusCode})."
-                };
+                errorMessage = $"Validation error: {body}";
             }
         }
         catch (Exception ex)
         {
             errorMessage = "An error occurred while saving the product: " + ex.Message;
         }
-        finally
-        {
-            isSubmitting = false;
-        }
+        finally { isSubmitting = false; }
     }
 
     private static string BuildSlug(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            return string.Empty;
-
+        if (string.IsNullOrWhiteSpace(value)) return string.Empty;
         var builder = new StringBuilder();
         var previousDash = false;
-
         foreach (var ch in value.Trim().ToLowerInvariant())
         {
-            if (char.IsLetterOrDigit(ch))
-            {
-                builder.Append(ch);
-                previousDash = false;
-            }
-            else if (!previousDash)
-            {
-                builder.Append('-');
-                previousDash = true;
-            }
+            if (char.IsLetterOrDigit(ch)) { builder.Append(ch); previousDash = false; }
+            else if (!previousDash) { builder.Append('-'); previousDash = true; }
         }
-
         return builder.ToString().Trim('-');
     }
 }

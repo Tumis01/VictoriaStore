@@ -15,7 +15,7 @@
     </div>
     <button @onclick="ToggleAddForm" class="flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
         <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-        Add Category
+        @(showAddForm && editingCategoryId.HasValue ? "Cancel Edit" : "Add Category")
     </button>
 </div>
 
@@ -36,18 +36,19 @@
 @if (showAddForm)
 {
     <div class="mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all">
-        <h3 class="mb-4 text-lg font-medium text-gray-900">Create New Category</h3>
+        <h3 class="mb-4 text-lg font-medium text-gray-900">@(editingCategoryId.HasValue ? "Edit Category" : "Create New Category")</h3>
         <EditForm Model="newCategory" OnValidSubmit="HandleSubmit" class="space-y-4">
             <DataAnnotationsValidator />
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Category Name</label>
-                    <InputText @bind-Value="newCategory.Name" required class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="e.g., Household Items" />
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Category Name <span class="text-red-500">*</span></label>
+                    <InputText @bind-Value="newCategory.Name" class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="e.g., Household Items" />
+                    <ValidationMessage For="@(() => newCategory.Name)" class="text-xs text-red-500 mt-1" />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Description</label>
-                    <InputText @bind-Value="newCategory.Description" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="Short description..." />
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <InputText @bind-Value="newCategory.Description" class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="Short description..." />
                 </div>
             </div>
 
@@ -63,7 +64,7 @@
                     }
                     else
                     {
-                        <span>Save Category</span>
+                        <span>@(editingCategoryId.HasValue ? "Update Category" : "Save Category")</span>
                     }
                 </button>
             </div>
@@ -101,14 +102,10 @@
                     @foreach (var category in categories)
                     {
                         <tr class="border-b bg-white hover:bg-gray-50">
-                            <td class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                                @category.Name
-                            </td>
-                            <td class="px-6 py-4">
-                                @category.Description
-                            </td>
+                            <td class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">@category.Name</td>
+                            <td class="px-6 py-4">@category.Description</td>
                             <td class="px-6 py-4 text-right">
-                                <button class="font-medium text-blue-600 hover:text-blue-800 mr-3">Edit</button>
+                                <button @onclick="() => EditCategory(category)" class="font-medium text-blue-600 hover:text-blue-800 mr-3">Edit</button>
                                 <button @onclick="() => DeleteCategory(category.Id)" class="font-medium text-red-600 hover:text-red-800">Delete</button>
                             </td>
                         </tr>
@@ -123,10 +120,10 @@
     private bool isLoading = true;
     private bool isSubmitting = false;
     private bool showAddForm = false;
+    private Guid? editingCategoryId = null;
 
     private string? errorMessage;
     private string? successMessage;
-
     private List<CategoryDto> categories = new();
     private CreateCategoryRequest newCategory = new();
 
@@ -147,10 +144,7 @@
             errorMessage = "Failed to load categories. Please check your connection.";
             Console.WriteLine(ex.Message);
         }
-        finally
-        {
-            isLoading = false;
-        }
+        finally { isLoading = false; }
     }
 
     private void ToggleAddForm()
@@ -161,25 +155,33 @@
 
         if (!showAddForm)
         {
+            editingCategoryId = null;
             newCategory = new CreateCategoryRequest();
         }
+    }
+
+    private void EditCategory(CategoryDto category)
+    {
+        editingCategoryId = category.Id;
+        newCategory = new CreateCategoryRequest
+        {
+            Name = category.Name,
+            Description = category.Description,
+            Slug = category.Slug,
+            DisplayOrder = category.DisplayOrder,
+            IsActive = category.IsActive
+        };
+        showAddForm = true;
+        errorMessage = null;
+        successMessage = null;
     }
 
     private async Task<HttpRequestMessage> CreateAuthorizedRequest(HttpMethod method, string url, object? body = null)
     {
         var token = await LocalStorage.GetItemAsync<string>("authToken");
         var request = new HttpRequestMessage(method, url);
-
-        if (!string.IsNullOrWhiteSpace(token))
-        {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        }
-
-        if (body is not null)
-        {
-            request.Content = JsonContent.Create(body);
-        }
-
+        if (!string.IsNullOrWhiteSpace(token)) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        if (body is not null) request.Content = JsonContent.Create(body);
         return request;
     }
 
@@ -191,40 +193,30 @@
 
         try
         {
-            var request = await CreateAuthorizedRequest(HttpMethod.Post, "api/category", newCategory);
+            HttpMethod method = editingCategoryId.HasValue ? HttpMethod.Put : HttpMethod.Post;
+            string url = editingCategoryId.HasValue ? $"api/category/{editingCategoryId.Value}" : "api/category";
+            
+            var request = await CreateAuthorizedRequest(method, url, newCategory);
             var response = await Http.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
-                successMessage = "Category added successfully!";
-                newCategory = new CreateCategoryRequest();
-                showAddForm = false;
+                successMessage = editingCategoryId.HasValue ? "Category updated successfully!" : "Category added successfully!";
+                ToggleAddForm(); // Closes form and resets variables
                 await LoadCategories();
             }
             else
             {
                 var body = await response.Content.ReadAsStringAsync();
-
-                errorMessage = (int)response.StatusCode switch
-                {
-                    401 => "Not authorised. Please log out and log back in.",
-                    403 => "Access denied. Only Super Admin can manage categories.",
-                    400 => $"Validation error: {body}",
-                    _ => $"Failed to add category (HTTP {(int)response.StatusCode})."
-                };
-
-                Console.WriteLine($"[Category POST] {(int)response.StatusCode}: {body}");
+                errorMessage = $"Validation error: {body}";
             }
         }
         catch (Exception ex)
         {
             errorMessage = "A network error occurred while saving the category.";
-            Console.WriteLine($"[Category POST] Exception: {ex.Message}");
+            Console.WriteLine(ex.Message);
         }
-        finally
-        {
-            isSubmitting = false;
-        }
+        finally { isSubmitting = false; }
     }
 
     private async Task DeleteCategory(Guid id)
@@ -239,24 +231,8 @@
                 successMessage = "Category deleted successfully.";
                 await LoadCategories();
             }
-            else
-            {
-                var body = await response.Content.ReadAsStringAsync();
-
-                errorMessage = (int)response.StatusCode switch
-                {
-                    401 => "Not authorised. Please log out and log back in.",
-                    403 => "Access denied. Only Super Admin can manage categories.",
-                    _ => $"Failed to delete category (HTTP {(int)response.StatusCode})."
-                };
-
-                Console.WriteLine($"[Category DELETE] {(int)response.StatusCode}: {body}");
-            }
+            else { errorMessage = "Failed to delete category."; }
         }
-        catch (Exception ex)
-        {
-            errorMessage = "An error occurred while deleting the category.";
-            Console.WriteLine($"[Category DELETE] Exception: {ex.Message}");
-        }
+        catch (Exception) { errorMessage = "An error occurred while deleting the category."; }
     }
 }

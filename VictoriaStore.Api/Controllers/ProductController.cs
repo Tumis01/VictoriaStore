@@ -44,7 +44,20 @@ public class ProductController : ControllerBase
         var product = await _productService.CreateAsync(request);
         return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
     }
-
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin")]
+    public async Task<IActionResult> Update(Guid id, [FromForm] CreateProductRequest request)
+    {
+        try
+        {
+            var product = await _productService.UpdateAsync(id, request);
+            return Ok(product);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "SuperAdmin")]
     public async Task<IActionResult> Delete(Guid id)

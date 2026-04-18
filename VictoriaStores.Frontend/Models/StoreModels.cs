@@ -1,4 +1,6 @@
-﻿namespace VictoriaStores.Frontend.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace VictoriaStores.Frontend.Models;
 
 public class LoginRequest
 {
@@ -50,11 +52,46 @@ public class CategoryDto
 
 public class CreateCategoryRequest
 {
+    [Required(ErrorMessage = "Category Name is required.")]
     public string Name { get; set; } = string.Empty;
-    public string? Slug { get; set; }           // optional — API auto-generates
+    public string? Slug { get; set; }
     public string? Description { get; set; }
     public int DisplayOrder { get; set; } = 0;
     public bool IsActive { get; set; } = true;
+}
+
+public class ProductDto
+{
+    public Guid Id { get; set; }
+
+    [Required(ErrorMessage = "Product Name is required.")]
+    public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Price is required.")]
+    [Range(1, double.MaxValue, ErrorMessage = "Price must be greater than zero.")]
+    public decimal Price { get; set; }
+    public decimal? SalePrice { get; set; }
+    public string SKU { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Stock quantity is required.")]
+    [Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative.")]
+    public int StockQuantity { get; set; }
+    public bool IsActive { get; set; } = true;
+
+    [Required(ErrorMessage = "Please select a category.")]
+    public Guid CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
+    public List<ProductImageDto> Images { get; set; } = new();
+
+    // NEW: Colors Property
+    public List<string> Colors { get; set; } = new();
+
+    public string MainImageUrl =>
+        Images.FirstOrDefault(i => i.IsMain)?.ImageUrl
+        ?? Images.FirstOrDefault()?.ImageUrl
+        ?? string.Empty;
 }
 public class OrderResponseDto
 {
@@ -120,23 +157,3 @@ public class ProductImageDto
     public bool IsMain { get; set; }
 }
 
-public class ProductDto
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Slug { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public decimal Price { get; set; }
-    public decimal? SalePrice { get; set; }
-    public string SKU { get; set; } = string.Empty;
-    public int StockQuantity { get; set; }
-    public bool IsActive { get; set; } = true;
-    public Guid CategoryId { get; set; }
-    public string CategoryName { get; set; } = string.Empty;
-    public List<ProductImageDto> Images { get; set; } = new();
-
-    public string MainImageUrl =>
-        Images.FirstOrDefault(i => i.IsMain)?.ImageUrl
-        ?? Images.FirstOrDefault()?.ImageUrl
-        ?? string.Empty;
-}

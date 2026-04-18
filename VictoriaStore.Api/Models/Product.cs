@@ -10,6 +10,7 @@ public class Product
     public decimal? SalePrice { get; set; }
     public required string SKU { get; set; }
     public int StockQuantity { get; set; }
+    public List<string> Colors { get; set; } = new List<string>();
     public bool IsActive { get; set; } = true;
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
