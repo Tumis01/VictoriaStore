@@ -1,6 +1,9 @@
 ﻿@page "/admin/categories"
 @layout Layout.AdminLayout
 @inject HttpClient Http
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
 @using VictoriaStores.Frontend.Models
 
 <PageTitle>Manage Categories - Victoria Admin</PageTitle>
@@ -36,7 +39,7 @@
         <h3 class="mb-4 text-lg font-medium text-gray-900">Create New Category</h3>
         <EditForm Model="newCategory" OnValidSubmit="HandleSubmit" class="space-y-4">
             <DataAnnotationsValidator />
-            
+
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Category Name</label>
@@ -120,10 +123,10 @@
     private bool isLoading = true;
     private bool isSubmitting = false;
     private bool showAddForm = false;
-    
+
     private string? errorMessage;
     private string? successMessage;
-    
+
     private List<CategoryDto> categories = new();
     private CreateCategoryRequest newCategory = new();
 
@@ -155,10 +158,29 @@
         showAddForm = !showAddForm;
         errorMessage = null;
         successMessage = null;
-        if (!showAddForm) 
+
+        if (!showAddForm)
         {
-            newCategory = new CreateCategoryRequest(); // Reset form if closed
+            newCategory = new CreateCategoryRequest();
         }
+    }
+
+    private async Task<HttpRequestMessage> CreateAuthorizedRequest(HttpMethod method, string url, object? body = null)
+    {
+        var token = await LocalStorage.GetItemAsync<string>("authToken");
+        var request = new HttpRequestMessage(method, url);
+
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
+        if (body is not null)
+        {
+            request.Content = JsonContent.Create(body);
+        }
+
+        return request;
     }
 
     private async Task HandleSubmit()
@@ -169,7 +191,8 @@
 
         try
         {
-            var response = await Http.PostAsJsonAsync("api/category", newCategory);
+            var request = await CreateAuthorizedRequest(HttpMethod.Post, "api/category", newCategory);
+            var response = await Http.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
@@ -180,7 +203,6 @@
             }
             else
             {
-                // Read the actual error from the API for diagnosis
                 var body = await response.Content.ReadAsStringAsync();
 
                 errorMessage = (int)response.StatusCode switch
@@ -207,11 +229,11 @@
 
     private async Task DeleteCategory(Guid id)
     {
-        // Note: In a production app, use a proper custom confirmation modal here.
-        // For now, we proceed to delete.
         try
         {
-            var response = await Http.DeleteAsync($"api/category/{id}");
+            var request = await CreateAuthorizedRequest(HttpMethod.Delete, $"api/category/{id}");
+            var response = await Http.SendAsync(request);
+
             if (response.IsSuccessStatusCode)
             {
                 successMessage = "Category deleted successfully.";
@@ -219,13 +241,22 @@
             }
             else
             {
-                errorMessage = "Failed to delete category. It might be in use by existing products.";
+                var body = await response.Content.ReadAsStringAsync();
+
+                errorMessage = (int)response.StatusCode switch
+                {
+                    401 => "Not authorised. Please log out and log back in.",
+                    403 => "Access denied. Only Super Admin can manage categories.",
+                    _ => $"Failed to delete category (HTTP {(int)response.StatusCode})."
+                };
+
+                Console.WriteLine($"[Category DELETE] {(int)response.StatusCode}: {body}");
             }
         }
         catch (Exception ex)
         {
             errorMessage = "An error occurred while deleting the category.";
-            Console.WriteLine(ex.Message);
+            Console.WriteLine($"[Category DELETE] Exception: {ex.Message}");
         }
     }
 }

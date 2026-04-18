@@ -13,6 +13,7 @@ public interface IProductService
     Task<ProductDto> CreateAsync(CreateProductRequest request);
     Task<bool> SoftDeleteAsync(Guid id);
 }
+
 public class ProductService : IProductService
 {
     private readonly AppDbContext _context;
@@ -36,8 +37,6 @@ public class ProductService : IProductService
 
     public async Task<IEnumerable<ProductDto>> GetAllAdminAsync()
     {
-        // Admin sees inactive products, but usually not soft-deleted ones 
-        // unless you specifically want an archive view later.
         return await _context.Products
             .Include(p => p.Category)
             .Include(p => p.Images)
@@ -73,34 +72,45 @@ public class ProductService : IProductService
             UpdatedAt = DateTime.UtcNow
         };
 
-        // Handle Multiple Image Uploads to wwwroot/uploads/products
         if (request.Images != null && request.Images.Any())
         {
-            var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads", "products");
+            var uploadsFolder = Path.Combine(
+                _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"),
+                "images",
+                "products");
+
             Directory.CreateDirectory(uploadsFolder);
 
-            int displayOrder = 1;
+            var allowedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"
+            };
+
+            var displayOrder = 1;
+
             foreach (var file in request.Images)
             {
-                if (file.Length > 0)
+                if (file.Length <= 0)
+                    continue;
+
+                var extension = Path.GetExtension(file.FileName);
+                if (!allowedExtensions.Contains(extension))
+                    continue;
+
+                var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                await using var fileStream = new FileStream(filePath, FileMode.Create);
+                await file.CopyToAsync(fileStream);
+
+                product.Images.Add(new ProductImage
                 {
-                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    ImageUrl = $"/images/products/{uniqueFileName}",
+                    DisplayOrder = displayOrder,
+                    IsMain = displayOrder == 1
+                });
 
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(fileStream);
-                    }
-
-                    product.Images.Add(new ProductImage
-                    {
-                        ImageUrl = $"/uploads/products/{uniqueFileName}",
-                        DisplayOrder = displayOrder,
-                        IsMain = displayOrder == 1 // Make the first uploaded image the main one
-                    });
-
-                    displayOrder++;
-                }
+                displayOrder++;
             }
         }
 
@@ -116,14 +126,13 @@ public class ProductService : IProductService
         if (product == null || product.IsDeleted) return false;
 
         product.IsDeleted = true;
-        product.IsActive = false; // Ensure it hides from the storefront immediately
+        product.IsActive = false;
         product.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
         return true;
     }
 
-    // Helper method to keep projection clean
     private static ProductDto MapToDto(Product p)
     {
         return new ProductDto

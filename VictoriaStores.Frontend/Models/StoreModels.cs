@@ -14,29 +14,7 @@ public class AuthResponse
     public List<string> EnumerableRoles { get; set; } = new();
 }
 
-public class ProductDto
-{
-    public Guid Id { get; set; }
 
-    // Basic Info
-    public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-
-    // Pricing
-    public decimal Price { get; set; }
-    public decimal? SalePrice { get; set; }
-
-    // Inventory & Status
-    public int StockQuantity { get; set; }
-    public bool IsActive { get; set; } = true;
-
-    // Media
-    public string MainImageUrl { get; set; } = string.Empty;
-
-    // Relationships
-    public Guid CategoryId { get; set; }
-    public string CategoryName { get; set; } = string.Empty; // Helpful for displaying in the data table
-}
 public class CreateUpdateProductRequest
 {
     public string Name { get; set; } = string.Empty;
@@ -133,4 +111,32 @@ public class OrderItemDto
     public string ImageUrl { get; set; } = string.Empty;
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }
+}
+public class ProductImageDto
+{
+    public Guid Id { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
+    public int DisplayOrder { get; set; }
+    public bool IsMain { get; set; }
+}
+
+public class ProductDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public decimal? SalePrice { get; set; }
+    public string SKU { get; set; } = string.Empty;
+    public int StockQuantity { get; set; }
+    public bool IsActive { get; set; } = true;
+    public Guid CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
+    public List<ProductImageDto> Images { get; set; } = new();
+
+    public string MainImageUrl =>
+        Images.FirstOrDefault(i => i.IsMain)?.ImageUrl
+        ?? Images.FirstOrDefault()?.ImageUrl
+        ?? string.Empty;
 }
