@@ -122,7 +122,7 @@ public class ProductService : IProductService
     }
     public async Task<ProductDto> UpdateAsync(Guid id, CreateProductRequest request)
     {
-        // 1. Fetch the existing product directly from the database (EF starts tracking it here)
+        // 1. FETCH THE EXISTING PRODUCT (This keeps the correct DB Id!)
         var product = await _context.Products
             .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id);
@@ -130,7 +130,7 @@ public class ProductService : IProductService
         if (product == null || product.IsDeleted)
             throw new Exception("Product not found.");
 
-        // 2. Update ONLY the scalar properties (EF automatically notices these changes)
+        // 2. Overwrite the properties with the form data
         product.Name = request.Name;
         product.Slug = request.Slug;
         product.Description = request.Description;
@@ -165,13 +165,14 @@ public class ProductService : IProductService
                 {
                     ImageUrl = $"/images/products/{uniqueFileName}",
                     DisplayOrder = displayOrder,
-                    IsMain = !product.Images.Any() // Make main if it's the very first image
+                    IsMain = !product.Images.Any()
                 });
                 displayOrder++;
             }
         }
 
-        // 4. Save changes directly. We DO NOT call _context.Products.Update() here!
+        // 4. Save changes! DO NOT write _context.Products.Update(product); here!
+        // Because we fetched it in step 1, EF Core already knows it's modified.
         await _context.SaveChangesAsync();
 
         return await GetByIdAsync(product.Id) ?? throw new Exception("Failed to update product.");
