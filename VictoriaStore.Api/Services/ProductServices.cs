@@ -227,6 +227,7 @@ public class ProductService : IProductService
             IsActive = p.IsActive,
             CategoryId = p.CategoryId,
             CategoryName = p.Category?.Name,
+            CreatedAt = p.CreatedAt,
             Images = p.Images
                 .OrderBy(i => i.DisplayOrder)
                 .Select(i => new ProductImageDto

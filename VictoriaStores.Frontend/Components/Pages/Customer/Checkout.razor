@@ -1,0 +1,231 @@
+﻿@page "/checkout"
+@layout Layout.StoreLayout
+@inject HttpClient Http
+@inject VictoriaStores.Frontend.Services.CartService CartService
+@inject NavigationManager NavManager
+@using Microsoft.AspNetCore.Components.Forms
+@using VictoriaStores.Frontend.Models
+
+<PageTitle>Secure Checkout - Victoria James Store</PageTitle>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 bg-gray-50 min-h-screen">
+    
+    <div class="max-w-3xl mx-auto mb-10">
+        <div class="flex items-center justify-between relative">
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 rounded-full z-0"></div>
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-1 bg-brand rounded-full z-0 transition-all duration-500"></div>
+            
+            <div class="relative z-10 flex flex-col items-center gap-2 bg-gray-50 px-2">
+                <div class="w-8 h-8 rounded-full bg-brand text-white flex items-center justify-center font-bold text-sm shadow-sm">✓</div>
+                <span class="text-xs font-bold text-brand">Cart</span>
+            </div>
+            <div class="relative z-10 flex flex-col items-center gap-2 bg-gray-50 px-2">
+                <div class="w-8 h-8 rounded-full bg-brand text-white border-4 border-brand-light flex items-center justify-center font-bold text-sm shadow-sm">2</div>
+                <span class="text-xs font-bold text-brand">Checkout</span>
+            </div>
+            <div class="relative z-10 flex flex-col items-center gap-2 bg-gray-50 px-2">
+                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm border-4 border-gray-50">3</div>
+                <span class="text-xs font-bold text-gray-400">Confirmed</span>
+            </div>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="flex justify-center py-20">
+            <svg class="animate-spin h-10 w-10 text-brand" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        </div>
+    }
+    else if (!cartItems.Any())
+    {
+        <div class="text-center py-16">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
+            <a href="/" class="text-brand font-semibold hover:underline">← Return to Shop</a>
+        </div>
+    }
+    else
+    {
+        <EditForm Model="checkoutModel" OnValidSubmit="PlaceOrder" class="flex flex-col lg:flex-row gap-8 items-start">
+            <DataAnnotationsValidator />
+
+            <div class="w-full lg:w-[60%]">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+                    <h2 class="font-serif text-2xl font-bold text-gray-900 mb-6">Delivery Details</h2>
+                    
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm font-semibold flex items-start gap-3">
+                            <span class="text-red-500 mt-0.5">✕</span>
+                            <p>@errorMessage</p>
+                        </div>
+                    }
+
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5">Full Name <span class="text-red-500">*</span></label>
+                            <InputText @bind-Value="checkoutModel.CustomerName" class="h-11 w-full px-4 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-colors" placeholder="e.g. Chioma Okonkwo" />
+                            <ValidationMessage For="@(() => checkoutModel.CustomerName)" class="text-xs text-red-500 mt-1" />
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1.5">Phone Number <span class="text-red-500">*</span></label>
+                                <InputText @bind-Value="checkoutModel.CustomerPhone" type="tel" class="h-11 w-full px-4 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-colors" placeholder="08012345678" />
+                                <p class="text-xs text-gray-500 mt-1">We'll contact you to confirm delivery.</p>
+                                <ValidationMessage For="@(() => checkoutModel.CustomerPhone)" class="text-xs text-red-500 mt-1" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1.5">Email Address <span class="text-red-500">*</span></label>
+                                <InputText @bind-Value="checkoutModel.CustomerEmail" type="email" class="h-11 w-full px-4 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-colors" placeholder="your@email.com" />
+                                <ValidationMessage For="@(() => checkoutModel.CustomerEmail)" class="text-xs text-red-500 mt-1" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5">Delivery Address <span class="text-red-500">*</span></label>
+                            <InputTextArea @bind-Value="checkoutModel.DeliveryAddress" rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent resize-none transition-colors" placeholder="Street, Area, City, State"></InputTextArea>
+                            <ValidationMessage For="@(() => checkoutModel.DeliveryAddress)" class="text-xs text-red-500 mt-1" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5">Additional Notes <span class="text-gray-400 font-normal">(Optional)</span></label>
+                            <InputTextArea @bind-Value="checkoutModel.Notes" rows="2" class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent resize-none transition-colors" placeholder="Any special instructions for delivery?"></InputTextArea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-[40%] bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:sticky lg:top-24">
+                <h3 class="font-serif text-xl font-bold text-gray-900 mb-6">Your Order (@cartItems.Sum(i => i.Quantity) items)</h3>
+                
+                <div class="space-y-4 mb-6 max-h-64 overflow-y-auto pr-2 scrollbar-thin">
+                    @foreach (var item in cartItems)
+                    {
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-xl bg-gray-50 border border-gray-100 flex-shrink-0 p-1 relative">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="https://localhost:7145@(item.ImageUrl)" alt="@item.ProductName" class="w-full h-full object-cover mix-blend-multiply" />
+                                }
+                                <span class="absolute -top-2 -right-2 bg-gray-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">@item.Quantity</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-bold text-gray-900 line-clamp-1">@item.ProductName</p>
+                                <p class="text-xs text-gray-500">₦@item.UnitPrice.ToString("N0") each</p>
+                            </div>
+                            <div class="text-sm font-extrabold text-gray-900">
+                                ₦@item.LineTotal.ToString("N0")
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <hr class="border-gray-100 mb-4" />
+
+                <div class="space-y-3 text-sm font-semibold text-gray-600 mb-4">
+                    <div class="flex justify-between items-center">
+                        <span>Subtotal</span>
+                        <span class="text-gray-900">₦@Subtotal.ToString("N0")</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>Delivery</span>
+                        <span class="text-gray-400 italic">Calculated after order</span>
+                    </div>
+                </div>
+
+                <hr class="border-gray-100 mb-4" />
+
+                <div class="flex justify-between items-center mb-8">
+                    <span class="font-bold text-gray-900 text-lg">Total</span>
+                    <span class="font-extrabold text-brand text-2xl tracking-tight">₦@Subtotal.ToString("N0")</span>
+                </div>
+
+                <button type="submit" disabled="@isSubmitting" class="flex items-center justify-center w-full h-14 bg-brand text-white font-bold text-lg rounded-xl hover:bg-brand-dark active:scale-[0.98] transition-all shadow-md disabled:bg-gray-400">
+                    @if (isSubmitting)
+                    {
+                        <svg class="animate-spin h-5 w-5 text-white mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span>Processing...</span>
+                    }
+                    else
+                    {
+                        <span>Place Order</span>
+                    }
+                </button>
+                
+                <div class="mt-6 flex flex-col items-center justify-center gap-1 text-xs font-semibold text-gray-500 text-center">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        Secure Checkout
+                    </div>
+                    <p class="font-normal text-gray-400">You will receive bank transfer details on the next page.</p>
+                </div>
+            </div>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private bool isLoading = true;
+    private bool isSubmitting = false;
+    private string? errorMessage;
+    
+    private List<CartItemDto> cartItems = new();
+    private CheckoutRequest checkoutModel = new();
+
+    private decimal Subtotal => cartItems.Sum(i => i.LineTotal);
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        cartItems = await CartService.GetCartAsync();
+        
+        if (cartItems.Any())
+        {
+            checkoutModel.Items = cartItems;
+        }
+        else
+        {
+            NavManager.NavigateTo("/cart");
+        }
+        
+        isLoading = false;
+    }
+
+    private async Task PlaceOrder()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            // Assuming your backend OrderController has a POST route at api/order
+            var response = await Http.PostAsJsonAsync("api/order", checkoutModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
+                
+                if (result != null)
+                {
+                    // Clear the cart on successful order!
+                    await CartService.ClearCartAsync();
+                    
+                    // Redirect to the success page
+                    NavManager.NavigateTo($"/confirmation/{result.Id}");
+                }
+            }
+            else
+            {
+                errorMessage = "Failed to place order. Please verify your details and try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "A network error occurred. Please check your connection. " + ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

@@ -13,6 +13,7 @@ public class ProductDto
     public List<string> Colors { get; set; } = new();
     public bool IsActive { get; set; }
     public Guid CategoryId { get; set; }
+    public DateTime CreatedAt { get; set; }
     public string? CategoryName { get; set; }
     public List<ProductImageDto> Images { get; set; } = new();
 }

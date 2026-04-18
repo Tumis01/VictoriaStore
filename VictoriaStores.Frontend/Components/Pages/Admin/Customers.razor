@@ -1,0 +1,198 @@
+﻿@page "/admin/customers"
+@layout Layout.AdminLayout
+@inject HttpClient Http
+@using System.Net.Http.Json
+@using System.Linq
+@using VictoriaStores.Frontend.Models
+
+<PageTitle>Customers - Victoria Admin</PageTitle>
+
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 font-serif">Customers</h1>
+        <p class="text-sm text-gray-500 mt-0.5">Manage your registered customers and view their order history.</p>
+    </div>
+    <button class="h-10 px-4 bg-white border border-gray-300 text-gray-700 font-semibold text-sm rounded-lg hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+        Export CSV
+    </button>
+</div>
+
+<div class="bg-white rounded-t-xl border border-gray-200 border-b-0 p-4 flex gap-4 items-center shadow-sm">
+    <div class="relative w-full sm:w-96">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search by name, email, or phone..." class="h-10 w-full pl-10 pr-4 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand transition-colors" />
+    </div>
+</div>
+
+<div class="bg-white rounded-b-xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm text-left">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Customer Info</th>
+                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Orders</th>
+                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Total Spent</th>
+                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Joined Date</th>
+                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @if (isLoading)
+                {
+                    <tr>
+                        <td colspan="5" class="px-5 py-12 text-center">
+                            <svg class="animate-spin h-8 w-8 text-brand mx-auto" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </td>
+                    </tr>
+                }
+                else if (!FilteredCustomers.Any())
+                {
+                    <tr><td colspan="5" class="px-5 py-12 text-center text-gray-500">No customers found.</td></tr>
+                }
+                else
+                {
+                    @foreach (var customer in FilteredCustomers)
+                    {
+                        var isExpanded = expandedCustomerId == customer.Id;
+                        
+                        <tr class="hover:bg-gray-50 transition-colors cursor-pointer group @(isExpanded ? "bg-brand-light/20" : "bg-white")" @onclick="() => ToggleRow(customer.Id)">
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-10 w-10 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold text-sm">
+                                        @GetInitials(customer.Name)
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-gray-900 group-hover:text-brand transition-colors">@customer.Name</div>
+                                        <div class="text-xs text-gray-500 flex gap-2 mt-0.5">
+                                            <span>@customer.Phone</span>
+                                            <span class="text-gray-300">|</span>
+                                            <span>@customer.Email</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-5 py-4 text-center font-bold text-gray-700">@customer.OrdersCount</td>
+                            <td class="px-5 py-4 text-right font-extrabold text-brand">₦@customer.TotalSpent.ToString("N0")</td>
+                            <td class="px-5 py-4 text-gray-600">@customer.JoinedDate.ToString("dd MMM yyyy")</td>
+                            <td class="px-5 py-4 text-right">
+                                <button class="text-gray-400 group-hover:text-brand transition-colors transform duration-200 @(isExpanded ? "rotate-180" : "")">
+                                    <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </button>
+                            </td>
+                        </tr>
+
+                        @if (isExpanded)
+                        {
+                            <tr class="bg-gray-50/50 border-b border-gray-200">
+                                <td colspan="5" class="px-10 py-6">
+                                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Recent Orders</h4>
+                                    @if (customer.RecentOrders.Any())
+                                    {
+                                        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                                            <table class="min-w-full text-sm">
+                                                <thead class="bg-gray-50 border-b border-gray-100">
+                                                    <tr>
+                                                        <th class="px-4 py-2 text-left font-semibold text-gray-600">Order #</th>
+                                                        <th class="px-4 py-2 text-left font-semibold text-gray-600">Date</th>
+                                                        <th class="px-4 py-2 text-left font-semibold text-gray-600">Status</th>
+                                                        <th class="px-4 py-2 text-right font-semibold text-gray-600">Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-gray-100">
+                                                    @foreach (var order in customer.RecentOrders)
+                                                    {
+                                                        <tr class="hover:bg-gray-50">
+                                                            <td class="px-4 py-2.5 font-bold text-brand">
+                                                                <a href="/admin/orders/@order.Id" class="hover:underline">@order.OrderNumber</a>
+                                                            </td>
+                                                            <td class="px-4 py-2.5 text-gray-600">@order.CreatedAt.ToString("dd MMM yyyy")</td>
+                                                            <td class="px-4 py-2.5">
+                                                                @if (order.Status == "Pending")
+                                                                {
+                                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">PENDING</span>
+                                                                }
+                                                                else if (order.Status == "Delivered")
+                                                                {
+
+                                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">DELIVERED</span>
+                                                                }
+                                                                else
+                                                                {
+
+                                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">@order.Status.ToUpper()</span>
+                                                                }
+                                                            </td>
+                                                            <td class="px-4 py-2.5 text-right font-bold text-gray-900">₦@order.TotalAmount.ToString("N0")</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-sm text-gray-500 italic">No orders found for this customer.</p>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private bool isLoading = true;
+    private List<CustomerDto> customers = new();
+    private string searchTerm = string.Empty;
+    private Guid? expandedCustomerId = null;
+
+    private IEnumerable<CustomerDto> FilteredCustomers => customers.Where(c =>
+        string.IsNullOrWhiteSpace(searchTerm) ||
+        c.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+        c.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+        c.Phone.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+    );
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            // You will need a GET /api/customer endpoint in your backend to supply this data
+            customers = await Http.GetFromJsonAsync<List<CustomerDto>>("api/customer") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading customers: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ToggleRow(Guid customerId)
+    {
+        // If clicking the already expanded row, close it. Otherwise, open the new one.
+        if (expandedCustomerId == customerId)
+        {
+            expandedCustomerId = null;
+        }
+        else
+        {
+            expandedCustomerId = customerId;
+        }
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "VJS";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
+        return $"{parts[0][0]}{parts[^1][0]}".ToUpper();
+    }
+}

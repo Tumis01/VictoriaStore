@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; // Added for FirstOrDefaultAsync
 using System.Security.Claims;
+using VictoriaStore.Api.Data;        // Added for AppDbContext
 using VictoriaStore.Api.DTOs;
 using VictoriaStore.Api.Services;
 
@@ -12,11 +14,14 @@ public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;
     private readonly IEmailService _emailService;
+    private readonly AppDbContext _context; // 1. Added Database Context
 
-    public OrderController(IOrderService orderService, IEmailService emailService)
+    // 2. Injected AppDbContext into the constructor
+    public OrderController(IOrderService orderService, IEmailService emailService, AppDbContext context)
     {
         _orderService = orderService;
         _emailService = emailService;
+        _context = context;
     }
 
     [HttpPost] // Public guest checkout for Phase 1
@@ -71,6 +76,37 @@ public class OrderController : ControllerBase
         }
 
         return Ok(new { Message = "Status updated successfully" });
+    }
+
+    // 3. The newly added Tracking Endpoint
+    [HttpGet("track")]
+    public async Task<IActionResult> TrackOrder([FromQuery] string orderNumber, [FromQuery] string phone)
+    {
+        if (string.IsNullOrWhiteSpace(orderNumber) || string.IsNullOrWhiteSpace(phone))
+            return BadRequest("Order number and phone are required.");
+
+        var order = await _context.Orders
+            .FirstOrDefaultAsync(o =>
+                o.OrderNumber.ToLower() == orderNumber.Trim().ToLower() &&
+                o.CustomerPhone == phone.Trim());
+
+        if (order == null)
+            return NotFound("Order not found or phone number does not match.");
+
+        var result = new OrderResponseDto
+        {
+            Id = order.Id,
+            OrderNumber = order.OrderNumber,
+            CustomerName = order.CustomerName,
+            CustomerPhone = order.CustomerPhone,
+            CustomerEmail = order.CustomerEmail,
+            DeliveryAddress = order.DeliveryAddress,
+            Status = order.Status,
+            TotalAmount = order.TotalAmount,
+            CreatedAt = order.CreatedAt
+        };
+
+        return Ok(result);
     }
 }
 

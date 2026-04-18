@@ -87,7 +87,7 @@ public class ProductDto
 
     // NEW: Colors Property
     public List<string> Colors { get; set; } = new();
-
+    public DateTime CreatedAt { get; set; }
     public string MainImageUrl =>
         Images.FirstOrDefault(i => i.IsMain)?.ImageUrl
         ?? Images.FirstOrDefault()?.ImageUrl
@@ -157,3 +157,44 @@ public class ProductImageDto
     public bool IsMain { get; set; }
 }
 
+public class CustomerDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public int OrdersCount { get; set; }
+    public decimal TotalSpent { get; set; }
+    public DateTime JoinedDate { get; set; }
+
+    // Holds the nested order history for the accordion dropdown
+    public List<CustomerOrderHistoryDto> RecentOrders { get; set; } = new();
+}
+
+public class CustomerOrderHistoryDto
+{
+    public Guid Id { get; set; }
+    public string OrderNumber { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public decimal TotalAmount { get; set; }
+}
+public class CheckoutRequest
+{
+    [Required(ErrorMessage = "Full Name is required.")]
+    public string CustomerName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Email Address is required.")]
+    [EmailAddress(ErrorMessage = "Please enter a valid email.")]
+    public string CustomerEmail { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Phone Number is required.")]
+    public string CustomerPhone { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Delivery Address is required.")]
+    public string DeliveryAddress { get; set; } = string.Empty;
+
+    public string? Notes { get; set; } // Optional special instructions
+
+    public List<CartItemDto> Items { get; set; } = new();
+}

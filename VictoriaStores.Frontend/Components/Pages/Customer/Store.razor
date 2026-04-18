@@ -1,0 +1,321 @@
+﻿@page "/store"
+@page "/category/{CategorySlug}"
+@layout Layout.StoreLayout
+@inject HttpClient Http
+@inject VictoriaStores.Frontend.Services.ProductApiClient ProductApi
+@using VictoriaStores.Frontend.Models
+
+<PageTitle>@(CurrentCategory?.Name ?? "All Products") - Victoria James Store</PageTitle>
+
+<div class="w-full bg-gradient-to-r from-brand-dark to-brand h-[180px] relative flex items-center justify-center overflow-hidden">
+    @if (CurrentCategory != null && !string.IsNullOrEmpty(CurrentCategory.BannerImageUrl))
+    {
+        <img src="@CurrentCategory.BannerImageUrl" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40" />
+    }
+    <div class="absolute inset-0 bg-black/20 z-0"></div>
+    <div class="relative z-10 text-center px-4">
+        <h1 class="font-serif text-3xl md:text-5xl font-bold text-white mb-2 shadow-sm">
+            @(CurrentCategory?.Name ?? "All Products")
+        </h1>
+        <p class="text-brand-light font-semibold">
+            @FilteredProducts.Count() items found
+        </p>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    
+    <nav class="flex text-sm text-gray-500 mb-8 font-semibold">
+        <a href="/" class="hover:text-brand transition-colors">Home</a>
+        <span class="mx-2">/</span>
+        @if (CurrentCategory != null)
+        {
+            <a href="/store" class="hover:text-brand transition-colors">Store</a>
+            <span class="mx-2">/</span>
+            <span class="text-gray-900 uppercase">@CurrentCategory.Name</span>
+        }
+        else
+        {
+            <span class="text-gray-900">All Products</span>
+        }
+    </nav>
+
+    <div class="lg:hidden mb-6 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <button @onclick="() => showMobileFilters = true" class="flex items-center gap-2 text-gray-700 font-bold">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+            Filter & Sort
+        </button>
+        <span class="text-sm font-semibold text-gray-500">@FilteredProducts.Count() items</span>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8 items-start">
+        
+        <div class="@(showMobileFilters ? "fixed inset-0 z-50 flex bg-black/50" : "hidden lg:block w-full lg:w-64 flex-shrink-0")">
+            
+            <div class="@(showMobileFilters ? "w-4/5 max-w-sm h-full bg-white shadow-2xl overflow-y-auto p-6 animate-slide-up" : "sticky top-24")">
+                
+                @if (showMobileFilters)
+                {
+                    <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
+                        <h2 class="font-bold text-lg text-gray-900">Filters</h2>
+                        <button @onclick="() => showMobileFilters = false" class="text-gray-400 hover:text-gray-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                }
+
+                <div class="mb-8">
+                    <h3 class="font-bold text-gray-900 mb-4 flex items-center justify-between">
+                        Categories
+                    </h3>
+                    <div class="space-y-3">
+                        <a href="/store" class="flex items-center gap-3 text-sm font-semibold @(string.IsNullOrEmpty(CategorySlug) ? "text-brand border-l-2 border-brand pl-2" : "text-gray-600 hover:text-brand pl-2.5")">
+                            All Products
+                        </a>
+                        @foreach (var cat in allCategories)
+                        {
+                            <a href="/category/@cat.Slug" class="flex items-center gap-3 text-sm font-semibold @(CategorySlug == cat.Slug ? "text-brand border-l-2 border-brand pl-2" : "text-gray-600 hover:text-brand pl-2.5")">
+                                @cat.Name
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <hr class="border-gray-100 mb-8" />
+
+                <div class="mb-8">
+                    <h3 class="font-bold text-gray-900 mb-4">Price Range</h3>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="flex-1 relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">₦</span>
+                            <input type="number" @bind="minPrice" class="w-full h-10 pl-8 pr-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:border-brand" placeholder="Min" />
+                        </div>
+                        <span class="text-gray-400">-</span>
+                        <div class="flex-1 relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">₦</span>
+                            <input type="number" @bind="maxPrice" class="w-full h-10 pl-8 pr-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:border-brand" placeholder="Max" />
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-gray-100 mb-8" />
+
+                <div class="mb-8">
+                    <h3 class="font-bold text-gray-900 mb-4">Availability</h3>
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" @bind="inStockOnly" class="w-5 h-5 rounded border-gray-300 text-brand focus:ring-brand" />
+                        <span class="text-sm font-semibold text-gray-600 group-hover:text-gray-900">In Stock Only</span>
+                    </label>
+                </div>
+
+                @if (showMobileFilters)
+                {
+                    <hr class="border-gray-100 mb-8" />
+                    <div class="mb-8">
+                        <h3 class="font-bold text-gray-900 mb-4">Sort By</h3>
+                        <select @bind="sortOrder" class="w-full h-11 px-4 rounded-lg border border-gray-300 text-sm bg-white focus:outline-none focus:border-brand">
+                            <option value="newest">Newest Arrivals</option>
+                            <option value="price_asc">Price: Low to High</option>
+                            <option value="price_desc">Price: High to Low</option>
+                        </select>
+                    </div>
+
+                    <button @onclick="() => showMobileFilters = false" class="w-full h-12 bg-brand text-white font-bold rounded-xl shadow-sm">
+                        Show @FilteredProducts.Count() Results
+                    </button>
+                }
+            </div>
+            
+            @if (showMobileFilters)
+            {
+                <div class="flex-1" @onclick="() => showMobileFilters = false"></div>
+            }
+        </div>
+
+        <div class="flex-1 w-full">
+            
+            <div class="hidden lg:flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <span class="text-sm font-semibold text-gray-500">Showing @FilteredProducts.Count() products</span>
+                
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-bold text-gray-700">Sort By:</label>
+                    <select @bind="sortOrder" class="h-10 px-4 rounded-lg border border-gray-300 text-sm bg-white focus:outline-none focus:border-brand">
+                        <option value="newest">Newest Arrivals</option>
+                        <option value="price_asc">Price: Low to High</option>
+                        <option value="price_desc">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+
+            @if (inStockOnly || minPrice > 0 || maxPrice < 5000000)
+            {
+                <div class="flex flex-wrap gap-2 mb-6">
+                    @if (inStockOnly)
+                    {
+                        <span class="inline-flex items-center gap-1.5 bg-brand-light text-brand rounded-full px-3 py-1 text-xs font-bold">
+                            In Stock
+                            <button @onclick="() => inStockOnly = false" class="hover:text-brand-dark">✕</button>
+                        </span>
+                    }
+                    @if (minPrice > 0 || maxPrice < 5000000)
+                    {
+                        <span class="inline-flex items-center gap-1.5 bg-brand-light text-brand rounded-full px-3 py-1 text-xs font-bold">
+                            ₦@minPrice - ₦@maxPrice
+                            <button @onclick="ClearPriceFilter" class="hover:text-brand-dark">✕</button>
+                        </span>
+                    }
+                    <button @onclick="ClearAllFilters" class="text-xs font-bold text-gray-500 hover:text-brand underline ml-2">Clear All</button>
+                </div>
+            }
+
+            @if (isLoading)
+            {
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 animate-pulse">
+                    @for (int i = 0; i < 6; i++)
+                    {
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 h-80 flex flex-col p-4">
+                            <div class="bg-gray-200 rounded-lg w-full h-40 mb-4"></div>
+                            <div class="bg-gray-200 rounded h-4 w-3/4 mb-2"></div>
+                            <div class="bg-gray-200 rounded h-4 w-1/2 mb-4"></div>
+                            <div class="mt-auto bg-gray-200 rounded h-10 w-full"></div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (!FilteredProducts.Any())
+            {
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">No products found</h3>
+                    <p class="text-gray-500 mb-6">Try adjusting your filters or search criteria.</p>
+                    <button @onclick="ClearAllFilters" class="text-brand font-bold hover:underline">Clear all filters</button>
+                </div>
+            }
+            else
+            {
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                    @foreach (var product in FilteredProducts)
+                    {
+                        <VictoriaStores.Frontend.Components.ProductCard Product="product" />
+                    }
+                </div>
+                
+                @if (FilteredProducts.Count() >= 20)
+                {
+                    <div class="mt-12 flex justify-center">
+                        <button class="h-12 px-8 bg-gray-100 text-gray-700 font-bold text-sm rounded-xl hover:bg-gray-200 transition-colors shadow-sm">
+                            Load More Products
+                        </button>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? CategorySlug { get; set; }
+
+    private bool isLoading = true;
+    private bool showMobileFilters = false;
+    
+    // Filter State
+    private decimal minPrice = 0;
+    private decimal maxPrice = 5000000; // Arbitrary high default max
+    private bool inStockOnly = false;
+    private string sortOrder = "newest";
+
+    private List<ProductDto> allProducts = new();
+    private List<CategoryDto> allCategories = new();
+    private CategoryDto? CurrentCategory;
+
+    // Computed property for dynamic filtering & sorting
+    private IEnumerable<ProductDto> FilteredProducts
+    {
+        get
+        {
+            var query = allProducts.AsEnumerable();
+
+            // 1. Category Filter
+            if (CurrentCategory != null)
+            {
+                query = query.Where(p => p.CategoryId == CurrentCategory.Id);
+            }
+
+            // 2. Price Filter
+            query = query.Where(p => (p.SalePrice ?? p.Price) >= minPrice && (p.SalePrice ?? p.Price) <= maxPrice);
+
+            // 3. Stock Filter
+            if (inStockOnly)
+            {
+                query = query.Where(p => p.StockQuantity > 0);
+            }
+
+            // 4. Sorting
+            return sortOrder switch
+            {
+                "price_asc" => query.OrderBy(p => p.SalePrice ?? p.Price),
+                "price_desc" => query.OrderByDescending(p => p.SalePrice ?? p.Price),
+                _ => query.OrderByDescending(p => p.CreatedAt) // "newest"
+            };
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Re-run this whenever the URL changes (e.g., clicking a category link in the sidebar)
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            isLoading = true;
+
+            // Fetch data if not already loaded
+            if (!allCategories.Any())
+            {
+                allCategories = await Http.GetFromJsonAsync<List<CategoryDto>>("api/category") ?? new();
+            }
+            
+            if (!allProducts.Any())
+            {
+                allProducts = await ProductApi.GetActiveProductsAsync() ?? new();
+            }
+
+            // Determine current category based on slug
+            if (!string.IsNullOrEmpty(CategorySlug))
+            {
+                CurrentCategory = allCategories.FirstOrDefault(c => c.Slug?.ToLower() == CategorySlug.ToLower());
+            }
+            else
+            {
+                CurrentCategory = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading store data: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ClearPriceFilter()
+    {
+        minPrice = 0;
+        maxPrice = 5000000;
+    }
+
+    private void ClearAllFilters()
+    {
+        ClearPriceFilter();
+        inStockOnly = false;
+        sortOrder = "newest";
+    }
+}

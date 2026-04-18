@@ -106,6 +106,7 @@ public class CategoryService : ICategoryService
             BannerImageUrl = c.BannerImageUrl,
             DisplayOrder = c.DisplayOrder,
             IsActive = c.IsActive
+
         };
     }
 
