@@ -53,7 +53,7 @@
             </div>
 
             <div class="flex justify-end space-x-3 pt-2">
-                <button type="button" @onclick="ToggleAddForm" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+                <button type="button" @onclick="CloseForm" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
                     Cancel
                 </button>
                 <button type="submit" disabled="@isSubmitting" class="flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:bg-blue-400">
@@ -132,32 +132,80 @@
         await LoadCategories();
     }
 
+    private async Task<HttpRequestMessage> CreateAuthorizedRequest(HttpMethod method, string url, object? body = null)
+    {
+        var token = await LocalStorage.GetItemAsync<string>("authToken");
+        var request = new HttpRequestMessage(method, url);
+
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
+        if (body is not null)
+        {
+            request.Content = JsonContent.Create(body);
+        }
+
+        return request;
+    }
+
     private async Task LoadCategories()
     {
         try
         {
             isLoading = true;
-            categories = await Http.GetFromJsonAsync<List<CategoryDto>>("api/category") ?? new List<CategoryDto>();
+            errorMessage = null;
+
+            using var request = await CreateAuthorizedRequest(HttpMethod.Get, "api/category/admin");
+            using var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                categories = await response.Content.ReadFromJsonAsync<List<CategoryDto>>() ?? new();
+            }
+            else
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                errorMessage = (int)response.StatusCode switch
+                {
+                    401 => "Not authorised. Please log out and log back in.",
+                    403 => "Access denied. Only Super Admin can manage categories.",
+                    _ => $"Failed to load categories (HTTP {(int)response.StatusCode}). {body}"
+                };
+            }
         }
         catch (Exception ex)
         {
             errorMessage = "Failed to load categories. Please check your connection.";
             Console.WriteLine(ex.Message);
         }
-        finally { isLoading = false; }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     private void ToggleAddForm()
     {
-        showAddForm = !showAddForm;
-        errorMessage = null;
-        successMessage = null;
-
-        if (!showAddForm)
+        if (showAddForm)
         {
-            editingCategoryId = null;
-            newCategory = new CreateCategoryRequest();
+            CloseForm();
+            return;
         }
+
+        showAddForm = true;
+        editingCategoryId = null;
+        newCategory = new CreateCategoryRequest();
+        errorMessage = null;
+    }
+
+    private void CloseForm()
+    {
+        showAddForm = false;
+        editingCategoryId = null;
+        newCategory = new CreateCategoryRequest();
+        errorMessage = null;
     }
 
     private void EditCategory(CategoryDto category)
@@ -176,15 +224,6 @@
         successMessage = null;
     }
 
-    private async Task<HttpRequestMessage> CreateAuthorizedRequest(HttpMethod method, string url, object? body = null)
-    {
-        var token = await LocalStorage.GetItemAsync<string>("authToken");
-        var request = new HttpRequestMessage(method, url);
-        if (!string.IsNullOrWhiteSpace(token)) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        if (body is not null) request.Content = JsonContent.Create(body);
-        return request;
-    }
-
     private async Task HandleSubmit()
     {
         isSubmitting = true;
@@ -193,22 +232,31 @@
 
         try
         {
-            HttpMethod method = editingCategoryId.HasValue ? HttpMethod.Put : HttpMethod.Post;
-            string url = editingCategoryId.HasValue ? $"api/category/{editingCategoryId.Value}" : "api/category";
-            
-            var request = await CreateAuthorizedRequest(method, url, newCategory);
-            var response = await Http.SendAsync(request);
+            var method = editingCategoryId.HasValue ? HttpMethod.Put : HttpMethod.Post;
+            var url = editingCategoryId.HasValue ? $"api/category/{editingCategoryId.Value}" : "api/category";
+
+            using var request = await CreateAuthorizedRequest(method, url, newCategory);
+            using var response = await Http.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
-                successMessage = editingCategoryId.HasValue ? "Category updated successfully!" : "Category added successfully!";
-                ToggleAddForm(); // Closes form and resets variables
+                var wasEditing = editingCategoryId.HasValue;
+                CloseForm();
+                successMessage = wasEditing ? "Category updated successfully." : "Category added successfully.";
                 await LoadCategories();
             }
             else
             {
                 var body = await response.Content.ReadAsStringAsync();
-                errorMessage = $"Validation error: {body}";
+                errorMessage = (int)response.StatusCode switch
+                {
+                    401 => "Not authorised. Please log out and log back in.",
+                    403 => "Access denied. Only Super Admin can manage categories.",
+                    404 => "Category not found.",
+                    409 => body,
+                    400 => $"Validation error: {body}",
+                    _ => $"Failed to save category (HTTP {(int)response.StatusCode}). {body}"
+                };
             }
         }
         catch (Exception ex)
@@ -216,23 +264,44 @@
             errorMessage = "A network error occurred while saving the category.";
             Console.WriteLine(ex.Message);
         }
-        finally { isSubmitting = false; }
+        finally
+        {
+            isSubmitting = false;
+        }
     }
 
     private async Task DeleteCategory(Guid id)
     {
         try
         {
-            var request = await CreateAuthorizedRequest(HttpMethod.Delete, $"api/category/{id}");
-            var response = await Http.SendAsync(request);
+            errorMessage = null;
+            successMessage = null;
+
+            using var request = await CreateAuthorizedRequest(HttpMethod.Delete, $"api/category/{id}");
+            using var response = await Http.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
                 successMessage = "Category deleted successfully.";
                 await LoadCategories();
             }
-            else { errorMessage = "Failed to delete category."; }
+            else
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                errorMessage = (int)response.StatusCode switch
+                {
+                    401 => "Not authorised. Please log out and log back in.",
+                    403 => "Access denied. Only Super Admin can manage categories.",
+                    404 => "Category not found.",
+                    409 => body,
+                    _ => $"Failed to delete category (HTTP {(int)response.StatusCode}). {body}"
+                };
+            }
         }
-        catch (Exception) { errorMessage = "An error occurred while deleting the category."; }
+        catch (Exception ex)
+        {
+            errorMessage = "An error occurred while deleting the category.";
+            Console.WriteLine(ex.Message);
+        }
     }
 }

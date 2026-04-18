@@ -122,72 +122,93 @@ public class ProductService : IProductService
     }
     public async Task<ProductDto> UpdateAsync(Guid id, CreateProductRequest request)
     {
-        // 1. FETCH THE EXISTING PRODUCT (This keeps the correct DB Id!)
         var product = await _context.Products
+            .Include(p => p.Category)
             .Include(p => p.Images)
-            .FirstOrDefaultAsync(p => p.Id == id);
+            .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
 
-        if (product == null || product.IsDeleted)
-            throw new Exception("Product not found.");
+        if (product == null)
+            throw new KeyNotFoundException("Product not found.");
 
-        // 2. Overwrite the properties with the form data
-        product.Name = request.Name;
-        product.Slug = request.Slug;
+        product.Name = request.Name.Trim();
+        product.Slug = request.Slug.Trim();
         product.Description = request.Description;
         product.Price = request.Price;
         product.SalePrice = request.SalePrice;
-        product.SKU = request.SKU;
+        product.SKU = request.SKU.Trim().ToUpperInvariant();
         product.StockQuantity = request.StockQuantity;
         product.CategoryId = request.CategoryId;
         product.IsActive = request.IsActive;
-        product.Colors = request.Colors ?? new List<string>();
+        product.Colors = (request.Colors ?? new List<string>())
+            .Where(c => !string.IsNullOrWhiteSpace(c))
+            .Select(c => c.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
         product.UpdatedAt = DateTime.UtcNow;
 
-        // 3. Handle Images IF new ones are uploaded
         if (request.Images != null && request.Images.Any())
         {
-            var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "images", "products");
+            var uploadsFolder = Path.Combine(
+                _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"),
+                "images",
+                "products");
+
             Directory.CreateDirectory(uploadsFolder);
 
-            int displayOrder = product.Images.Count + 1;
+            var allowedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"
+        };
+
+            var previousMainImage = product.Images.FirstOrDefault(i => i.IsMain);
+            var nextDisplayOrder = product.Images.Any() ? product.Images.Max(i => i.DisplayOrder) + 1 : 1;
+            var savedNewImage = false;
+            var firstNewImage = true;
 
             foreach (var file in request.Images)
             {
-                if (file.Length <= 0) continue;
+                if (file.Length <= 0)
+                    continue;
 
-                var uniqueFileName = $"{Guid.NewGuid():N}{Path.GetExtension(file.FileName)}";
+                var extension = Path.GetExtension(file.FileName);
+                if (!allowedExtensions.Contains(extension))
+                    continue;
+
+                var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                 await using var fileStream = new FileStream(filePath, FileMode.Create);
                 await file.CopyToAsync(fileStream);
 
+                if (firstNewImage)
+                {
+                    foreach (var image in product.Images)
+                    {
+                        image.IsMain = false;
+                    }
+                }
+
                 product.Images.Add(new ProductImage
                 {
                     ImageUrl = $"/images/products/{uniqueFileName}",
-                    DisplayOrder = displayOrder,
-                    IsMain = !product.Images.Any()
+                    DisplayOrder = nextDisplayOrder++,
+                    IsMain = firstNewImage
                 });
-                displayOrder++;
+
+                savedNewImage = true;
+                firstNewImage = false;
+            }
+
+            if (!savedNewImage && previousMainImage != null)
+            {
+                previousMainImage.IsMain = true;
             }
         }
 
-        // 4. Save changes! DO NOT write _context.Products.Update(product); here!
-        // Because we fetched it in step 1, EF Core already knows it's modified.
         await _context.SaveChangesAsync();
 
-        return await GetByIdAsync(product.Id) ?? throw new Exception("Failed to update product.");
-    }
-    public async Task<bool> SoftDeleteAsync(Guid id)
-    {
-        var product = await _context.Products.FindAsync(id);
-        if (product == null || product.IsDeleted) return false;
-
-        product.IsDeleted = true;
-        product.IsActive = false;
-        product.UpdatedAt = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync();
-        return true;
+        return await GetByIdAsync(product.Id)
+            ?? throw new Exception("Failed to retrieve updated product.");
     }
 
     private static ProductDto MapToDto(Product p)
@@ -202,16 +223,34 @@ public class ProductService : IProductService
             SalePrice = p.SalePrice,
             SKU = p.SKU,
             StockQuantity = p.StockQuantity,
+            Colors = p.Colors?.ToList() ?? new List<string>(),
             IsActive = p.IsActive,
             CategoryId = p.CategoryId,
             CategoryName = p.Category?.Name,
-            Images = p.Images.OrderBy(i => i.DisplayOrder).Select(i => new ProductImageDto
-            {
-                Id = i.Id,
-                ImageUrl = i.ImageUrl,
-                DisplayOrder = i.DisplayOrder,
-                IsMain = i.IsMain
-            }).ToList()
+            Images = p.Images
+                .OrderBy(i => i.DisplayOrder)
+                .Select(i => new ProductImageDto
+                {
+                    Id = i.Id,
+                    ImageUrl = i.ImageUrl,
+                    DisplayOrder = i.DisplayOrder,
+                    IsMain = i.IsMain
+                })
+                .ToList()
         };
     }
+
+    public async Task<bool> SoftDeleteAsync(Guid id)
+    {
+        var product = await _context.Products.FindAsync(id);
+        if (product == null || product.IsDeleted) return false;
+
+        product.IsDeleted = true;
+        product.IsActive = false;
+        product.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
 }

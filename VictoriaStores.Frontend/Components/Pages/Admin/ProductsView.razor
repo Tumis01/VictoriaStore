@@ -1,7 +1,8 @@
 ﻿@page "/admin/products"
 @layout Layout.AdminLayout
 @inject HttpClient Http
-@inject VictoriaStores.Frontend.Services.ProductApiClient ProductApi
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@using System.Net.Http.Headers
 @using System.Net.Http.Json
 @using System.Linq
 @using VictoriaStores.Frontend.Models
@@ -20,6 +21,20 @@
         </a>
     </div>
 </div>
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="mb-4 rounded-md bg-red-50 p-4 border border-red-200">
+        <p class="text-sm font-medium text-red-800">@errorMessage</p>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(successMessage))
+{
+    <div class="mb-4 rounded-md bg-green-50 p-4 border border-green-200">
+        <p class="text-sm font-medium text-green-800">@successMessage</p>
+    </div>
+}
 
 <div class="bg-white rounded-t-xl border border-gray-200 border-b-0 p-4 flex flex-col sm:flex-row gap-4 justify-between items-center shadow-sm">
     <div class="relative w-full sm:w-96">
@@ -63,7 +78,7 @@
                 }
                 else
                 {
-                    int index = 1;
+                    var index = 1;
                     @foreach (var product in FilteredProducts)
                     {
                         <tr class="hover:bg-gray-50 transition-colors duration-150 group">
@@ -128,8 +143,9 @@
     private List<ProductDto> products = new();
     private string searchTerm = string.Empty;
     private string statusFilter = string.Empty;
+    private string? errorMessage;
+    private string? successMessage;
 
-    // Filter Logic fixed
     private IEnumerable<ProductDto> FilteredProducts => products.Where(p =>
         (string.IsNullOrWhiteSpace(searchTerm) || p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) &&
         (string.IsNullOrWhiteSpace(statusFilter) ||
@@ -139,30 +155,88 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadProducts();
+    }
+
+    private async Task<HttpRequestMessage> CreateAuthorizedRequest(HttpMethod method, string url)
+    {
+        var token = await LocalStorage.GetItemAsync<string>("authToken");
+        var request = new HttpRequestMessage(method, url);
+
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
+        return request;
+    }
+
+    private async Task LoadProducts()
+    {
         try
         {
             isLoading = true;
-            products = await ProductApi.GetActiveProductsAsync() ?? new();
+            errorMessage = null;
+
+            using var request = await CreateAuthorizedRequest(HttpMethod.Get, "api/product/admin");
+            using var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                products = await response.Content.ReadFromJsonAsync<List<ProductDto>>() ?? new();
+            }
+            else
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                errorMessage = (int)response.StatusCode switch
+                {
+                    401 => "Not authorised. Please log out and log back in.",
+                    403 => "Access denied. Only Super Admin can manage products.",
+                    _ => $"Failed to load products (HTTP {(int)response.StatusCode}). {body}"
+                };
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading products: {ex.Message}");
+            errorMessage = "An error occurred while loading products.";
+            Console.WriteLine($"Load products failed: {ex.Message}");
         }
-        finally { isLoading = false; }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     private async Task DeleteProduct(Guid id)
     {
         try
         {
-            var response = await Http.DeleteAsync($"api/product/{id}");
+            errorMessage = null;
+            successMessage = null;
+
+            using var request = await CreateAuthorizedRequest(HttpMethod.Delete, $"api/product/{id}");
+            using var response = await Http.SendAsync(request);
+
             if (response.IsSuccessStatusCode)
             {
                 products.RemoveAll(p => p.Id == id);
+                successMessage = "Product deleted successfully.";
+            }
+            else
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                errorMessage = (int)response.StatusCode switch
+                {
+                    401 => "Not authorised. Please log out and log back in.",
+                    403 => "Access denied. Only Super Admin can manage products.",
+                    404 => "Product not found.",
+                    _ => $"Failed to delete product (HTTP {(int)response.StatusCode}). {body}"
+                };
             }
         }
         catch (Exception ex)
         {
+            errorMessage = "An error occurred while deleting the product.";
             Console.WriteLine($"Delete failed: {ex.Message}");
         }
     }

@@ -39,4 +39,42 @@ public class CategoryController : ControllerBase
         var category = await _categoryService.CreateAsync(request);
         return CreatedAtAction(nameof(GetActiveCategories), new { id = category.Id }, category);
     }
+
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] CreateCategoryRequest request)
+    {
+        try
+        {
+            var category = await _categoryService.UpdateAsync(id, request);
+            return Ok(category);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(ex.Message);
+        }
+    }
+
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            await _categoryService.DeleteAsync(id);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(ex.Message);
+        }
+    }
 }

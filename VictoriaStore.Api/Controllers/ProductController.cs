@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VictoriaStore.Api.DTOs;
 using VictoriaStore.Api.Services;
 
@@ -16,13 +17,13 @@ public class ProductController : ControllerBase
         _productService = productService;
     }
 
-    [HttpGet] // Public
+    [HttpGet]
     public async Task<IActionResult> GetActiveProducts()
     {
         return Ok(await _productService.GetAllActiveAsync());
     }
 
-    [HttpGet("{id:guid}")] // Public
+    [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetProduct(Guid id)
     {
         var product = await _productService.GetByIdAsync(id);
@@ -44,6 +45,7 @@ public class ProductController : ControllerBase
         var product = await _productService.CreateAsync(request);
         return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
     }
+
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "SuperAdmin")]
     public async Task<IActionResult> Update(Guid id, [FromForm] CreateProductRequest request)
@@ -53,11 +55,20 @@ public class ProductController : ControllerBase
             var product = await _productService.UpdateAsync(id, request);
             return Ok(product);
         }
-        catch (Exception ex)
+        catch (KeyNotFoundException ex)
         {
-            return BadRequest(ex.Message);
+            return NotFound(ex.Message);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Conflict("This product was changed or removed while you were editing it. Refresh and try again.");
+        }
+        catch (DbUpdateException ex)
+        {
+            return BadRequest(ex.InnerException?.Message ?? ex.Message);
         }
     }
+
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "SuperAdmin")]
     public async Task<IActionResult> Delete(Guid id)

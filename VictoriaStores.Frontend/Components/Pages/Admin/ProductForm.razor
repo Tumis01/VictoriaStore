@@ -5,6 +5,7 @@
 @inject NavigationManager NavManager
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @using System.Globalization
+@using System.Linq
 @using System.Net.Http.Headers
 @using System.Net.Http.Json
 @using System.Text
@@ -66,7 +67,9 @@ else
                         <div class="flex flex-wrap gap-2">
                             @foreach (var color in predefinedColors)
                             {
-                                <button type="button" @onclick="() => ToggleColor(color)" class="@(productModel.Colors.Contains(color) ? "bg-brand text-white border-brand" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50") px-4 py-1.5 rounded-full border text-sm font-semibold transition-colors shadow-sm">
+                                <button type="button"
+                                        @onclick="() => ToggleColor(color)"
+                                        class="@(productModel.Colors.Contains(color) ? "bg-brand text-white border-brand" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50") px-4 py-1.5 rounded-full border text-sm font-semibold transition-colors shadow-sm">
                                     @color
                                 </button>
                             }
@@ -76,20 +79,68 @@ else
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h3 class="text-lg font-bold text-gray-900 font-serif mb-4">Media</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900 font-serif">Media</h3>
+                    <span class="text-xs font-semibold text-gray-500">Up to @MaxFileCount images, auto-resized before upload</span>
+                </div>
+
                 <label for="product-images" class="block border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer">
                     <div class="mx-auto w-12 h-12 bg-brand-light text-brand rounded-full flex items-center justify-center mb-3">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
                     <p class="text-sm font-bold text-brand">Click to upload <span class="text-gray-500 font-normal">product image(s)</span></p>
+                    <p class="text-xs text-gray-400 mt-1">PNG, JPG, JPEG, WEBP, GIF or SVG</p>
+                    <p class="text-xs text-gray-400 mt-1">Large images are compressed to speed up saving</p>
                 </label>
+
                 <InputFile id="product-images" OnChange="HandleFilesSelected" accept="image/*" multiple class="hidden" />
 
-                @if (!string.IsNullOrWhiteSpace(productModel.MainImageUrl))
+                @if (!string.IsNullOrWhiteSpace(uploadStatus))
                 {
-                    <div class="mt-4">
-                        <p class="text-sm font-semibold text-gray-700 mb-2">Current image</p>
-                        <img src="@($"https://localhost:7145{productModel.MainImageUrl}")" alt="@productModel.Name" class="h-32 w-32 rounded-lg border object-cover" />
+                    <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                        <p class="text-sm font-medium text-blue-800">@uploadStatus</p>
+                    </div>
+                }
+
+                @if (selectedFiles.Any())
+                {
+                    <div class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
+                        <p class="text-sm font-semibold text-green-800 mb-3">Selected files</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            @foreach (var file in selectedFiles)
+                            {
+                                <div class="rounded-lg border border-green-200 bg-white px-3 py-2">
+                                    <p class="text-sm font-medium text-gray-800 truncate">@file.Name</p>
+                                    <p class="text-xs text-gray-500">@FormatFileSize(file.Size)</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @if (productModel.Images.Any())
+                {
+                    <div class="mt-6">
+                        <p class="text-sm font-semibold text-gray-700 mb-3">Current gallery</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            @foreach (var image in productModel.Images.OrderBy(i => i.DisplayOrder))
+                            {
+                                <div class="rounded-xl border border-gray-200 overflow-hidden bg-white">
+                                    <div class="aspect-square bg-gray-50">
+                                        <img src="@($"https://localhost:7145{image.ImageUrl}")" alt="@productModel.Name" class="h-full w-full object-cover" />
+                                    </div>
+                                    <div class="p-3">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <span class="text-xs text-gray-500">Order: @image.DisplayOrder</span>
+                                            @if (image.IsMain)
+                                            {
+                                                <span class="inline-flex items-center rounded-full bg-brand-light px-2 py-0.5 text-xs font-semibold text-brand">Main</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
                 }
             </div>
@@ -98,6 +149,7 @@ else
         <div class="space-y-6">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h3 class="text-lg font-bold text-gray-900 font-serif mb-4">Pricing</h3>
+
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Regular Price (₦) <span class="text-red-500">*</span></label>
@@ -113,6 +165,7 @@ else
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h3 class="text-lg font-bold text-gray-900 font-serif mb-4">Organization</h3>
+
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Category <span class="text-red-500">*</span></label>
@@ -123,13 +176,14 @@ else
                                 <option value="@cat.Id">@cat.Name</option>
                             }
                         </InputSelect>
-                        <ValidationMessage For="@(() => productModel.CategoryId)" class="text-xs text-red-500 mt-1" />
                     </div>
+
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Stock Quantity <span class="text-red-500">*</span></label>
                         <InputNumber @bind-Value="productModel.StockQuantity" class="h-11 w-full px-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand outline-none" />
                         <ValidationMessage For="@(() => productModel.StockQuantity)" class="text-xs text-red-500 mt-1" />
                     </div>
+
                     <div class="flex items-center gap-3 pt-2">
                         <InputCheckbox @bind-Value="productModel.IsActive" id="isActive" class="w-5 h-5 text-brand border-gray-300 rounded focus:ring-brand" />
                         <label for="isActive" class="text-sm font-semibold text-gray-700 cursor-pointer">Product is Active</label>
@@ -142,8 +196,13 @@ else
                 {
                     <div class="p-3 text-sm text-red-700 bg-red-100 rounded-lg">@errorMessage</div>
                 }
+
                 <button type="submit" disabled="@isSubmitting" class="h-12 w-full bg-brand text-white font-bold rounded-xl shadow-sm hover:bg-brand-dark transition-colors disabled:bg-gray-400">
-                    @(isSubmitting ? "Saving..." : (IsEditMode ? "Update Product" : "Save Product"))
+                    @SaveButtonText
+                </button>
+
+                <button type="button" @onclick='() => NavManager.NavigateTo("/admin/products")' class="h-12 w-full bg-white border border-gray-300 text-gray-700 font-bold rounded-xl shadow-sm hover:bg-gray-50 transition-colors">
+                    Cancel
                 </button>
             </div>
         </div>
@@ -157,13 +216,24 @@ else
     private bool isLoading = true;
     private bool isSubmitting = false;
     private string? errorMessage;
+    private string? uploadStatus;
+
+    private const int MaxFileCount = 5;
+    private const long MaxFileSize = 2 * 1024 * 1024;
 
     private ProductDto productModel = new() { IsActive = true };
     private List<CategoryDto> categories = new();
-    private IReadOnlyList<IBrowserFile> selectedFiles = Array.Empty<IBrowserFile>();
+    private List<IBrowserFile> selectedFiles = new();
 
-    // Standard list of colors for the admin to choose from
-    private List<string> predefinedColors = new() { "Black", "White", "Red", "Blue", "Green", "Yellow", "Silver", "Gold", "Pink", "Brown", "Grey" };
+    private readonly List<string> predefinedColors = new()
+    {
+        "Black", "White", "Red", "Blue", "Green", "Yellow", "Silver", "Gold", "Pink", "Brown", "Grey"
+    };
+
+    private string SaveButtonText =>
+        isSubmitting
+            ? (selectedFiles.Any() ? $"Uploading {selectedFiles.Count} image(s)..." : "Saving...")
+            : (IsEditMode ? "Update Product" : "Save Product");
 
     protected override async Task OnInitializedAsync()
     {
@@ -175,14 +245,20 @@ else
             if (IsEditMode)
             {
                 var fetched = await Http.GetFromJsonAsync<ProductDto>($"api/product/{Id}");
-                if (fetched != null) productModel = fetched;
+                if (fetched != null)
+                {
+                    productModel = fetched;
+                }
             }
         }
         catch (Exception ex)
         {
             errorMessage = "Failed to load required data. " + ex.Message;
         }
-        finally { isLoading = false; }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     private void ToggleColor(string color)
@@ -197,16 +273,64 @@ else
         }
     }
 
-    private void HandleFilesSelected(InputFileChangeEventArgs e)
+    private async Task HandleFilesSelected(InputFileChangeEventArgs e)
     {
-        selectedFiles = e.GetMultipleFiles(10);
+        errorMessage = null;
+        uploadStatus = null;
+
+        IReadOnlyList<IBrowserFile> files;
+
+        try
+        {
+            files = e.GetMultipleFiles(MaxFileCount);
+        }
+        catch (InvalidOperationException)
+        {
+            errorMessage = $"Please select no more than {MaxFileCount} images.";
+            selectedFiles.Clear();
+            return;
+        }
+
+        var processedFiles = new List<IBrowserFile>();
+
+        foreach (var file in files)
+        {
+            if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            {
+                errorMessage = $"'{file.Name}' is not a valid image file.";
+                selectedFiles.Clear();
+                return;
+            }
+
+            var resizedFile = await file.RequestImageFileAsync("image/jpeg", 1280, 1280);
+
+            if (resizedFile.Size > MaxFileSize)
+            {
+                errorMessage = $"'{file.Name}' is still too large after compression. Please use a smaller image.";
+                selectedFiles.Clear();
+                return;
+            }
+
+            processedFiles.Add(resizedFile);
+        }
+
+        selectedFiles = processedFiles;
+        uploadStatus = $"{selectedFiles.Count} image(s) ready to upload.";
     }
 
     private async Task<HttpRequestMessage> CreateAuthorizedRequest(HttpMethod method, string url, HttpContent content)
     {
         var token = await LocalStorage.GetItemAsync<string>("authToken");
-        var request = new HttpRequestMessage(method, url) { Content = content };
-        if (!string.IsNullOrWhiteSpace(token)) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var request = new HttpRequestMessage(method, url)
+        {
+            Content = content
+        };
+
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
         return request;
     }
 
@@ -214,11 +338,31 @@ else
     {
         isSubmitting = true;
         errorMessage = null;
+        uploadStatus = selectedFiles.Any()
+            ? $"Uploading {selectedFiles.Count} image(s)..."
+            : "Saving product...";
 
         try
         {
-            var slug = string.IsNullOrWhiteSpace(productModel.Slug) ? BuildSlug(productModel.Name) : BuildSlug(productModel.Slug);
-            var sku = string.IsNullOrWhiteSpace(productModel.SKU) ? $"VJS-{DateTime.UtcNow:yyyyMMddHHmmss}" : productModel.SKU.Trim().ToUpperInvariant();
+            if (string.IsNullOrWhiteSpace(productModel.Name))
+            {
+                errorMessage = "Product name is required.";
+                return;
+            }
+
+            if (productModel.CategoryId == Guid.Empty)
+            {
+                errorMessage = "Please select a category.";
+                return;
+            }
+
+            var slug = string.IsNullOrWhiteSpace(productModel.Slug)
+                ? BuildSlug(productModel.Name)
+                : BuildSlug(productModel.Slug);
+
+            var sku = string.IsNullOrWhiteSpace(productModel.SKU)
+                ? $"VJS-{DateTime.UtcNow:yyyyMMddHHmmss}"
+                : productModel.SKU.Trim().ToUpperInvariant();
 
             using var content = new MultipartFormDataContent
             {
@@ -233,9 +377,10 @@ else
             };
 
             if (productModel.SalePrice.HasValue)
+            {
                 content.Add(new StringContent(productModel.SalePrice.Value.ToString(CultureInfo.InvariantCulture)), "SalePrice");
+            }
 
-            // Attach selected colors
             foreach (var color in productModel.Colors)
             {
                 content.Add(new StringContent(color), "Colors");
@@ -243,14 +388,13 @@ else
 
             foreach (var file in selectedFiles)
             {
-                var streamContent = new StreamContent(file.OpenReadStream(10 * 1024 * 1024));
+                var streamContent = new StreamContent(file.OpenReadStream(MaxFileSize));
                 streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                 content.Add(streamContent, "Images", file.Name);
             }
 
-            // Execute PUT for Edit, POST for New
-            HttpMethod method = IsEditMode ? HttpMethod.Put : HttpMethod.Post;
-            string url = IsEditMode ? $"api/product/{Id}" : "api/product";
+            var method = IsEditMode ? HttpMethod.Put : HttpMethod.Post;
+            var url = IsEditMode ? $"api/product/{Id}" : "api/product";
 
             using var request = await CreateAuthorizedRequest(method, url, content);
             using var response = await Http.SendAsync(request);
@@ -262,26 +406,61 @@ else
             else
             {
                 var body = await response.Content.ReadAsStringAsync();
-                errorMessage = $"Validation error: {body}";
+
+                errorMessage = (int)response.StatusCode switch
+                {
+                    401 => "Not authorised. Please log out and log back in.",
+                    403 => "Access denied. Only Super Admin can manage products.",
+                    409 => body,
+                    400 => $"Validation error: {body}",
+                    _ => $"Failed to save product (HTTP {(int)response.StatusCode}). {body}"
+                };
             }
         }
         catch (Exception ex)
         {
             errorMessage = "An error occurred while saving the product: " + ex.Message;
         }
-        finally { isSubmitting = false; }
+        finally
+        {
+            isSubmitting = false;
+            uploadStatus = null;
+        }
     }
 
     private static string BuildSlug(string value)
     {
-        if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
         var builder = new StringBuilder();
         var previousDash = false;
+
         foreach (var ch in value.Trim().ToLowerInvariant())
         {
-            if (char.IsLetterOrDigit(ch)) { builder.Append(ch); previousDash = false; }
-            else if (!previousDash) { builder.Append('-'); previousDash = true; }
+            if (char.IsLetterOrDigit(ch))
+            {
+                builder.Append(ch);
+                previousDash = false;
+            }
+            else if (!previousDash)
+            {
+                builder.Append('-');
+                previousDash = true;
+            }
         }
+
         return builder.ToString().Trim('-');
+    }
+
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024)
+            return $"{bytes} B";
+
+        if (bytes < 1024 * 1024)
+            return $"{Math.Round(bytes / 1024d, 1)} KB";
+
+        return $"{Math.Round(bytes / 1024d / 1024d, 1)} MB";
     }
 }
