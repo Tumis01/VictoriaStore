@@ -28,22 +28,28 @@ public class ProductService : IProductService
 
     public async Task<IEnumerable<ProductDto>> GetAllActiveAsync()
     {
-        return await _context.Products
+        // 1. Fetch the data from the database first
+        var products = await _context.Products
             .Include(p => p.Category)
             .Include(p => p.Images)
             .Where(p => p.IsActive && !p.IsDeleted)
-            .Select(p => MapToDto(p))
             .ToListAsync();
+
+        // 2. Map to DTOs in memory using your custom method
+        return products.Select(p => MapToDto(p));
     }
 
     public async Task<IEnumerable<ProductDto>> GetAllAdminAsync()
     {
-        return await _context.Products
+        // 1. Fetch the data from the database first
+        var products = await _context.Products
             .Include(p => p.Category)
             .Include(p => p.Images)
             .Where(p => !p.IsDeleted)
-            .Select(p => MapToDto(p))
             .ToListAsync();
+
+        // 2. Map to DTOs in memory
+        return products.Select(p => MapToDto(p));
     }
 
     public async Task<ProductDto?> GetByIdAsync(Guid id)

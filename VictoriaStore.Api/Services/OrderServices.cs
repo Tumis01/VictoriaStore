@@ -41,6 +41,7 @@ public class OrderService : IOrderService
                 CustomerEmail = request.CustomerEmail,
                 CustomerPhone = request.CustomerPhone,
                 DeliveryAddress = request.DeliveryAddress,
+                BankPaymentNote = request.Notes,
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow

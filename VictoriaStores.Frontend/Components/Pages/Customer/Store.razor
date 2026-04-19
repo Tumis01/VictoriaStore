@@ -181,7 +181,7 @@
                     }
                 </div>
             }
-            <!-- Empty state (no products in DB at all) -->
+            @* Empty state (no products in DB at all) *@
             else if (!allProducts.Any() && string.IsNullOrEmpty(errorMessage))
             {
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-14 text-center">
@@ -191,17 +191,17 @@
                         Products haven't been added to the store yet. Check back soon, or contact us on WhatsApp for availability.
                     </p>
                     <a href="https://wa.me/2348162809886" target="_blank"
-                       class="inline-flex items-center gap-2 h-11 px-6 bg-green-500 text-white font-bold rounded-xl text-sm hover:bg-green-600 transition-colors">
+                           class="inline-flex items-center gap-2 h-11 px-6 bg-green-500 text-white font-bold rounded-xl text-sm hover:bg-green-600 transition-colors">
                         Ask on WhatsApp
                     </a>
                 </div>
             }
-            <!-- Empty state (filters too strict) -->
+            @* Empty state (filters too strict) *@
             else if (!FilteredProducts.Any())
             {
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
                     <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </div>
                     <h3 class="text-lg font-bold text-gray-900 mb-2">No products match your filters</h3>
                     <p class="text-gray-500 text-sm mb-6">Try adjusting your filters or browse all products.</p>
@@ -210,13 +210,13 @@
                     </button>
                 </div>
             }
-            <!-- Product grid -->
+            @* Product grid *@
             else
             {
                 <div class="@(isGridView ? "grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5" : "flex flex-col gap-4")">
                     @foreach (var product in DisplayedProducts)
                     {
-                        <VictoriaStores.Frontend.Components.ProductCard Product="product" IsListView="!isGridView" />
+                        <ProductCard Product="product" IsListView="!isGridView" />
                     }
                 </div>
 
@@ -225,10 +225,10 @@
                     <div class="mt-10 flex justify-center">
                         <button @onclick="LoadMore"
                                 class="inline-flex items-center gap-2 h-12 px-10 bg-white border-2 border-gray-200
-                                       text-gray-700 font-bold text-sm rounded-xl hover:border-brand hover:text-brand
-                                       transition-all duration-200 shadow-sm">
+                            text-gray-700 font-bold text-sm rounded-xl hover:border-brand hover:text-brand
+                            transition-all duration-200 shadow-sm">
                             Load More Products
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
                         </button>
                     </div>
                 }
@@ -368,9 +368,9 @@
                 Console.WriteLine($"[Store] ProductApiClient failed: {apiEx.Message}. Trying direct HTTP...");
             }
 
-            if (products == null || !products.Any())
+            if (products == null)
             {
-                // Direct fallback — public endpoint, no auth required
+                // Only fallback if the first call actually returned null (e.g., API client failed)
                 products = await Http.GetFromJsonAsync<List<ProductDto>>("api/product") ?? new();
             }
 

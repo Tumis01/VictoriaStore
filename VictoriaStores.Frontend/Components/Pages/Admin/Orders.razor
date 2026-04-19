@@ -256,15 +256,29 @@
         if (selectedOrder == null) return;
         try
         {
-            // Requires an endpoint like PUT api/order/{id}/status
-            var response = await Http.PutAsJsonAsync($"api/order/{selectedOrder.Id}/status", selectedOrder.Status);
+            // 1. Create the exact payload object the backend expects
+            var payload = new UpdateOrderStatusRequest
+            {
+                Status = selectedOrder.Status
+            };
+
+            // 2. Use PATCH instead of PUT
+            var response = await Http.PatchAsJsonAsync($"api/order/{selectedOrder.Id}/status", payload);
+            
             if (response.IsSuccessStatusCode)
             {
                 updateSuccess = true;
-                await LoadOrders(); // Refresh table
+                await LoadOrders(); // Refresh the background table
+            }
+            else
+            {
+                Console.WriteLine($"Failed to update status: {response.StatusCode}");
             }
         }
-        catch { /* Handle error */ }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating status: {ex.Message}");
+        }
     }
 
     private void ExportOrders()

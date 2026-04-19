@@ -6,6 +6,7 @@ public class CheckoutRequest
     public required string CustomerEmail { get; set; }
     public required string CustomerPhone { get; set; }
     public string? DeliveryAddress { get; set; }
+    public string? Notes { get; set; }
     public required List<CartItemDto> Items { get; set; } = new();
 }
 

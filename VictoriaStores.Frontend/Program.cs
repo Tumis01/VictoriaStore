@@ -12,15 +12,22 @@ builder.Services.AddRazorComponents()
 // Register the custom authorization handler
 builder.Services.AddScoped<CustomAuthorizationHandler>();
 
-// Configure a named HttpClient for the API
-builder.Services.AddHttpClient("VictoriaApi", client =>
+// Create a Scoped HttpClient tied directly to the active user's Blazor circuit
+builder.Services.AddScoped(sp =>
 {
-    client.BaseAddress = new Uri("https://localhost:7145/");
-    client.Timeout = TimeSpan.FromMinutes(10);
-}).AddHttpMessageHandler<CustomAuthorizationHandler>();
+    var authHandler = sp.GetRequiredService<CustomAuthorizationHandler>();
+    authHandler.InnerHandler = new HttpClientHandler(); // Set the base handler
 
+    var client = new HttpClient(authHandler)
+    {
+        BaseAddress = new Uri("https://localhost:7145/"),
+        Timeout = TimeSpan.FromMinutes(10)
+    };
+
+    return client;
+});
 // Set it as the default HttpClient for the app
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("VictoriaApi"));
+//builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("VictoriaApi"));
 
 // Local storage
 builder.Services.AddBlazoredLocalStorage();

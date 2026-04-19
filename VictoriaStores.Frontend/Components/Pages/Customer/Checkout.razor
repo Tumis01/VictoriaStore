@@ -51,7 +51,7 @@
     }
     else
     {
-        <EditForm Model="checkoutModel" OnValidSubmit="PlaceOrder" class="flex flex-col lg:flex-row gap-8 items-start">
+        <EditForm Model="checkoutModel" OnValidSubmit="PlaceOrder" FormName="checkoutForm" class="flex flex-col lg:flex-row gap-8 items-start">
             <DataAnnotationsValidator />
 
             <div class="w-full lg:w-[60%]">
@@ -198,40 +198,64 @@
     }
 
     private async Task PlaceOrder()
+{
+    isSubmitting = true;
+    errorMessage = null;
+
+    try
     {
-        isSubmitting = true;
-        errorMessage = null;
+        var response = await Http.PostAsJsonAsync("api/order", checkoutModel);
 
-        try
+        if (response.IsSuccessStatusCode)
         {
-            // Assuming your backend OrderController has a POST route at api/order
-            var response = await Http.PostAsJsonAsync("api/order", checkoutModel);
-
-            if (response.IsSuccessStatusCode)
+            var result = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
+            
+            if (result != null)
             {
-                var result = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
+                // Clear the cart on successful order!
+                await CartService.ClearCartAsync();
                 
-                if (result != null)
+                // Redirect to the success page
+                NavManager.NavigateTo($"/confirmation/{result.Id}");
+            }
+        }
+        else
+        {
+            // Fetch the exact error string from your backend API!
+            var errorStr = await response.Content.ReadAsStringAsync();
+            
+            try 
+            {
+                // Parse the JSON error object sent by your OrderController
+                var json = System.Text.Json.JsonDocument.Parse(errorStr);
+                
+                if (json.RootElement.TryGetProperty("message", out var msg))
                 {
-                    // Clear the cart on successful order!
-                    await CartService.ClearCartAsync();
-                    
-                    // Redirect to the success page
-                    NavManager.NavigateTo($"/confirmation/{result.Id}");
+                    errorMessage = msg.GetString();
+                }
+                else if (json.RootElement.TryGetProperty("Message", out var capMsg))
+                {
+                    errorMessage = capMsg.GetString();
+                }
+                else
+                {
+                    errorMessage = "Validation error. Please check your form details.";
                 }
             }
-            else
+            catch
             {
-                errorMessage = "Failed to place order. Please verify your details and try again.";
+                // Fallback if the error isn't JSON (e.g., a 500 Server Crash)
+                errorMessage = "Server Error: " + errorStr;
             }
         }
-        catch (Exception ex)
-        {
-            errorMessage = "A network error occurred. Please check your connection. " + ex.Message;
-        }
-        finally
-        {
-            isSubmitting = false;
-        }
     }
+    catch (Exception ex)
+    {
+        errorMessage = "A network error occurred. Please check your connection. " + ex.Message;
+    }
+    finally
+    {
+        isSubmitting = false;
+    }
+}
 }
