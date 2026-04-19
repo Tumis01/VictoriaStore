@@ -262,10 +262,10 @@ else
         var cartItem = new CartItemDto
         {
             ProductId = product.Id,
-            Name = product.Name + (string.IsNullOrEmpty(selectedColor) ? "" : $" - {selectedColor}"),
-            Price = product.SalePrice ?? product.Price,
-            Quantity = quantity,
-            MainImageUrl = product.MainImageUrl
+            ProductName = product.Name,              // Changed from Name
+            UnitPrice = product.SalePrice ?? product.Price, // Changed from Price (Also handles discounts!)
+            Quantity = 1,
+            ImageUrl = product.MainImageUrl          // Changed from MainImageUrl
         };
 
         await CartService.AddToCartAsync(cartItem);

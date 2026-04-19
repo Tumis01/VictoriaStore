@@ -7,32 +7,35 @@
 
 <PageTitle>@(CurrentCategory?.Name ?? "All Products") - Victoria James Store</PageTitle>
 
-<div class="w-full bg-gradient-to-r from-brand-dark to-brand h-[180px] relative flex items-center justify-center overflow-hidden">
+<!-- Category Banner -->
+<div class="w-full h-[160px] md:h-[200px] relative flex items-center justify-center overflow-hidden"
+     style="background:linear-gradient(135deg,#1e3a8a 0%,#1A56DB 60%,#3b82f6 100%)">
     @if (CurrentCategory != null && !string.IsNullOrEmpty(CurrentCategory.BannerImageUrl))
     {
-        <img src="@CurrentCategory.BannerImageUrl" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40" />
+        <img src="@CurrentCategory.BannerImageUrl" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40" alt=""/>
     }
-    <div class="absolute inset-0 bg-black/20 z-0"></div>
+    <div class="absolute inset-0 pointer-events-none" style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,.08) 1px,transparent 0);background-size:24px 24px"></div>
     <div class="relative z-10 text-center px-4">
-        <h1 class="font-serif text-3xl md:text-5xl font-bold text-white mb-2 shadow-sm">
+        <h1 class="font-serif text-3xl md:text-5xl font-bold text-white mb-2">
             @(CurrentCategory?.Name ?? "All Products")
         </h1>
-        <p class="text-brand-light font-semibold">
-            @FilteredProducts.Count() items found
+        <p class="text-blue-200 font-semibold text-sm">
+            @FilteredProducts.Count() @(FilteredProducts.Count() == 1 ? "item" : "items") found
         </p>
     </div>
 </div>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-    
-    <nav class="flex text-sm text-gray-500 mb-8 font-semibold">
+
+    <!-- Breadcrumb -->
+    <nav class="flex text-sm text-gray-500 mb-8 font-semibold items-center gap-1.5">
         <a href="/" class="hover:text-brand transition-colors">Home</a>
-        <span class="mx-2">/</span>
+        <span class="text-gray-300">/</span>
         @if (CurrentCategory != null)
         {
             <a href="/store" class="hover:text-brand transition-colors">Store</a>
-            <span class="mx-2">/</span>
-            <span class="text-gray-900 uppercase">@CurrentCategory.Name</span>
+            <span class="text-gray-300">/</span>
+            <span class="text-gray-900">@CurrentCategory.Name</span>
         }
         else
         {
@@ -40,182 +43,192 @@
         }
     </nav>
 
-    <div class="lg:hidden mb-6 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-        <button @onclick="() => showMobileFilters = true" class="flex items-center gap-2 text-gray-700 font-bold">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-            Filter & Sort
-        </button>
-        <span class="text-sm font-semibold text-gray-500">@FilteredProducts.Count() items</span>
+    <!-- Error Banner -->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="mb-6 flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm">
+            <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div>
+                <p class="font-semibold">Could not load products</p>
+                <p class="text-red-600 mt-0.5">@errorMessage</p>
+                <button @onclick="RetryLoad" class="mt-2 text-brand font-bold hover:underline text-xs">↻ Try again</button>
+            </div>
+        </div>
+    }
+
+    <!-- Mobile filter button -->
+    <div class="lg:hidden mb-5">
+        <div class="flex items-center justify-between bg-white rounded-xl border border-gray-200 shadow-sm px-4 py-3">
+            <button @onclick="() => showMobileFilters = true" class="flex items-center gap-2 text-gray-700 font-bold text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                </svg>
+                Filter & Sort
+                @if (activeFilterCount > 0)
+                {
+                    <span class="bg-brand text-white text-[10px] font-extrabold rounded-full px-1.5 py-0.5">@activeFilterCount</span>
+                }
+            </button>
+            <span class="text-sm font-semibold text-gray-400">@FilteredProducts.Count() results</span>
+        </div>
     </div>
 
     <div class="flex flex-col lg:flex-row gap-8 items-start">
-        
-        <div class="@(showMobileFilters ? "fixed inset-0 z-50 flex bg-black/50" : "hidden lg:block w-full lg:w-64 flex-shrink-0")">
-            
-            <div class="@(showMobileFilters ? "w-4/5 max-w-sm h-full bg-white shadow-2xl overflow-y-auto p-6 animate-slide-up" : "sticky top-24")">
-                
-                @if (showMobileFilters)
-                {
-                    <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
-                        <h2 class="font-bold text-lg text-gray-900">Filters</h2>
-                        <button @onclick="() => showMobileFilters = false" class="text-gray-400 hover:text-gray-700">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+
+        <!-- ── Sidebar ── -->
+        @if (showMobileFilters)
+        {
+            <div class="fixed inset-0 z-50 flex" @onclick="() => showMobileFilters = false">
+                <div class="w-4/5 max-w-sm h-full bg-white shadow-2xl overflow-y-auto p-6 flex flex-col" @onclick:stopPropagation="true">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                        <h2 class="font-bold text-lg text-gray-900">Filters & Sort</h2>
+                        <button @onclick="() => showMobileFilters = false" class="text-gray-400 hover:text-gray-700 p-1">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
-                }
-
-                <div class="mb-8">
-                    <h3 class="font-bold text-gray-900 mb-4 flex items-center justify-between">
-                        Categories
-                    </h3>
-                    <div class="space-y-3">
-                        <a href="/store" class="flex items-center gap-3 text-sm font-semibold @(string.IsNullOrEmpty(CategorySlug) ? "text-brand border-l-2 border-brand pl-2" : "text-gray-600 hover:text-brand pl-2.5")">
-                            All Products
-                        </a>
-                        @foreach (var cat in allCategories)
-                        {
-                            <a href="/category/@cat.Slug" class="flex items-center gap-3 text-sm font-semibold @(CategorySlug == cat.Slug ? "text-brand border-l-2 border-brand pl-2" : "text-gray-600 hover:text-brand pl-2.5")">
-                                @cat.Name
-                            </a>
-                        }
+                    @FilterSidebarContent()
+                    <div class="mt-auto pt-4">
+                        <button @onclick="() => showMobileFilters = false"
+                                class="w-full h-12 bg-brand text-white font-bold rounded-xl shadow-sm text-sm">
+                            Show @FilteredProducts.Count() Results
+                        </button>
+                        <button @onclick="ClearAllFilters" class="w-full mt-2 h-10 text-gray-500 font-semibold text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
+                            Clear All Filters
+                        </button>
                     </div>
                 </div>
-
-                <hr class="border-gray-100 mb-8" />
-
-                <div class="mb-8">
-                    <h3 class="font-bold text-gray-900 mb-4">Price Range</h3>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="flex-1 relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">₦</span>
-                            <input type="number" @bind="minPrice" class="w-full h-10 pl-8 pr-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:border-brand" placeholder="Min" />
-                        </div>
-                        <span class="text-gray-400">-</span>
-                        <div class="flex-1 relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">₦</span>
-                            <input type="number" @bind="maxPrice" class="w-full h-10 pl-8 pr-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:border-brand" placeholder="Max" />
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="border-gray-100 mb-8" />
-
-                <div class="mb-8">
-                    <h3 class="font-bold text-gray-900 mb-4">Availability</h3>
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox" @bind="inStockOnly" class="w-5 h-5 rounded border-gray-300 text-brand focus:ring-brand" />
-                        <span class="text-sm font-semibold text-gray-600 group-hover:text-gray-900">In Stock Only</span>
-                    </label>
-                </div>
-
-                @if (showMobileFilters)
-                {
-                    <hr class="border-gray-100 mb-8" />
-                    <div class="mb-8">
-                        <h3 class="font-bold text-gray-900 mb-4">Sort By</h3>
-                        <select @bind="sortOrder" class="w-full h-11 px-4 rounded-lg border border-gray-300 text-sm bg-white focus:outline-none focus:border-brand">
-                            <option value="newest">Newest Arrivals</option>
-                            <option value="price_asc">Price: Low to High</option>
-                            <option value="price_desc">Price: High to Low</option>
-                        </select>
-                    </div>
-
-                    <button @onclick="() => showMobileFilters = false" class="w-full h-12 bg-brand text-white font-bold rounded-xl shadow-sm">
-                        Show @FilteredProducts.Count() Results
-                    </button>
-                }
+                <div class="flex-1 bg-black/40"></div>
             </div>
-            
-            @if (showMobileFilters)
-            {
-                <div class="flex-1" @onclick="() => showMobileFilters = false"></div>
-            }
-        </div>
+        }
 
-        <div class="flex-1 w-full">
-            
-            <div class="hidden lg:flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <span class="text-sm font-semibold text-gray-500">Showing @DisplayedProducts.Count() of @FilteredProducts.Count() products</span>
-                
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden mr-2">
-                        <button class="@(isGridView ? "bg-gray-100 text-brand" : "bg-white text-gray-400 hover:text-gray-600") px-3 py-2 transition-colors" @onclick="() => ToggleView(true)">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+        <!-- Desktop sidebar -->
+        <aside class="hidden lg:block w-64 flex-shrink-0 sticky top-24">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                @FilterSidebarContent()
+            </div>
+        </aside>
+
+        <!-- ── Products grid ── -->
+        <div class="flex-1 min-w-0">
+
+            <!-- Toolbar (desktop) -->
+            <div class="hidden lg:flex justify-between items-center mb-6 bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-3.5">
+                <span class="text-sm font-semibold text-gray-500">
+                    Showing <span class="text-gray-900 font-bold">@DisplayedProducts.Count()</span> of <span class="text-gray-900 font-bold">@FilteredProducts.Count()</span> products
+                </span>
+                <div class="flex items-center gap-3">
+                    <!-- Grid / List toggle -->
+                    <div class="flex border border-gray-200 rounded-lg overflow-hidden">
+                        <button @onclick="() => isGridView = true"
+                                class="px-3 py-2 transition-colors @(isGridView ? "bg-brand text-white" : "bg-white text-gray-400 hover:text-gray-600")"
+                                aria-label="Grid view">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                         </button>
-                        <button class="@(!isGridView ? "bg-gray-100 text-brand" : "bg-white text-gray-400 hover:text-gray-600") px-3 py-2 transition-colors" @onclick="() => ToggleView(false)">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        <button @onclick="() => isGridView = false"
+                                class="px-3 py-2 transition-colors @(!isGridView ? "bg-brand text-white" : "bg-white text-gray-400 hover:text-gray-600")"
+                                aria-label="List view">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                         </button>
                     </div>
-
-                    <label class="text-sm font-bold text-gray-700">Sort By:</label>
-                    <select @bind="sortOrder" class="h-10 px-4 rounded-lg border border-gray-300 text-sm bg-white focus:outline-none focus:border-brand">
-                        <option value="newest">Newest Arrivals</option>
-                        <option value="price_asc">Price: Low to High</option>
-                        <option value="price_desc">Price: High to Low</option>
+                    <select @bind="sortOrder" class="h-9 px-3 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:border-brand text-gray-700 font-semibold">
+                        <option value="newest">Newest First</option>
+                        <option value="price_asc">Price: Low → High</option>
+                        <option value="price_desc">Price: High → Low</option>
+                        <option value="name_asc">Name: A → Z</option>
                     </select>
                 </div>
             </div>
 
-            @if (inStockOnly || minPrice > 0 || maxPrice < 5000000)
+            <!-- Active filter chips -->
+            @if (activeFilterCount > 0)
             {
-                <div class="flex flex-wrap gap-2 mb-6">
+                <div class="flex flex-wrap gap-2 mb-5">
                     @if (inStockOnly)
                     {
                         <span class="inline-flex items-center gap-1.5 bg-brand-light text-brand rounded-full px-3 py-1 text-xs font-bold">
                             In Stock
-                            <button @onclick="() => inStockOnly = false" class="hover:text-brand-dark">✕</button>
+                            <button @onclick="() => inStockOnly = false" class="hover:text-brand-dark ml-0.5">✕</button>
                         </span>
                     }
-                    @if (minPrice > 0 || maxPrice < 5000000)
+                    @if (minPrice > 0 || maxPrice < _maxPriceCap)
                     {
                         <span class="inline-flex items-center gap-1.5 bg-brand-light text-brand rounded-full px-3 py-1 text-xs font-bold">
-                            ₦@minPrice - ₦@maxPrice
-                            <button @onclick="ClearPriceFilter" class="hover:text-brand-dark">✕</button>
+                            ₦@minPrice.ToString("N0") — ₦@maxPrice.ToString("N0")
+                            <button @onclick="ClearPriceFilter" class="hover:text-brand-dark ml-0.5">✕</button>
                         </span>
                     }
-                    <button @onclick="ClearAllFilters" class="text-xs font-bold text-gray-500 hover:text-brand underline ml-2">Clear All</button>
+                    <button @onclick="ClearAllFilters" class="text-xs font-bold text-gray-400 hover:text-red-500 transition-colors ml-1">Clear all</button>
                 </div>
             }
 
+            <!-- Loading state -->
             @if (isLoading)
             {
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 animate-pulse">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
                     @for (int i = 0; i < 6; i++)
                     {
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 h-80 flex flex-col p-4">
-                            <div class="bg-gray-200 rounded-lg w-full h-40 mb-4"></div>
-                            <div class="bg-gray-200 rounded h-4 w-3/4 mb-2"></div>
-                            <div class="bg-gray-200 rounded h-4 w-1/2 mb-4"></div>
-                            <div class="mt-auto bg-gray-200 rounded h-10 w-full"></div>
+                        <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+                            <div class="aspect-square w-full bg-gray-100 animate-pulse"></div>
+                            <div class="p-4 space-y-2.5">
+                                <div class="h-3 bg-gray-100 rounded-full animate-pulse w-1/3"></div>
+                                <div class="h-4 bg-gray-100 rounded-md animate-pulse w-3/4"></div>
+                                <div class="h-4 bg-gray-100 rounded-md animate-pulse w-1/2"></div>
+                                <div class="h-10 bg-gray-100 rounded-xl animate-pulse w-full mt-2"></div>
+                            </div>
                         </div>
                     }
                 </div>
             }
-            else if (!FilteredProducts.Any())
+            <!-- Empty state (no products in DB at all) -->
+            else if (!allProducts.Any() && string.IsNullOrEmpty(errorMessage))
             {
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">No products found</h3>
-                    <p class="text-gray-500 mb-6">Try adjusting your filters or search criteria.</p>
-                    <button @onclick="ClearAllFilters" class="text-brand font-bold hover:underline">Clear all filters</button>
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-14 text-center">
+                    <div class="text-6xl mb-5 select-none">📦</div>
+                    <h3 class="font-serif text-xl font-bold text-gray-900 mb-2">No Products Yet</h3>
+                    <p class="text-gray-500 text-sm max-w-xs mx-auto mb-6">
+                        Products haven't been added to the store yet. Check back soon, or contact us on WhatsApp for availability.
+                    </p>
+                    <a href="https://wa.me/2348162809886" target="_blank"
+                       class="inline-flex items-center gap-2 h-11 px-6 bg-green-500 text-white font-bold rounded-xl text-sm hover:bg-green-600 transition-colors">
+                        Ask on WhatsApp
+                    </a>
                 </div>
             }
+            <!-- Empty state (filters too strict) -->
+            else if (!FilteredProducts.Any())
+            {
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">No products match your filters</h3>
+                    <p class="text-gray-500 text-sm mb-6">Try adjusting your filters or browse all products.</p>
+                    <button @onclick="ClearAllFilters" class="inline-flex items-center gap-2 h-11 px-6 bg-brand text-white font-bold rounded-xl text-sm hover:bg-brand-dark transition-colors">
+                        Clear Filters
+                    </button>
+                </div>
+            }
+            <!-- Product grid -->
             else
             {
-                <div class="@(isGridView ? "grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6" : "flex flex-col gap-4")">
+                <div class="@(isGridView ? "grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5" : "flex flex-col gap-4")">
                     @foreach (var product in DisplayedProducts)
                     {
                         <VictoriaStores.Frontend.Components.ProductCard Product="product" IsListView="!isGridView" />
                     }
                 </div>
-                
+
                 @if (FilteredProducts.Count() > DisplayedProducts.Count())
                 {
-                    <div class="mt-12 flex justify-center">
-                        <button @onclick="LoadMore" class="h-12 px-8 bg-gray-100 text-gray-700 font-bold text-sm rounded-xl hover:bg-gray-200 transition-colors shadow-sm">
+                    <div class="mt-10 flex justify-center">
+                        <button @onclick="LoadMore"
+                                class="inline-flex items-center gap-2 h-12 px-10 bg-white border-2 border-gray-200
+                                       text-gray-700 font-bold text-sm rounded-xl hover:border-brand hover:text-brand
+                                       transition-all duration-200 shadow-sm">
                             Load More Products
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                         </button>
                     </div>
                 }
@@ -227,114 +240,168 @@
 @code {
     [Parameter] public string? CategorySlug { get; set; }
 
-    private bool isLoading = true;
-    private bool showMobileFilters = false;
-    
-    // Filter State
-    private decimal minPrice = 0;
-    private decimal maxPrice = 5000000; // Arbitrary high default max
-    private bool inStockOnly = false;
-    private string sortOrder = "newest";
+    private bool   isLoading          = true;
+    private bool   showMobileFilters  = false;
+    private bool   isGridView         = true;
+    private string errorMessage       = "";
+    private int    visibleCount       = 20;
 
-    private int visibleCount = 20;
-    private bool isGridView = true;
+    private const decimal _maxPriceCap = 50_000_000m;
 
-    private List<ProductDto> allProducts = new();
+    // Filter state
+    private decimal minPrice   = 0;
+    private decimal maxPrice   = _maxPriceCap;
+    private bool    inStockOnly = false;
+    private string  sortOrder  = "newest";
+
+    private List<ProductDto>  allProducts   = new();
     private List<CategoryDto> allCategories = new();
-    private CategoryDto? CurrentCategory;
+    private CategoryDto?      CurrentCategory;
 
-    // Computed property for dynamic filtering & sorting
-    private IEnumerable<ProductDto> DisplayedProducts => FilteredProducts.Take(visibleCount);
+    private int activeFilterCount => (inStockOnly ? 1 : 0) + (minPrice > 0 || maxPrice < _maxPriceCap ? 1 : 0);
+
+    private IEnumerable<ProductDto> DisplayedProducts  => FilteredProducts.Take(visibleCount);
 
     private IEnumerable<ProductDto> FilteredProducts
     {
         get
         {
-            var query = allProducts.AsEnumerable();
-
-            // 1. Category Filter
-            if (CurrentCategory != null)
-            {
-                query = query.Where(p => p.CategoryId == CurrentCategory.Id);
-            }
-
-            // 2. Price Filter
-            query = query.Where(p => (p.SalePrice ?? p.Price) >= minPrice && (p.SalePrice ?? p.Price) <= maxPrice);
-
-            // 3. Stock Filter
-            if (inStockOnly)
-            {
-                query = query.Where(p => p.StockQuantity > 0);
-            }
-
-            // 4. Sorting
+            var q = allProducts.AsEnumerable();
+            if (CurrentCategory != null) q = q.Where(p => p.CategoryId == CurrentCategory.Id);
+            q = q.Where(p => (p.SalePrice ?? p.Price) >= minPrice && (p.SalePrice ?? p.Price) <= maxPrice);
+            if (inStockOnly) q = q.Where(p => p.StockQuantity > 0);
             return sortOrder switch
             {
-                "price_asc" => query.OrderBy(p => p.SalePrice ?? p.Price),
-                "price_desc" => query.OrderByDescending(p => p.SalePrice ?? p.Price),
-                _ => query.OrderByDescending(p => p.CreatedAt) // "newest"
+                "price_asc"  => q.OrderBy(p => p.SalePrice ?? p.Price),
+                "price_desc" => q.OrderByDescending(p => p.SalePrice ?? p.Price),
+                "name_asc"   => q.OrderBy(p => p.Name),
+                _            => q.OrderByDescending(p => p.CreatedAt)
             };
         }
     }
 
-    protected override async Task OnParametersSetAsync()
+    // Render the filter sidebar content (shared between desktop + mobile)
+    private RenderFragment FilterSidebarContent() => __builder =>
     {
-        // Re-run this whenever the URL changes (e.g., clicking a category link in the sidebar)
-        await LoadDataAsync();
+        <div>
+            <div class="mb-7">
+                <h3 class="font-extrabold text-gray-900 text-sm mb-3.5 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    Categories
+                </h3>
+                <div class="space-y-1">
+                    <a href="/store" class="flex items-center gap-2.5 text-sm font-semibold py-2 px-2.5 rounded-lg transition-colors
+                                           @(string.IsNullOrEmpty(CategorySlug) ? "bg-brand-light text-brand border-l-2 border-brand" : "text-gray-600 hover:text-brand hover:bg-gray-50")">
+                        All Products
+                    </a>
+                    @foreach (var cat in allCategories)
+                    {
+                        <a href="/category/@cat.Slug" class="flex items-center gap-2.5 text-sm font-semibold py-2 px-2.5 rounded-lg transition-colors
+                                                              @(CategorySlug?.ToLower() == cat.Slug?.ToLower() ? "bg-brand-light text-brand border-l-2 border-brand" : "text-gray-600 hover:text-brand hover:bg-gray-50")">
+                            @cat.Name
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <div class="border-t border-gray-100 pt-6 mb-7">
+                <h3 class="font-extrabold text-gray-900 text-sm mb-4">Price Range</h3>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="flex-1 relative">
+                        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs font-bold">₦</span>
+                        <input type="number" @bind="minPrice" placeholder="Min" class="w-full h-9 pl-6 pr-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-brand"/>
+                    </div>
+                    <span class="text-gray-400 text-sm">—</span>
+                    <div class="flex-1 relative">
+                        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs font-bold">₦</span>
+                        <input type="number" @bind="maxPrice" placeholder="Max" class="w-full h-9 pl-6 pr-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-brand"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-100 pt-6 mb-7">
+                <h3 class="font-extrabold text-gray-900 text-sm mb-4">Availability</h3>
+                <label class="flex items-center gap-3 cursor-pointer group select-none">
+                    <input type="checkbox" @bind="inStockOnly" class="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand"/>
+                    <span class="text-sm font-semibold text-gray-600 group-hover:text-gray-900">In Stock Only</span>
+                </label>
+            </div>
+
+            <div class="border-t border-gray-100 pt-6">
+                <h3 class="font-extrabold text-gray-900 text-sm mb-4">Sort By</h3>
+                <select @bind="sortOrder" class="w-full h-10 px-3 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:border-brand text-gray-700 font-semibold">
+                    <option value="newest">Newest First</option>
+                    <option value="price_asc">Price: Low → High</option>
+                    <option value="price_desc">Price: High → Low</option>
+                    <option value="name_asc">Name: A → Z</option>
+                </select>
+            </div>
+        </div>
+    };
+
+    protected override async Task OnInitializedAsync() => await LoadDataAsync();
+
+    protected override void OnParametersSet()
+    {
+        if (allCategories.Any()) UpdateCategoryFilter();
     }
 
     private async Task LoadDataAsync()
     {
+        isLoading = true;
+        errorMessage = "";
+        StateHasChanged();
+
         try
         {
-            isLoading = true;
+            // Load categories (public — no auth)
+            allCategories = await Http.GetFromJsonAsync<List<CategoryDto>>("api/category") ?? new();
 
-            // Fetch data if not already loaded
-            if (!allCategories.Any())
+            // Load products — try ProductApiClient first, fall back to direct HTTP
+            List<ProductDto>? products = null;
+            try
             {
-                allCategories = await Http.GetFromJsonAsync<List<CategoryDto>>("api/category") ?? new();
+                products = await ProductApi.GetActiveProductsAsync();
             }
-            
-            if (!allProducts.Any())
+            catch (Exception apiEx)
             {
-                allProducts = await ProductApi.GetActiveProductsAsync() ?? new();
+                Console.WriteLine($"[Store] ProductApiClient failed: {apiEx.Message}. Trying direct HTTP...");
             }
 
-            // Determine current category based on slug
-            if (!string.IsNullOrEmpty(CategorySlug))
+            if (products == null || !products.Any())
             {
-                CurrentCategory = allCategories.FirstOrDefault(c => c.Slug?.ToLower() == CategorySlug.ToLower());
+                // Direct fallback — public endpoint, no auth required
+                products = await Http.GetFromJsonAsync<List<ProductDto>>("api/product") ?? new();
             }
-            else
-            {
-                CurrentCategory = null;
-            }
+
+            allProducts = products ?? new();
+            Console.WriteLine($"[Store] Loaded {allProducts.Count} products, {allCategories.Count} categories");
+
+            UpdateCategoryFilter();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading store data: {ex.Message}");
+            errorMessage = $"Failed to load: {ex.Message}";
+            Console.WriteLine($"[Store] Load error: {ex}");
         }
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
     }
 
-    private void ClearPriceFilter()
+    private async Task RetryLoad() => await LoadDataAsync();
+
+    private void UpdateCategoryFilter()
     {
-        minPrice = 0;
-        maxPrice = 5000000;
+        CurrentCategory = string.IsNullOrEmpty(CategorySlug)
+            ? null
+            : allCategories.FirstOrDefault(c =>
+                string.Equals(c.Slug, CategorySlug, StringComparison.OrdinalIgnoreCase));
     }
 
-    private void ClearAllFilters()
-    {
-        ClearPriceFilter();
-        inStockOnly = false;
-        sortOrder = "newest";
-        visibleCount = 20;
-    }
-
-    private void ToggleView(bool grid) => isGridView = grid;
-
-    private void LoadMore() => visibleCount += 20;
+    private void ClearPriceFilter()  { minPrice = 0; maxPrice = _maxPriceCap; }
+    private void ClearAllFilters()   { ClearPriceFilter(); inStockOnly = false; sortOrder = "newest"; visibleCount = 20; }
+    private void LoadMore()          => visibleCount += 20;
 }

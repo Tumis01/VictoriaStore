@@ -22,9 +22,11 @@ public class DashboardController : ControllerBase
     {
         var totalRevenue = await _context.Orders.Where(o => o.Status != "Cancelled").SumAsync(o => o.TotalAmount);
         var totalOrders = await _context.Orders.CountAsync();
-        var totalCustomers = await _context.Users.Where(u => u.Role == "Customer").CountAsync(); 
-        // Note: Assuming there is a Role or distinguishing factor for customers, 
-        // if not we will just use a mock or count of unique emails in orders.
+        var customerCount = await (from user in _context.Users
+                                   join userRole in _context.UserRoles on user.Id equals userRole.UserId
+                                   join role in _context.Roles on userRole.RoleId equals role.Id
+                                   where role.Name == "Customer"
+                                   select user.Id).CountAsync();
         var customerCountFromOrders = await _context.Orders.Select(o => o.CustomerEmail).Distinct().CountAsync();
 
         return Ok(new
