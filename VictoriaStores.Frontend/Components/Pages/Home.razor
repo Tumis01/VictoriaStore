@@ -4,177 +4,137 @@
 @inject HttpClient Http
 @using VictoriaStores.Frontend.Models
 
-<PageTitle>Victoria James Store – Modern & Affordable Lifestyle</PageTitle>
+<PageTitle>Victoria James Store – Quality Products Delivered Across Nigeria</PageTitle>
 
-<!-- ═══════════════════════════════════════════════
-     ANNOUNCEMENT BAR
-════════════════════════════════════════════════ -->
-<div id="vj-announcement" class="relative bg-brand text-white text-xs font-semibold py-2.5 px-4 text-center overflow-hidden"
-     style="display:block">
-    <div class="absolute inset-0 pointer-events-none"
-         style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,0.08) 1px,transparent 0);background-size:20px 20px;">
-    </div>
-    <span class="relative z-10">🇳🇬&nbsp; Free WhatsApp Support &nbsp;·&nbsp; Call 08162809886 &nbsp;·&nbsp; Fast delivery across Nigeria</span>
-    <button onclick="document.getElementById('vj-announcement').style.display='none';localStorage.setItem('vj_ann','0')"
-            class="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-6 h-6 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 rounded-full transition-all duration-150 text-sm leading-none"
-            aria-label="Dismiss announcement">
-        ✕
-    </button>
-</div>
-<script>
-    if (localStorage.getItem('vj_ann') === '0') {
-        var el = document.getElementById('vj-announcement');
-        if (el) el.style.display = 'none';
-    }
-</script>
+<style>
+    @@keyframes heroFadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    .hero-1{animation:heroFadeUp .6s ease-out .1s both}
+    .hero-2{animation:heroFadeUp .6s ease-out .25s both}
+    .hero-3{animation:heroFadeUp .6s ease-out .4s both}
+    .hero-4{animation:heroFadeUp .6s ease-out .55s both}
+    @@keyframes floatBadge{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(-3deg)}}
+    .float-badge{animation:floatBadge 3.5s ease-in-out infinite}
+    @@keyframes cardHover{from{transform:rotate(var(--r,0deg))}to{transform:rotate(0deg) scale(1.03)}}
+    .hero-card{transition:transform .4s cubic-bezier(.16,1,.3,1)}
+    .hero-card:hover{transform:rotate(0deg) scale(1.04)}
+    @@keyframes stepPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,86,219,.3)}50%{box-shadow:0 0 0 8px rgba(26,86,219,0)}}
+    .step-active{animation:stepPulse 2.5s ease-in-out infinite}
+</style>
 
-<!-- ═══════════════════════════════════════════════
-     HERO SECTION
-════════════════════════════════════════════════ -->
-<section class="relative overflow-hidden bg-gradient-to-br from-[#0d2d6b] via-brand to-blue-500 min-h-[560px] flex items-center">
-    <!-- Dot-grid pattern overlay -->
-    <div class="absolute inset-0 pointer-events-none"
-         style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,0.10) 1px,transparent 0);background-size:28px 28px;">
-    </div>
-    <!-- Atmospheric blur blobs -->
-    <div class="absolute -top-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-0 left-0 w-72 h-72 bg-accent/10 rounded-full blur-3xl pointer-events-none -translate-x-1/3 translate-y-1/3"></div>
+<!-- ══ HERO ════════════════════════════════════════════════════════════ -->
+<section class="relative overflow-hidden bg-gradient-to-br from-[#04163c] via-[#0c2d6b] to-[#1A56DB] min-h-[580px] flex items-center">
+    <!-- Dot grid -->
+    <div class="absolute inset-0 pointer-events-none opacity-30"
+         style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,0.15) 1px,transparent 0);background-size:28px 28px;"></div>
+    <!-- Atmospheric blobs -->
+    <div class="absolute -top-32 -right-32 w-[500px] h-[500px] bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-accent/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[300px] bg-brand/20 rounded-full blur-[80px] pointer-events-none"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 w-full relative z-10">
         <div class="flex flex-col md:flex-row items-center gap-10 lg:gap-16">
 
-            <!-- ── Left: Text content ── -->
+            <!-- Text side -->
             <div class="w-full md:w-3/5 text-center md:text-left">
-                <!-- Eyebrow badge -->
-                <span class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs font-bold px-4 py-2 rounded-full mb-6 border border-white/20 shadow-sm">
-                    <span class="w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span>
-                    ✨ Quality You Can Trust
-                </span>
+                <div class="hero-1">
+                    <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white text-[11.5px] font-bold px-4 py-2 rounded-full mb-6 border border-white/20 shadow-sm">
+                        <span class="w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span>
+                        🇳🇬 Nigeria's Trusted Online Store
+                    </span>
+                </div>
 
-                <!-- Headline -->
-                <h1 class="font-serif text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-white leading-[1.15] mb-5 tracking-tight">
+                <h1 class="hero-2 font-serif text-4xl md:text-5xl lg:text-[3.4rem] font-bold text-white leading-[1.12] mb-5 tracking-tight">
                     Shop Fresh, Modern &amp;<br class="hidden md:block" />
                     <span class="relative inline-block">
                         Affordable Products
-                        <svg class="absolute -bottom-1.5 left-0 w-full h-[6px]" viewBox="0 0 320 6"
-                             fill="none" preserveAspectRatio="none" aria-hidden="true">
-                            <path d="M0 5 Q80 1 160 4 Q240 7 320 3"
-                                  stroke="#F97316" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <svg class="absolute -bottom-2 left-0 w-full h-[8px]" viewBox="0 0 340 8" fill="none" preserveAspectRatio="none" aria-hidden="true">
+                            <path d="M2 6 Q85 2 170 5 Q255 8 338 3" stroke="#F97316" stroke-width="3" fill="none" stroke-linecap="round"/>
                         </svg>
                     </span>
                 </h1>
 
-                <!-- Sub-copy -->
-                <p class="text-white/75 text-base lg:text-lg mb-8 max-w-md mx-auto md:mx-0 leading-relaxed">
+                <p class="hero-3 text-white/70 text-base lg:text-lg mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed">
                     From household essentials to fashion gifts — delivered across Nigeria.
-                    Place your order and we'll confirm via WhatsApp.
+                    Place your order and we'll confirm via WhatsApp. 🚚
                 </p>
 
-                <!-- CTA buttons -->
-                <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3 mb-10">
+                <div class="hero-4 flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3 mb-10">
                     <a href="/store"
-                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-8
-                              bg-white text-brand font-extrabold text-sm rounded-xl
-                              hover:bg-gray-50 hover:shadow-xl active:scale-95 transition-all duration-200 shadow-md">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                        </svg>
+                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-13 px-8 py-3.5
+                              bg-white text-[#0c2d6b] font-extrabold text-sm rounded-2xl
+                              hover:bg-gray-50 hover:shadow-2xl active:scale-95 transition-all duration-200 shadow-lg">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                         Shop Now
                     </a>
                     <a href="/track"
-                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-8
-                              bg-white/10 backdrop-blur-sm text-white font-bold text-sm rounded-xl
-                              border border-white/30 hover:bg-white/20 hover:border-white/60 active:scale-95 transition-all duration-200">
+                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-13 px-8 py-3.5
+                              bg-white/10 backdrop-blur-sm text-white font-bold text-sm rounded-2xl
+                              border border-white/30 hover:bg-white/20 hover:border-white/50 active:scale-95 transition-all duration-200">
                         Track My Order
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-                        </svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </a>
                 </div>
 
-                <!-- Stats row -->
-                <div class="inline-flex items-stretch divide-x divide-white/20 rounded-xl overflow-hidden bg-white/10 backdrop-blur-sm border border-white/15">
-                    <div class="text-center px-5 py-3">
+                <!-- Stats -->
+                <div class="hero-4 inline-flex items-stretch divide-x divide-white/20 rounded-2xl overflow-hidden bg-white/10 backdrop-blur-sm border border-white/15 shadow-lg">
+                    <div class="text-center px-5 py-3.5">
                         <p class="text-white font-extrabold text-2xl leading-none">500+</p>
-                        <p class="text-white/60 text-xs mt-1 font-medium">Products</p>
+                        <p class="text-white/55 text-xs mt-1 font-semibold">Products</p>
                     </div>
-                    <div class="text-center px-5 py-3">
+                    <div class="text-center px-5 py-3.5">
                         <p class="text-white font-extrabold text-2xl leading-none">1,000+</p>
-                        <p class="text-white/60 text-xs mt-1 font-medium">Customers</p>
+                        <p class="text-white/55 text-xs mt-1 font-semibold">Customers</p>
                     </div>
-                    <div class="text-center px-5 py-3">
+                    <div class="text-center px-5 py-3.5">
                         <p class="text-yellow-400 font-extrabold text-2xl leading-none">4.9★</p>
-                        <p class="text-white/60 text-xs mt-1 font-medium">Rating</p>
+                        <p class="text-white/55 text-xs mt-1 font-semibold">Rating</p>
                     </div>
                 </div>
             </div>
 
-            <!-- ── Right: Product card collage ── -->
+            <!-- Hero product collage (desktop) -->
             <div class="w-full md:w-2/5 hidden md:flex items-center justify-center" aria-hidden="true">
-                <div class="relative w-[320px] h-[320px]">
-
-                    <!-- Card 1: top-left, tilted left -->
-                    <div class="absolute top-0 left-0 w-[148px] group"
-                         style="transform:rotate(-4deg);transition:transform .4s ease">
-                        <div class="bg-white/12 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl border border-white/20 hover:rotate-0 transition-transform duration-500 hover:scale-105">
+                <div class="relative w-[340px] h-[340px]">
+                    <!-- Card 1 -->
+                    <div class="hero-card absolute top-0 left-0 w-[154px]" style="--r:-4deg;transform:rotate(-4deg)">
+                        <div class="bg-white/12 backdrop-blur-xl rounded-2xl p-3 shadow-2xl border border-white/25 hover:border-white/50">
                             <div class="w-full aspect-square bg-white/10 rounded-xl overflow-hidden flex items-center justify-center">
-                                <img src="/images/hero-kitchen.jpg" alt="Kitchen Utensils"
-                                     class="w-full h-full object-cover rounded-xl"
-                                     loading="eager"
-                                     onerror="this.parentElement.innerHTML='<span style=\'font-size:3rem;line-height:1\'>🍳</span>'" />
+                                <img src="/images/hero-kitchen.jpg" alt="Kitchen" class="w-full h-full object-cover rounded-xl" loading="eager" onerror="this.parentElement.innerHTML='<span style=font-size:3rem>🍳</span>'"/>
                             </div>
                             <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Kitchen Utensils</p>
                         </div>
                     </div>
-
-                    <!-- Card 2: top-right, tilted right, offset down -->
-                    <div class="absolute top-0 right-0 w-[136px] translate-y-6"
-                         style="transform:rotate(4deg) translateY(24px);transition:transform .4s ease">
-                        <div class="bg-white/12 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl border border-white/20 hover:rotate-0 transition-transform duration-500 hover:scale-105">
+                    <!-- Card 2 -->
+                    <div class="hero-card absolute top-0 right-0 w-[140px]" style="--r:4deg;transform:rotate(4deg) translateY(20px)">
+                        <div class="bg-white/12 backdrop-blur-xl rounded-2xl p-3 shadow-2xl border border-white/25 hover:border-white/50">
                             <div class="w-full aspect-square bg-white/10 rounded-xl overflow-hidden flex items-center justify-center">
-                                <img src="/images/hero-fashion.jpg" alt="Fashion &amp; Giftpacks"
-                                     class="w-full h-full object-cover rounded-xl"
-                                     loading="eager"
-                                     onerror="this.parentElement.innerHTML='<span style=\'font-size:3rem;line-height:1\'>👗</span>'" />
+                                <img src="/images/hero-fashion.jpg" alt="Fashion" class="w-full h-full object-cover rounded-xl" loading="eager" onerror="this.parentElement.innerHTML='<span style=font-size:3rem>👗</span>'"/>
                             </div>
                             <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Fashion &amp; Gifts</p>
                         </div>
                     </div>
-
-                    <!-- Card 3: bottom-left, slight tilt -->
-                    <div class="absolute bottom-0 left-4 w-[136px]"
-                         style="transform:rotate(2.5deg);transition:transform .4s ease">
-                        <div class="bg-white/12 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl border border-white/20 hover:rotate-0 transition-transform duration-500 hover:scale-105">
+                    <!-- Card 3 -->
+                    <div class="hero-card absolute bottom-0 left-4 w-[142px]" style="--r:2.5deg;transform:rotate(2.5deg)">
+                        <div class="bg-white/12 backdrop-blur-xl rounded-2xl p-3 shadow-2xl border border-white/25 hover:border-white/50">
                             <div class="w-full aspect-square bg-white/10 rounded-xl overflow-hidden flex items-center justify-center">
-                                <img src="/images/hero-household.jpg" alt="Household Items"
-                                     class="w-full h-full object-cover rounded-xl"
-                                     loading="eager"
-                                     onerror="this.parentElement.innerHTML='<span style=\'font-size:3rem;line-height:1\'>🏠</span>'" />
+                                <img src="/images/hero-household.jpg" alt="Household" class="w-full h-full object-cover rounded-xl" loading="eager" onerror="this.parentElement.innerHTML='<span style=font-size:3rem>🏠</span>'"/>
                             </div>
                             <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Household Items</p>
                         </div>
                     </div>
-
-                    <!-- Card 4: bottom-right, slight tilt -->
-                    <div class="absolute bottom-2 right-0 w-[148px]"
-                         style="transform:rotate(-2deg);transition:transform .4s ease">
-                        <div class="bg-white/12 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl border border-white/20 hover:rotate-0 transition-transform duration-500 hover:scale-105">
+                    <!-- Card 4 -->
+                    <div class="hero-card absolute bottom-2 right-0 w-[154px]" style="--r:-2deg;transform:rotate(-2deg)">
+                        <div class="bg-white/12 backdrop-blur-xl rounded-2xl p-3 shadow-2xl border border-white/25 hover:border-white/50">
                             <div class="w-full aspect-square bg-white/10 rounded-xl overflow-hidden flex items-center justify-center">
-                                <img src="/images/hero-accessories.jpg" alt="Accessories"
-                                     class="w-full h-full object-cover rounded-xl"
-                                     loading="eager"
-                                     onerror="this.parentElement.innerHTML='<span style=\'font-size:3rem;line-height:1\'>💍</span>'" />
+                                <img src="/images/hero-accessories.jpg" alt="Accessories" class="w-full h-full object-cover rounded-xl" loading="eager" onerror="this.parentElement.innerHTML='<span style=font-size:3rem>💍</span>'"/>
                             </div>
                             <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Accessories</p>
                         </div>
                     </div>
-
                     <!-- Floating sale badge -->
-                    <div class="absolute -top-4 -right-4 w-[58px] h-[58px] bg-accent rounded-full shadow-xl flex flex-col items-center justify-center z-20 border-2 border-white/30"
-                         style="animation:bounce 3s ease-in-out infinite">
-                        <span class="text-white text-xs font-extrabold leading-none">50%</span>
-                        <span class="text-white/80 text-[9px] font-bold leading-none mt-0.5">OFF</span>
+                    <div class="float-badge absolute -top-5 -right-5 w-[64px] h-[64px] bg-gradient-to-br from-accent to-orange-600 rounded-full shadow-2xl flex flex-col items-center justify-center z-20 border-2 border-white/40">
+                        <span class="text-white text-sm font-extrabold leading-none">50%</span>
+                        <span class="text-white/75 text-[9px] font-bold leading-none mt-0.5">OFF</span>
                     </div>
                 </div>
             </div>
@@ -183,15 +143,13 @@
 
     <!-- Wave divider -->
     <div class="absolute bottom-0 left-0 right-0 pointer-events-none" aria-hidden="true">
-        <svg viewBox="0 0 1440 48" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="w-full h-10">
-            <path d="M0 48 L0 28 Q360 0 720 24 Q1080 48 1440 20 L1440 48 Z" fill="white"/>
+        <svg viewBox="0 0 1440 56" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="w-full h-12">
+            <path d="M0 56 L0 32 Q360 4 720 28 Q1080 52 1440 24 L1440 56 Z" fill="#f9fafb"/>
         </svg>
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════
-     SHOP BY CATEGORY
-════════════════════════════════════════════════ -->
+<!-- ══ SHOP BY CATEGORY ══════════════════════════════════════════════════ -->
 <section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10">
@@ -202,7 +160,6 @@
 
         @if (categoriesLoading)
         {
-            <!-- Skeleton state -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 @for (int i = 0; i < 4; i++)
                 {
@@ -217,14 +174,7 @@
                 {
                     <a href="/category/@(cat.Slug ?? cat.Name.ToLower().Replace(" ", "-"))"
                        class="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 block aspect-[3/4] bg-brand-light focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2">
-                        @if (!string.IsNullOrEmpty(cat.BannerImageUrl))
-                        {
-                            <img src="@cat.BannerImageUrl" alt="@cat.Name"
-                                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                                 loading="lazy" decoding="async"
-                                 onerror="this.style.display='none'" />
-                        }
-                        <!-- Emoji fallback layer (always present, hidden by image if loaded) -->
+                        
                         <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-brand-light to-blue-100">
                             <span class="text-7xl opacity-30 select-none">
                                 @(cat.Name.Contains("Kitchen") ? "🍳"
@@ -233,12 +183,20 @@
                                   : "🏠")
                             </span>
                         </div>
-                        <!-- Gradient overlay -->
+
+                        @if (!string.IsNullOrEmpty(cat.BannerImageUrl))
+                        {
+                            <img src="https://localhost:7145@(cat.BannerImageUrl)" alt="@cat.Name"
+                                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                                 loading="lazy" decoding="async"
+                                 onerror="this.style.display='none'" />
+                        }
+                        
                         <div class="absolute inset-0 bg-gradient-to-t from-gray-950/85 via-gray-900/20 to-transparent group-hover:from-brand/80 group-hover:via-brand/25 transition-all duration-500"></div>
-                        <!-- Bottom content -->
+                        
                         <div class="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
                             <h3 class="text-white font-bold text-base md:text-lg leading-tight drop-shadow-sm">@cat.Name</h3>
-                            <!-- Arrow: slides in from right on hover -->
+                            
                             <span class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center
                                          translate-x-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 flex-shrink-0">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -246,7 +204,7 @@
                                 </svg>
                             </span>
                         </div>
-                        <!-- Shop Now ribbon (appears on hover) -->
+                        
                         <div class="absolute top-3 right-3
                                     bg-white text-brand text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-sm
                                     opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
@@ -258,7 +216,6 @@
         }
         else
         {
-            <!-- Hardcoded fallback when API returns empty -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 @foreach (var (name, slug, emoji, from, to) in _defaultCategories)
                 {
@@ -278,22 +235,17 @@
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════
-     NEW ARRIVALS
-════════════════════════════════════════════════ -->
-<section class="py-16 bg-gray-50">
+<!-- ══ NEW ARRIVALS ════════════════════════════════════════════════════ -->
+<section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-end justify-between mb-8">
             <div>
-                <p class="text-brand text-xs font-extrabold uppercase tracking-widest mb-1.5">Just In</p>
+                <p class="text-brand text-[11px] font-extrabold uppercase tracking-widest mb-1.5">Just In</p>
                 <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900">New Arrivals</h2>
             </div>
-            <a href="/store"
-               class="hidden sm:inline-flex items-center gap-1.5 text-brand font-semibold text-sm group hover:gap-3 transition-all duration-200">
+            <a href="/store" class="hidden sm:inline-flex items-center gap-1.5 text-brand font-bold text-sm group hover:gap-3 transition-all duration-200">
                 View All
-                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-                </svg>
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </a>
         </div>
 
@@ -304,187 +256,169 @@
                 {
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="skeleton aspect-square w-full"></div>
-                        <div class="p-4 space-y-2.5">
-                            <div class="skeleton h-3 w-1/3 rounded-full"></div>
-                            <div class="skeleton h-4 w-3/4 rounded-md"></div>
-                            <div class="skeleton h-4 w-1/2 rounded-md"></div>
-                            <div class="skeleton h-10 w-full rounded-xl mt-3"></div>
-                        </div>
+                        <div class="p-4 space-y-2.5"><div class="skeleton h-3 w-1/3 rounded-full"></div><div class="skeleton h-4 w-3/4 rounded"></div><div class="skeleton h-4 w-1/2 rounded"></div><div class="skeleton h-10 w-full rounded-xl mt-2"></div></div>
                     </div>
                 }
             </div>
         }
-        else if (newArrivals.Any())
+       else if (newArrivals.Any())
         {
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 @foreach (var product in newArrivals.Take(4))
                 {
-                    <VictoriaStores.Frontend.Components.ProductCard Product="product" />
+                    <ProductCard Product="product" />
                 }
             </div>
-            <!-- Mobile-only view all button -->
             <div class="mt-8 text-center sm:hidden">
-                <a href="/store"
-                   class="inline-flex items-center justify-center gap-2 h-11 px-8 bg-brand text-white font-bold text-sm rounded-xl shadow-sm">
-                    View All Products
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-                    </svg>
-                </a>
+                <a href="/store" class="inline-flex items-center justify-center gap-2 h-11 px-8 bg-brand text-white font-bold text-sm rounded-2xl shadow-sm">View All Products →</a>
             </div>
         }
         else
         {
-            <p class="text-center text-gray-400 py-12">Products are being added — check back soon!</p>
+            <div class="text-center py-16">
+                <div class="text-5xl mb-4">📦</div>
+                <p class="text-gray-500 font-semibold">Products are being added — check back soon!</p>
+            </div>
         }
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════
-     PROMOTIONAL BANNER
-════════════════════════════════════════════════ -->
-<section class="py-10 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="relative rounded-3xl overflow-hidden border border-brand/10 shadow-sm bg-gradient-to-br from-brand-light via-white to-accent/5">
-            <!-- Decorative circles -->
-            <div class="absolute -top-16 -right-16 w-56 h-56 bg-brand/5 rounded-full pointer-events-none"></div>
-            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-accent/5 rounded-full pointer-events-none"></div>
+<!-- ══ PROMOTIONAL BANNER ══════════════════════════════════════════════ -->
+@if (promoProduct != null && promoProduct.SalePrice.HasValue)
+{
+    var discountPercent = Math.Round((1 - (promoProduct.SalePrice.Value / promoProduct.Price)) * 100);
 
-            <div class="relative flex flex-col md:flex-row items-stretch">
-                <!-- Text side -->
-                <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center text-center md:text-left z-10">
-                    <span class="inline-flex items-center gap-1.5 bg-accent text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full mb-5 self-center md:self-start">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
-                        </svg>
-                        Limited Time Offer
-                    </span>
-                    <h2 class="font-serif text-3xl md:text-[2.25rem] font-bold text-gray-900 mb-4 leading-tight">
-                        50% Off Kitchen Sets<br class="hidden md:block" />
-                        <span class="text-accent">This Week Only!</span>
-                    </h2>
-                    <p class="text-gray-500 text-sm md:text-base mb-8 max-w-sm mx-auto md:mx-0 leading-relaxed">
-                        Upgrade your cooking experience with our premium non-stick collections. Limited stock — act fast!
-                    </p>
-                    <div>
-                        <a href="/category/kitchen-utensils"
-                           class="inline-flex items-center justify-center gap-2 h-12 px-8 bg-accent text-white font-extrabold text-sm rounded-xl hover:bg-accent-dark active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg">
-                            Shop Kitchen Utensils
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+    <section class="py-10 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-[#04163c] to-[#1A56DB]">
+                <div class="absolute inset-0 pointer-events-none opacity-20" style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,.15) 1px,transparent 0);background-size:24px 24px;"></div>
+                <div class="absolute -top-20 -right-20 w-72 h-72 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="absolute -bottom-12 -left-12 w-56 h-56 bg-accent/10 rounded-full blur-2xl pointer-events-none"></div>
 
-                <!-- Visual side -->
-                <div class="w-full md:w-1/2 relative min-h-[200px] md:min-h-[280px] overflow-hidden flex items-center justify-center">
-                    <img src="/images/promo-kitchen.jpg" alt="Kitchen promotion"
-                         class="absolute inset-0 w-full h-full object-cover"
-                         loading="lazy"
-                         onerror="this.style.display='none'" />
-                    <!-- Emoji fallback when no image -->
-                    <div class="relative z-0 text-center py-8 md:py-0">
-                        <div class="text-8xl mb-2 drop-shadow-sm select-none">🍳</div>
-                        <p class="text-brand font-bold text-base opacity-50">Kitchen Collection</p>
+                <div class="relative flex flex-col md:flex-row items-stretch">
+                    <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center text-center md:text-left z-10">
+                        <span class="inline-flex items-center gap-1.5 bg-accent text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full mb-5 self-center md:self-start shadow-md">
+                            🔥 Limited Time Offer
+                        </span>
+                        <h2 class="font-serif text-3xl md:text-[2.4rem] font-bold text-white mb-4 leading-tight">
+                            @promoProduct.Name<br class="hidden md:block" />
+                            <span class="text-accent">@discountPercent% OFF!</span>
+                        </h2>
+                        <p class="text-white/65 text-sm md:text-base mb-8 max-w-sm mx-auto md:mx-0 leading-relaxed line-clamp-2">
+                            @(string.IsNullOrEmpty(promoProduct.Description) ? "Upgrade your lifestyle with our premium collections. Limited stock — act fast!" : promoProduct.Description)
+                        </p>
+                        <div>
+                            <a href="/product/@promoProduct.Id"
+                               class="inline-flex items-center justify-center gap-2 h-12 px-8 bg-accent text-white font-extrabold text-sm rounded-2xl hover:bg-accent-dark active:scale-95 transition-all duration-200 shadow-lg hover:shadow-xl">
+                                Shop Now →
+                            </a>
+                        </div>
                     </div>
-                    <!-- Floating price tag -->
-                    <div class="absolute top-5 right-5 z-10 bg-white rounded-2xl shadow-xl p-4 text-center border border-gray-100 min-w-[90px]">
-                        <p class="text-gray-400 line-through text-xs font-semibold leading-none">₦20,000</p>
-                        <p class="text-accent font-extrabold text-2xl leading-tight mt-0.5">₦10,000</p>
-                        <span class="inline-block mt-1 bg-green-100 text-green-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">Save 50%</span>
+
+                    <div class="w-full md:w-1/2 relative min-h-[200px] md:min-h-[280px] overflow-hidden flex items-center justify-center bg-white/5">
+                        @if (!string.IsNullOrEmpty(promoProduct.MainImageUrl))
+                        {
+                            <img src="https://localhost:7145@(promoProduct.MainImageUrl)" alt="@promoProduct.Name"
+                                 class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay" loading="lazy" onerror="this.style.display='none'" />
+                        }
+                        else
+                        {
+                            <div class="relative z-0 text-center py-8 md:py-0">
+                                <div class="text-9xl mb-2 drop-shadow-2xl select-none">🎁</div>
+                            </div>
+                        }
+                        
+                        <div class="absolute top-5 right-5 z-10 bg-white rounded-2xl shadow-2xl p-4 text-center border border-gray-50 min-w-[96px]">
+                            <p class="text-gray-400 line-through text-xs font-semibold leading-none">₦@promoProduct.Price.ToString("N0")</p>
+                            <p class="text-accent font-extrabold text-2xl leading-tight mt-0.5">₦@promoProduct.SalePrice.Value.ToString("N0")</p>
+                            <span class="inline-block mt-1 bg-green-100 text-green-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">Save @discountPercent%</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+}
 
-<!-- ═══════════════════════════════════════════════
-     BEST SELLERS
-════════════════════════════════════════════════ -->
-<section class="py-16 bg-gray-50">
+<!-- ══ BEST SELLERS ════════════════════════════════════════════════════ -->
+<section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-end justify-between mb-8">
             <div>
-                <p class="text-brand text-xs font-extrabold uppercase tracking-widest mb-1.5 flex items-center gap-1"><span>⭐</span> Top Weekly</p>
+                <p class="text-accent text-[11px] font-extrabold uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><span>⭐</span> Top Weekly</p>
                 <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900">Best Sellers</h2>
             </div>
-            <a href="/store" class="hidden sm:inline-flex items-center gap-1.5 text-brand font-semibold text-sm group hover:gap-3 transition-all duration-200">
+            <a href="/store" class="hidden sm:inline-flex items-center gap-1.5 text-brand font-bold text-sm group hover:gap-3 transition-all duration-200">
                 View All
-                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </a>
         </div>
 
         @if (isLoading)
         {
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div class="flex overflow-x-auto pb-6 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 snap-x snap-mandatory hide-scrollbar">
                 @for (int i = 0; i < 4; i++)
                 {
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden w-[70vw] sm:w-auto flex-shrink-0 snap-start">
                         <div class="skeleton aspect-square w-full"></div>
-                        <div class="p-4 space-y-2.5">
-                            <div class="skeleton h-3 w-1/3 rounded-full"></div>
-                            <div class="skeleton h-4 w-3/4 rounded-md"></div>
-                            <div class="skeleton h-4 w-1/2 rounded-md"></div>
-                            <div class="skeleton h-10 w-full rounded-xl mt-3"></div>
-                        </div>
+                        <div class="p-4 space-y-2.5"><div class="skeleton h-3 w-1/3 rounded-full"></div><div class="skeleton h-4 w-3/4 rounded"></div><div class="skeleton h-4 w-1/2 rounded"></div><div class="skeleton h-10 w-full rounded-xl mt-2"></div></div>
                     </div>
                 }
             </div>
         }
         else if (bestSellers.Any())
         {
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div class="flex overflow-x-auto pb-6 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 snap-x snap-mandatory hide-scrollbar">
                 @foreach (var product in bestSellers.Take(4))
                 {
-                    <VictoriaStores.Frontend.Components.ProductCard Product="product" />
+                    <div class="w-[70vw] sm:w-auto flex-shrink-0 snap-start">
+                        <ProductCard Product="product" />
+                    </div>
                 }
             </div>
-            <div class="mt-8 text-center sm:hidden">
-                <a href="/store" class="inline-flex items-center justify-center gap-2 h-11 px-8 bg-brand text-white font-bold text-sm rounded-xl shadow-sm">
-                    View All Products
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            
+            <div class="mt-4 text-center sm:hidden">
+                <a href="/store" class="inline-flex items-center justify-center gap-2 h-11 px-8 bg-brand-light text-brand font-bold text-sm rounded-xl hover:bg-brand hover:text-white transition-colors shadow-sm w-full">
+                    View All Products →
                 </a>
             </div>
         }
         else
         {
-            <p class="text-center text-gray-400 py-12">Products are being added — check back soon!</p>
+            <div class="text-center bg-gray-50 border border-dashed border-gray-200 rounded-2xl py-12 px-4 shadow-sm">
+                <div class="text-4xl mb-3 opacity-50 select-none">🌟</div>
+                <p class="text-gray-500 font-semibold text-sm">Products coming soon!</p>
+            </div>
         }
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════
-     HOW TO ORDER
-════════════════════════════════════════════════ -->
+<!-- ══ HOW TO ORDER ════════════════════════════════════════════════════ -->
 <section class="py-16 bg-gray-50 border-y border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-            <p class="text-brand text-xs font-extrabold uppercase tracking-widest mb-2">Simple Process</p>
+            <p class="text-brand text-[11px] font-extrabold uppercase tracking-widest mb-2">Simple Process</p>
             <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900">How to Order</h2>
+            <p class="text-gray-500 text-sm mt-2 max-w-sm mx-auto">Four easy steps to get your products delivered to your door</p>
         </div>
 
         <div class="relative">
-            <!-- Connecting dotted line (desktop only) -->
             <div class="hidden lg:block absolute top-10 left-[calc(12.5%-8px)] right-[calc(12.5%-8px)] h-px pointer-events-none z-0"
-                 style="background-image:repeating-linear-gradient(90deg,#1A56DB 0,#1A56DB 10px,transparent 10px,transparent 20px);opacity:0.25">
-            </div>
+                 style="background-image:repeating-linear-gradient(90deg,#1A56DB 0,#1A56DB 10px,transparent 10px,transparent 20px);opacity:0.2"></div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 relative z-10">
                 @foreach (var step in _orderSteps)
                 {
                     <div class="text-center group cursor-default">
                         <div class="relative inline-flex mb-5">
-                            <div class="w-20 h-20 rounded-2xl bg-white border-2 border-gray-200 flex items-center justify-center mx-auto shadow-sm
-                                        group-hover:border-brand group-hover:shadow-md group-hover:bg-brand-light transition-all duration-300">
-                                <span class="text-3xl select-none" aria-hidden="true">@step.Icon</span>
+                            <div class="step-active w-20 h-20 rounded-2xl bg-white border-2 border-gray-200 flex items-center justify-center mx-auto shadow-sm group-hover:border-brand group-hover:shadow-lg group-hover:bg-brand-light transition-all duration-300">
+                                <span class="text-3xl select-none">@step.Icon</span>
                             </div>
-                            <span class="absolute -top-2.5 -right-2.5 w-6 h-6 bg-brand text-white text-xs font-extrabold rounded-full flex items-center justify-center shadow-sm ring-2 ring-white">
+                            <span class="absolute -top-2.5 -right-2.5 w-6 h-6 bg-gradient-to-br from-brand to-[#0c2d6b] text-white text-xs font-extrabold rounded-full flex items-center justify-center shadow ring-2 ring-white">
                                 @step.Number
                             </span>
                         </div>
-                        <h3 class="font-bold text-gray-900 mb-2 text-[15px] group-hover:text-brand transition-colors duration-200">@step.Title</h3>
+                        <h3 class="font-bold text-gray-900 mb-2 text-[15px] group-hover:text-brand transition-colors">@step.Title</h3>
                         <p class="text-gray-500 text-sm leading-relaxed max-w-[200px] mx-auto">@step.Description</p>
                     </div>
                 }
@@ -493,25 +427,22 @@
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════
-     WHY CHOOSE US
-════════════════════════════════════════════════ -->
+<!-- ══ WHY CHOOSE US ══════════════════════════════════════════════════ -->
 <section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10">
-            <p class="text-brand text-xs font-extrabold uppercase tracking-widest mb-2">Why Victoria James</p>
+            <p class="text-brand text-[11px] font-extrabold uppercase tracking-widest mb-2">Why Victoria James</p>
             <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900">Your Trusted Nigerian Store</h2>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach (var v in _whyChooseUs)
             {
-                <div class="group p-6 rounded-2xl border border-gray-100 bg-white
-                            hover:border-brand/25 hover:shadow-lg hover:bg-brand-light/20 transition-all duration-300 cursor-default">
-                    <div class="w-12 h-12 @v.IconBg rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div class="group p-6 rounded-2xl border border-gray-100 bg-white hover:border-brand/30 hover:shadow-xl hover:bg-blue-50/30 transition-all duration-300 cursor-default">
+                    <div class="w-12 h-12 @v.IconBg rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm">
                         @((MarkupString)v.IconSvg)
                     </div>
-                    <h3 class="font-bold text-gray-900 mb-2 text-[15px] group-hover:text-brand transition-colors duration-200">@v.Title</h3>
+                    <h3 class="font-bold text-gray-900 mb-2 text-[15px] group-hover:text-brand transition-colors">@v.Title</h3>
                     <p class="text-sm text-gray-500 leading-relaxed">@v.Description</p>
                 </div>
             }
@@ -519,69 +450,53 @@
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════
-     WHATSAPP CTA
-════════════════════════════════════════════════ -->
-<section class="relative overflow-hidden py-16 bg-gradient-to-br from-green-700 via-green-600 to-emerald-500">
-    <!-- Dot pattern -->
-    <div class="absolute inset-0 pointer-events-none"
-         style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,0.07) 1px,transparent 0);background-size:24px 24px;">
-    </div>
-    <!-- Blur bubbles -->
-    <div class="absolute top-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl -translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
-    <div class="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-2xl translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+<!-- ══ WHATSAPP CTA ════════════════════════════════════════════════════ -->
+<section class="relative overflow-hidden py-16 bg-gradient-to-br from-green-800 via-green-600 to-emerald-500">
+    <div class="absolute inset-0 pointer-events-none opacity-20" style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,0.1) 1px,transparent 0);background-size:24px 24px;"></div>
+    <div class="absolute top-0 left-0 w-56 h-56 bg-white/5 rounded-full blur-2xl -translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+    <div class="absolute bottom-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-2xl translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
 
     <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
-        <!-- Icon block -->
-        <div class="w-16 h-16 bg-white/15 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/20 shadow-lg">
-            <svg class="w-9 h-9 text-white" fill="currentColor" viewBox="0 0 24 24" aria-label="WhatsApp">
+        <div class="w-16 h-16 bg-white/15 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/20 shadow-xl">
+            <svg class="w-9 h-9 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
             </svg>
         </div>
-
         <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
             Get Exclusive Deals on WhatsApp!
         </h2>
         <p class="text-green-100 text-base mb-8 max-w-lg mx-auto leading-relaxed">
             Join our WhatsApp broadcast and be the first to know about flash sales, new arrivals, and exclusive offers.
         </p>
-
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="https://wa.me/2348162809886?text=Hi%20Victoria%20James%20Store!%20I%27d%20like%20to%20join%20your%20deals%20broadcast."
                target="_blank" rel="noopener noreferrer"
-               class="inline-flex items-center justify-center gap-3 h-14 px-10
-                      bg-white text-green-700 font-extrabold text-base rounded-2xl
-                      hover:bg-green-50 active:scale-95 transition-all duration-200 shadow-xl hover:shadow-2xl">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
+               class="inline-flex items-center justify-center gap-3 h-14 px-10 bg-white text-green-700 font-extrabold text-base rounded-2xl hover:bg-green-50 active:scale-95 transition-all duration-200 shadow-xl hover:shadow-2xl">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 Join WhatsApp Broadcast
             </a>
             <a href="/store"
-               class="inline-flex items-center justify-center gap-2 h-14 px-8
-                      bg-white/10 backdrop-blur-sm text-white font-bold text-base rounded-2xl
-                      border-2 border-white/30 hover:bg-white/20 hover:border-white/60 active:scale-95 transition-all duration-200">
-                Browse Products
+               class="inline-flex items-center justify-center gap-2 h-14 px-8 bg-white/10 backdrop-blur-sm text-white font-bold text-base rounded-2xl border-2 border-white/30 hover:bg-white/20 hover:border-white/60 active:scale-95 transition-all duration-200">
+                Browse Products →
             </a>
         </div>
     </div>
 </section>
 
 @code {
-    // ── State ──────────────────────────────────────────────────────
     private bool isLoading = true;
     private bool categoriesLoading = true;
     private List<ProductDto> newArrivals = new();
     private List<ProductDto> bestSellers = new();
     private List<CategoryDto> featuredCategories = new();
+    private ProductDto? promoProduct;
 
-    // ── Static data ────────────────────────────────────────────────
     private static readonly (string name, string slug, string emoji, string from, string to)[] _defaultCategories =
     {
-        ("Household Items",    "household-items",    "🏠", "from-blue-50",   "to-blue-100"),
-        ("Kitchen Utensils",   "kitchen-utensils",   "🍳", "from-orange-50", "to-orange-100"),
-        ("Fashion & Giftpacks","fashion-giftpacks",  "👗", "from-pink-50",   "to-pink-100"),
-        ("Accessories",        "accessories",         "💍", "from-purple-50", "to-purple-100"),
+        ("Household Items",     "household-items",   "🏠", "from-blue-50",   "to-blue-100"),
+        ("Kitchen Utensils",    "kitchen-utensils",  "🍳", "from-orange-50", "to-orange-100"),
+        ("Fashion & Giftpacks", "fashion-giftpacks", "👗", "from-pink-50",   "to-pink-100"),
+        ("Accessories",         "accessories",        "💍", "from-purple-50", "to-purple-100"),
     };
 
     private static readonly (int Number, string Icon, string Title, string Description)[] _orderSteps =
@@ -594,36 +509,18 @@
 
     private static readonly (string Title, string Description, string IconBg, string IconSvg)[] _whyChooseUs =
     {
-        (
-            "Trusted Quality",
-            "Every product is verified for quality before it reaches your doorstep.",
-            "bg-blue-50",
-            "<svg class=\"w-6 h-6 text-brand\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z\"/></svg>"
-        ),
-        (
-            "Nationwide Delivery",
-            "Fast, reliable logistics to anywhere across Nigeria.",
-            "bg-green-50",
-            "<svg class=\"w-6 h-6 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4\"/></svg>"
-        ),
-        (
-            "WhatsApp Support",
-            "Real-time human support on WhatsApp, available 12 hours a day.",
-            "bg-emerald-50",
-            "<svg class=\"w-6 h-6 text-emerald-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z\"/></svg>"
-        ),
-        (
-            "Easy Bank Transfer",
-            "Simple, secure checkout via direct local bank transfers. No card needed.",
-            "bg-amber-50",
-            "<svg class=\"w-6 h-6 text-amber-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z\"/></svg>"
-        ),
+        ("Trusted Quality", "Every product is verified for quality before it reaches your doorstep.", "bg-blue-50",
+         "<svg class=\"w-6 h-6 text-brand\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z\"/></svg>"),
+        ("Nationwide Delivery", "Fast, reliable logistics to anywhere across Nigeria.", "bg-green-50",
+         "<svg class=\"w-6 h-6 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4\"/></svg>"),
+        ("WhatsApp Support", "Real-time human support on WhatsApp, available 12 hours a day.", "bg-emerald-50",
+         "<svg class=\"w-6 h-6 text-emerald-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z\"/></svg>"),
+        ("Easy Bank Transfer", "Simple, secure checkout via direct local bank transfers. No card needed.", "bg-amber-50",
+         "<svg class=\"w-6 h-6 text-amber-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z\"/></svg>"),
     };
 
-    // ── Lifecycle ──────────────────────────────────────────────────
     protected override async Task OnInitializedAsync()
     {
-        // Parallel fetch for faster initial load
         await Task.WhenAll(LoadCategoriesAsync(), LoadProductsAsync());
     }
 
@@ -634,15 +531,8 @@
             categoriesLoading = true;
             featuredCategories = await Http.GetFromJsonAsync<List<CategoryDto>>("api/category") ?? new();
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[Home] Categories load error: {ex.Message}");
-            featuredCategories = new(); // fall through to default cards
-        }
-        finally
-        {
-            categoriesLoading = false;
-        }
+        catch (Exception ex) { Console.WriteLine($"[Home] Categories: {ex.Message}"); featuredCategories = new(); }
+        finally { categoriesLoading = false; }
     }
 
     private async Task LoadProductsAsync()
@@ -650,25 +540,35 @@
         try
         {
             isLoading = true;
-            var all = await ProductApi.GetActiveProductsAsync() ?? new();
+            
+            // FIXED: Use the direct Http client instead of ProductApi to prevent silent failures
+            var all = await Http.GetFromJsonAsync<List<ProductDto>>("api/product") ?? new();
+            
             // Sort by CreatedAt if available, otherwise fall back to Id ordering
             newArrivals = all
                 .OrderByDescending(p => p.CreatedAt != default ? (object)p.CreatedAt : p.Id)
                 .ToList();
-            
+
             // For now, pseudo-randomize or sort differently to simulate best sellers
             bestSellers = all
                 .OrderBy(p => p.Name) 
                 .ToList();
+
+            promoProduct = all
+                .Where(p => p.SalePrice.HasValue && p.Price > 0)
+                .OrderByDescending(p => (p.Price - p.SalePrice.Value) / p.Price)
+                .FirstOrDefault();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[Home] Products load error: {ex.Message}");
             newArrivals = new();
+            bestSellers = new();
         }
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
     }
 }

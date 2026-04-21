@@ -8,295 +8,417 @@
 
 <style>
     a,a:hover,a:visited,a:active,a:focus{text-decoration:none!important}
-    @@keyframes megaSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-    .mega-enter{animation:megaSlide .18s ease-out forwards}
+    @@keyframes megaSlide{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    .mega-enter{animation:megaSlide .2s cubic-bezier(.16,1,.3,1) forwards}
     @@keyframes drawerIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
-    .drawer-enter{animation:drawerIn .22s ease-out forwards}
-    @@keyframes vjping{0%{transform:scale(1);opacity:.4}75%,100%{transform:scale(1.8);opacity:0}}
-    .vj-ping{animation:vjping 2s cubic-bezier(0,0,.2,1) infinite}
+    .drawer-enter{animation:drawerIn .26s cubic-bezier(.16,1,.3,1) forwards}
+    @@keyframes vjping{0%{transform:scale(1);opacity:.5}75%,100%{transform:scale(2.2);opacity:0}}
+    .vj-ping{animation:vjping 2.2s cubic-bezier(0,0,.2,1) infinite}
+    @@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    .marquee-track{animation:marquee 28s linear infinite}
+    .marquee-track:hover{animation-play-state:paused}
+    .nav-link-vj{position:relative;padding-bottom:2px}
+    .nav-link-vj::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:#1A56DB;border-radius:1px;transition:width .22s ease}
+    .nav-link-vj:hover::after{width:100%}
+    .search-wrap:focus-within{box-shadow:0 0 0 3px rgba(26,86,219,.18)}
+    .cat-card{transition:transform .18s ease,box-shadow .18s ease}
+    .cat-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(26,86,219,.14)}
+    .footer-divider{background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent)}
+    .drawer-scroll::-webkit-scrollbar{width:4px}
+    .drawer-scroll::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:4px}
 </style>
 
 <div class="font-sans text-gray-900 bg-gray-50 min-h-screen flex flex-col">
 
 @if (showAnnouncement)
 {
-    <div class="relative bg-brand overflow-hidden">
-        <div class="absolute inset-0 pointer-events-none" style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,.08) 1px,transparent 0);background-size:20px 20px"></div>
-        <div class="relative z-10 flex items-center justify-center py-2 px-10 text-white text-[12px] font-semibold text-center">
-            🇳🇬&nbsp; Free WhatsApp support &nbsp;·&nbsp; Call&nbsp;08162809886 &nbsp;·&nbsp; Fast delivery across Nigeria
+    <div class="relative overflow-hidden bg-gradient-to-r from-[#0f2d6b] via-[#1A56DB] to-[#0f2d6b] text-white text-[11.5px] font-bold py-2 select-none">
+        <div class="marquee-track flex gap-0 whitespace-nowrap">
+            @for (int i = 0; i < 2; i++)
+            {
+                <span class="flex items-center gap-8 pr-8">
+                    <span>🚚 &nbsp;Free delivery on orders above ₦20,000</span>
+                    <span class="opacity-40">·</span>
+                    <span>📞 &nbsp;Call / WhatsApp: <strong>08162809886</strong></span>
+                    <span class="opacity-40">·</span>
+                    <span>🏦 &nbsp;Bank Transfer Accepted</span>
+                    <span class="opacity-40">·</span>
+                    <span>⚡ &nbsp;Fast delivery across Nigeria</span>
+                    <span class="opacity-40">·</span>
+                    <span>🔒 &nbsp;Secure &amp; trusted shopping</span>
+                    <span class="opacity-40">·</span>
+                </span>
+            }
         </div>
-        <button @onclick="DismissAnnouncement" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-6 h-6 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 rounded-full transition-all text-sm" aria-label="Dismiss">✕</button>
+        <button @onclick="DismissAnnouncement" class="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/20 transition-all z-10 text-xs flex-shrink-0" aria-label="Dismiss">✕</button>
     </div>
 }
 
-<header class="sticky top-0 z-40 w-full shadow-sm">
-    <div class="hidden md:flex justify-between items-center bg-gray-900 text-gray-400 text-xs py-1.5 px-6">
-        <div class="flex gap-5">
-            <a href="/about"   class="hover:text-white transition-colors">About Us</a>
-            <a href="/contact" class="hover:text-white transition-colors">Contact</a>
-            <a href="/track"   class="hover:text-white transition-colors">Order Tracking</a>
-        </div>
-        <span>Welcome to Victoria James Store</span>
-    </div>
+<header class="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/95 border-b border-gray-100 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
 
-    <div class="bg-white border-b border-gray-100 py-3.5 px-3 sm:px-6 w-full">
-    <div class="max-w-7xl mx-auto w-full flex items-center justify-between lg:justify-start gap-2 sm:gap-4 lg:gap-8">
-        <div class="flex items-center gap-2 sm:gap-3">
-            <button class="lg:hidden p-1.5 text-gray-600 hover:text-brand rounded-lg hover:bg-gray-50 transition-colors" @onclick="ToggleMobileDrawer" aria-label="Open menu">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-            </button>
-            <a href="/" class="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 group">
-                <div class="bg-brand rounded-xl w-9 h-9 sm:w-10 sm:h-10 text-white font-black text-lg sm:text-xl flex items-center justify-center shadow-sm group-hover:bg-brand-dark transition-colors">VJ</div>
-                <div class="hidden sm:block leading-tight">
-                    <p class="font-serif font-bold text-gray-900 text-[14px] sm:text-[15px]">Victoria James</p>
-                    <p class="text-brand text-[10px] sm:text-xs font-bold">Store</p>
-                </div>
-            </a>
-        </div>
-        <div class="hidden lg:flex flex-1 max-w-x relative"></div>
-
-        <div class="hidden lg:flex flex-1 max-w-xl">
-
-            <div class="flex w-full rounded-xl border border-gray-300 overflow-hidden focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20 transition-all">
-                <select @bind="searchCategory" class="bg-gray-50 border-r border-gray-200 text-sm px-3 text-gray-600 focus:outline-none h-11 w-32 cursor-pointer flex-shrink-0">
-                    <option value="All">All</option>
-                    @foreach (var cat in _navCategories)
-                    {
-                        <option value="@cat.Slug">@cat.Name</option>
-                    }
-                </select>
-                <input type="search" @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearchKey" placeholder="Search for products..." class="flex-1 h-11 px-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none bg-white" />
-                <button @onclick="PerformSearch" class="h-11 px-5 bg-brand text-white hover:bg-brand-dark transition-colors flex-shrink-0 flex items-center">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    <div class="py-3 px-3 sm:px-6">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 lg:gap-6">
+            
+            <div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+                <button class="lg:hidden p-2.5 text-gray-500 hover:text-brand hover:bg-blue-50/80 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-brand/20" @onclick="ToggleMobileDrawer" aria-label="Open menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
+                <a href="/" class="flex items-center gap-3 flex-shrink-0 group">
+                    <div class="relative flex-shrink-0">
+                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-[#1A56DB] via-[#1e4fd8] to-[#0f2d6b] flex items-center justify-center shadow-md shadow-brand/20 group-hover:shadow-lg group-hover:shadow-brand/30 group-hover:-translate-y-0.5 transition-all duration-300 ring-1 ring-white/20 inset-0">
+                            <span class="font-black text-white text-sm sm:text-base tracking-tight drop-shadow-sm">VJ</span>
+                        </div>
+                        <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-accent rounded-full border-2 border-white shadow-sm"></span>
+                    </div>
+                    <div class="hidden sm:block leading-tight">
+                        <p class="font-serif font-bold text-gray-900 text-[16px] tracking-tight">Victoria James</p>
+                        <p class="text-[9px] font-black tracking-[0.2em] text-brand uppercase mt-0.5 opacity-80">Store</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="hidden lg:flex flex-1 max-w-2xl">
+                <div class="flex w-full rounded-2xl ring-1 ring-gray-200 overflow-hidden bg-white hover:ring-brand/30 hover:shadow-md transition-all duration-300 focus-within:ring-2 focus-within:ring-brand focus-within:shadow-md">
+                    <select @bind="searchCategory" class="bg-gray-50/50 border-r border-gray-100 text-[13px] px-4 text-gray-600 focus:outline-none h-[48px] w-40 cursor-pointer flex-shrink-0 font-bold hover:bg-gray-100/80 transition-colors appearance-none">
+                        <option value="All">All Categories</option>
+                        @foreach (var cat in _navCategories)
+                        {
+                            <option value="@cat.Slug">@cat.Name</option>
+                        }
+                    </select>
+                    <input type="search" @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearchKey" placeholder="Search for products, brands and more…" class="flex-1 h-[48px] px-5 text-[14px] text-gray-900 placeholder-gray-400 focus:outline-none bg-transparent font-medium" />
+                    <button @onclick="PerformSearch" class="h-[48px] px-7 bg-brand text-white hover:bg-brand-dark transition-all flex-shrink-0 flex items-center gap-2.5 font-bold text-sm shadow-inner active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        Search
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 sm:gap-3 ml-auto lg:ml-0">
+                <a href="https://wa.me/2348162809886" target="_blank" rel="noopener noreferrer" class="hidden sm:flex flex-col items-center justify-center gap-1 w-14 h-14 text-green-600 hover:text-green-700 hover:bg-green-50/80 rounded-2xl transition-all duration-200 group">
+                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    <span class="text-[9px] font-extrabold tracking-wider uppercase">Chat</span>
+                </a>
+
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/account" class="flex flex-col items-center justify-center gap-1 w-14 h-14 text-gray-500 hover:text-brand hover:bg-blue-50/80 rounded-2xl transition-all duration-200 group">
+                            <svg class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            <span class="hidden sm:block text-[9px] font-extrabold tracking-wider uppercase">Profile</span>
+                        </a>
+                        <button @onclick="Logout" class="flex flex-col items-center justify-center gap-1 w-14 h-14 text-gray-400 hover:text-red-500 hover:bg-red-50/80 rounded-2xl transition-all duration-200 group">
+                            <svg class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            <span class="hidden sm:block text-[9px] font-extrabold tracking-wider uppercase">Logout</span>
+                        </button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/login" class="hidden sm:flex flex-col items-center justify-center gap-1 w-14 h-14 text-gray-500 hover:text-brand hover:bg-blue-50/80 rounded-2xl transition-all duration-200 group">
+                            <svg class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                            <span class="text-[9px] font-extrabold tracking-wider uppercase">Sign In</span>
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
+
+                <a href="/cart" class="relative flex flex-col items-center justify-center gap-1 w-14 h-14 text-gray-500 hover:text-brand hover:bg-blue-50/80 rounded-2xl transition-all duration-200 group ml-1">
+                    <div class="relative">
+                        <svg class="w-5 sm:w-6 h-5 sm:h-6 group-hover:-translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <span class="cart-badge absolute -top-2 -right-2.5 bg-accent text-white text-[10px] font-black rounded-full h-4.5 w-4.5 flex items-center justify-center hidden shadow-sm ring-2 ring-white">0</span>
+                    </div>
+                    <span class="hidden sm:block text-[9px] font-extrabold tracking-wider uppercase">Cart</span>
+                </a>
             </div>
         </div>
-        <div class="flex items-center gap-3 sm:gap-5 ml-auto lg:ml-0">
-            <a href="https://wa.me/2348162809886" target="_blank" rel="noopener noreferrer" class="hidden sm:flex flex-col items-center text-green-500 hover:text-green-600 transition-colors">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                <span class="text-[10px] font-bold mt-0.5">WhatsApp</span>
-            </a>
-            
-            <AuthorizeView>
-                <Authorized>
-                    <a href="/account" class="flex flex-col items-center text-gray-600 hover:text-brand transition-colors">
-                        <svg class="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        <span class="hidden sm:block text-[10px] font-bold mt-0.5">Account</span>
-                    </a>
-                    <button @onclick="Logout" class="flex flex-col items-center text-gray-600 hover:text-red-500 transition-colors">
-                            <svg class="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                            <span class="hidden sm:block text-[10px] font-bold mt-0.5">Logout</span>
-                    </button>
-                </Authorized>
-                <NotAuthorized>
-                    <div class="flex items-center gap-3 sm:gap-5">
-                        <a href="/login" class="flex flex-col items-center text-gray-600 hover:text-brand transition-colors">
-                            <svg class="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-                            <span class="hidden sm:block text-[10px] font-bold mt-0.5">Sign In</span>
-                        </a>
-                        <a href="/register" class="flex flex-col items-center text-gray-600 hover:text-brand transition-colors">
-                            <svg class="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-                            <span class="hidden sm:block text-[10px] font-bold mt-0.5">Register</span>
-                        </a>
-                    </div>
-                </NotAuthorized>
-            </AuthorizeView>
+    </div>
 
-            <a href="/cart" class="relative flex flex-col items-center text-gray-600 hover:text-brand transition-colors ml-1 sm:ml-0">
-                <svg class="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                <span class="hidden sm:block text-[10px] font-bold mt-0.5">Cart</span>
-                <span class="cart-badge absolute -top-1.5 -right-2 bg-accent text-white text-[10px] font-extrabold rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
-            </a>
+    <div class="lg:hidden px-4 py-3 border-t border-gray-100 bg-gray-50/50">
+        <div class="relative w-full max-w-md mx-auto">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </span>
+            <input type="search" @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearchKey" placeholder="Search products…"
+                   class="h-11 w-full pl-11 pr-14 rounded-xl border border-gray-200 text-[14px] font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand bg-white shadow-sm transition-all"/>
+            <button @onclick="PerformSearch" class="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 px-4 bg-brand text-white text-xs font-bold rounded-lg hover:bg-brand-dark transition-colors shadow-sm active:scale-95">Go</button>
         </div>
     </div>
-</div>
 
-<div class="lg:hidden px-4 py-2.5 bg-white border-b border-gray-100 w-full">
-    <div class="max-w-7xl mx-auto w-full relative">
-        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        </span>
-        <input type="search" @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearchKey" placeholder="Search products..." class="h-11 w-full pl-10 pr-4 rounded-xl border border-gray-200 text-sm placeholder-gray-400 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 bg-gray-50"/>
-    </div>
-</div>
-
-    <div class="hidden lg:block bg-white border-b border-gray-200">
+    <div class="hidden lg:block border-t border-gray-100">
         <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
-            <div class="relative">
-                <button @onclick="ToggleMegaMenu" class="flex items-center gap-2 bg-brand text-white text-sm font-bold px-5 py-3.5 hover:bg-brand-dark transition-colors focus:outline-none">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                    All Categories
-                    <svg class="w-4 h-4 transition-transform duration-200 @(isMegaMenuOpen?"rotate-180":"")" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+            
+            <div class="relative group/mega">
+                <button @onclick="ToggleMegaMenu"
+                        class="flex items-center gap-3 bg-brand text-white text-[13.5px] font-bold px-6 py-4 hover:bg-brand-dark transition-all focus:outline-none relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+                    <svg class="w-[18px] h-[18px] relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    <span class="relative z-10">All Categories</span>
+                    <svg class="w-3.5 h-3.5 relative z-10 transition-transform duration-300 @(isMegaMenuOpen ? "-rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
                 </button>
+
                 @if (isMegaMenuOpen)
                 {
-                    <div class="fixed inset-0 z-40" @onclick="() => isMegaMenuOpen=false"></div>
-                    <div class="absolute top-full left-0 w-[540px] bg-white border border-gray-200 shadow-2xl rounded-b-2xl z-50 flex overflow-hidden mega-enter">
-                        <ul class="w-1/2 border-r border-gray-100 py-2">
+                    <div class="fixed inset-0 z-40 bg-gray-900/10 backdrop-blur-[2px]" @onclick="() => isMegaMenuOpen=false"></div>
+                    
+                    <div class="absolute top-[102%] left-0 w-[500px] bg-white rounded-2xl shadow-2xl z-50 overflow-hidden ring-1 ring-gray-100 transform origin-top animate-fade-in">
+                        
+                        <div class="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+                            <span class="text-gray-900 font-extrabold text-[11px] tracking-[0.15em] uppercase">Browse Collections</span>
+                            <a href="/store" @onclick="() => isMegaMenuOpen=false" class="text-brand hover:text-brand-dark text-xs font-bold transition-colors inline-flex items-center gap-1 group/link">
+                                View Full Store 
+                                <svg class="w-3.5 h-3.5 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </a>
+                        </div>
+
+                        <div class="p-3 grid grid-cols-2 gap-2">
                             @foreach (var cat in _navCategories)
                             {
-                                <li>
-                                    <a href="/category/@cat.Slug" @onclick="() => isMegaMenuOpen=false" class="flex items-center justify-between px-6 py-3.5 group hover:bg-brand-light transition-colors">
-                                        <div class="flex items-center gap-3">
-                                            <span class="text-xl select-none">@GetCategoryEmoji(cat.Name)</span>
-                                            <span class="text-sm font-semibold text-gray-800 group-hover:text-brand">@cat.Name</span>
-                                        </div>
-                                        <svg class="w-4 h-4 text-gray-300 group-hover:text-brand transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                                    </a>
-                                </li>
+                                <a href="/category/@cat.Slug" @onclick="() => isMegaMenuOpen=false"
+                                   class="flex items-center gap-3.5 px-4 py-3.5 rounded-xl hover:bg-gray-50 transition-all duration-200 group/item border border-transparent hover:border-gray-100">
+                                    <div class="w-10 h-10 rounded-lg bg-white border border-gray-100 shadow-sm flex items-center justify-center text-lg flex-shrink-0 group-hover/item:shadow-md group-hover/item:scale-105 group-hover/item:border-brand/20 transition-all duration-300">
+                                        @GetCategoryEmoji(cat.Name)
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-[13px] font-bold text-gray-800 group-hover/item:text-brand truncate transition-colors">@cat.Name</p>
+                                    </div>
+                                    <svg class="w-4 h-4 text-gray-300 group-hover/item:text-brand group-hover/item:translate-x-0.5 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                </a>
                             }
+                            
                             @if (!_navCategories.Any())
                             {
-                                <li class="px-6 py-8 text-center text-sm text-gray-400">No categories yet</li>
-                            }
-                        </ul>
-                        <div class="w-1/2 bg-brand-light/40 p-6 flex flex-col justify-between">
-                            <div>
-                                <p class="text-xs font-extrabold uppercase tracking-widest text-brand mb-3">Featured</p>
-                                <div class="bg-gradient-to-br from-brand to-blue-600 rounded-2xl aspect-[4/3] flex items-center justify-center mb-4">
-                                    <span class="text-6xl select-none">🛍️</span>
+                                <div class="col-span-2 px-6 py-12 text-center">
+                                    <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-3 text-gray-300">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                    </div>
+                                    <p class="text-sm font-semibold text-gray-500">Categories loading...</p>
                                 </div>
-                                <p class="font-bold text-gray-900 text-sm">Explore Our Full Collection</p>
-                                <p class="text-xs text-gray-500 mt-1">Quality products for every need</p>
-                            </div>
-                            <a href="/store" @onclick="() => isMegaMenuOpen=false" class="mt-4 inline-flex items-center justify-center gap-2 h-10 px-5 bg-accent text-white text-sm font-bold rounded-xl hover:bg-accent-dark transition-colors">View All Products →</a>
+                            }
                         </div>
                     </div>
                 }
             </div>
 
-            <nav class="flex items-center flex-1 ml-2 overflow-x-auto">
-                <a href="/" class="px-3 py-3.5 text-sm font-semibold whitespace-nowrap hover:text-brand text-gray-700 transition-colors">Home</a>
-                @foreach (var cat in _navCategories)
+            <nav class="flex items-center flex-1 ml-6 overflow-x-auto gap-1">
+                <a href="/" class="px-3.5 py-4 text-[13.5px] font-bold text-gray-600 hover:text-brand transition-colors whitespace-nowrap relative group">
+                    Home
+                    <span class="absolute bottom-0 left-0 w-full h-[3px] bg-brand scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-t-full"></span>
+                </a>
+                <a href="/store" class="px-3.5 py-4 text-[13.5px] font-bold text-gray-600 hover:text-brand transition-colors whitespace-nowrap relative group">
+                    All Products
+                    <span class="absolute bottom-0 left-0 w-full h-[3px] bg-brand scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-t-full"></span>
+                </a>
+                @foreach (var cat in _navCategories.Take(4))
                 {
-                    <a href="/category/@cat.Slug" class="px-3 py-3.5 text-sm font-semibold whitespace-nowrap hover:text-brand text-gray-700 transition-colors">@cat.Name</a>
+                    <a href="/category/@cat.Slug" class="px-3.5 py-4 text-[13.5px] font-bold text-gray-600 hover:text-brand transition-colors whitespace-nowrap relative group">
+                        @cat.Name
+                        <span class="absolute bottom-0 left-0 w-full h-[3px] bg-brand scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-t-full"></span>
+                    </a>
                 }
             </nav>
 
-            <a href="/deals" class="text-accent font-bold text-sm flex items-center gap-1.5 hover:text-accent-dark transition-colors ml-4 flex-shrink-0 py-3.5">🔥 Trending</a>
+            <a href="/deals" class="flex items-center gap-2 text-accent font-extrabold text-[13px] hover:text-accent-dark transition-all ml-4 flex-shrink-0 py-3.5 px-3 rounded-xl hover:bg-orange-50 group">
+                <span class="relative flex h-2.5 w-2.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-60"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent group-hover:scale-110 transition-transform"></span>
+                </span>
+                <span class="tracking-wide">Hot Deals</span>
+            </a>
         </div>
     </div>
+
 </header>
 
 @if (isMobileDrawerOpen)
 {
-    <div class="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm" @onclick="ToggleMobileDrawer"></div>
-    <div class="fixed inset-y-0 left-0 max-w-[300px] w-full bg-white z-50 shadow-2xl flex flex-col drawer-enter">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <div class="fixed inset-0 bg-black/60 z-50 backdrop-blur-[2px]" @onclick="ToggleMobileDrawer"></div>
+    <div class="fixed inset-y-0 left-0 max-w-[310px] w-full bg-white z-50 shadow-2xl flex flex-col drawer-enter">
+        <div class="bg-gradient-to-r from-[#0c1e47] to-[#1A56DB] px-5 py-4 flex items-center justify-between flex-shrink-0">
             <a href="/" @onclick="ToggleMobileDrawer" class="flex items-center gap-2.5">
-                <div class="bg-brand rounded-xl w-9 h-9 text-white font-black text-lg flex items-center justify-center">VJ</div>
-                <div><p class="font-serif font-bold text-gray-900 text-sm">Victoria James</p><p class="text-brand text-xs font-bold">Store</p></div>
+                <div class="w-9 h-9 rounded-xl bg-white/20 border border-white/30 text-white font-black text-base flex items-center justify-center">VJ</div>
+                <div>
+                    <p class="font-serif font-bold text-white text-sm leading-none">Victoria James</p>
+                    <p class="text-white/60 text-[10px] font-bold tracking-widest uppercase mt-0.5">Store</p>
+                </div>
             </a>
-            <button @onclick="ToggleMobileDrawer" class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors">
+            <button @onclick="ToggleMobileDrawer" class="p-1.5 text-white/60 hover:text-white hover:bg-white/20 rounded-xl transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <div class="flex-1 overflow-y-auto py-3">
-            <div class="px-4 pb-3">
-                <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    </span>
-                    <input type="search" @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearchKey" placeholder="Search products..." class="h-10 w-full pl-9 pr-4 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand bg-gray-50"/>
-                </div>
+
+        <div class="px-4 pt-4 pb-2 flex-shrink-0">
+            <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </span>
+                <input type="search" @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearchKey" placeholder="Search products…"
+                       class="h-11 w-full pl-10 pr-4 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 bg-gray-50"/>
             </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto drawer-scroll py-2">
             <ul class="px-3 space-y-0.5">
-                <li><a href="/" @onclick="ToggleMobileDrawer" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-light hover:text-brand font-semibold text-gray-700 text-sm transition-colors"><span class="text-lg w-7 text-center">🏠</span> Home</a></li>
-                <li><a href="/store" @onclick="ToggleMobileDrawer" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-light hover:text-brand font-semibold text-gray-700 text-sm transition-colors"><span class="text-lg w-7 text-center">🛍️</span> All Products</a></li>
-                
+                <li><a href="/" @onclick="ToggleMobileDrawer" class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-blue-50 hover:text-brand font-semibold text-gray-700 text-[13.5px] transition-colors"><span class="w-7 text-center text-base">🏠</span> Home</a></li>
+                <li><a href="/store" @onclick="ToggleMobileDrawer" class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-blue-50 hover:text-brand font-semibold text-gray-700 text-[13.5px] transition-colors"><span class="w-7 text-center text-base">🛍️</span> All Products</a></li>
+                <li><a href="/deals" @onclick="ToggleMobileDrawer" class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-orange-50 hover:text-accent font-bold text-accent text-[13.5px] transition-colors"><span class="w-7 text-center text-base">🔥</span> Hot Deals</a></li>
+
                 <AuthorizeView>
                     <NotAuthorized>
-                        <li class="px-3 pt-4 pb-1.5"><p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Account</p></li>
-                        <li><a href="/login" @onclick="ToggleMobileDrawer" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-light hover:text-brand font-semibold text-gray-700 text-sm transition-colors"><span class="text-lg w-7 text-center">🔐</span> Sign In</a></li>
-                        <li><a href="/register" @onclick="ToggleMobileDrawer" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-light hover:text-brand font-semibold text-gray-700 text-sm transition-colors"><span class="text-lg w-7 text-center">📝</span> Register</a></li>
+                        <li class="px-3.5 pt-5 pb-2"><p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">My Account</p></li>
+                        <li><a href="/login" @onclick="ToggleMobileDrawer" class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-blue-50 hover:text-brand font-semibold text-gray-700 text-[13.5px] transition-colors"><span class="w-7 text-center text-base">🔐</span> Sign In</a></li>
+                        <li><a href="/register" @onclick="ToggleMobileDrawer" class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-blue-50 hover:text-brand font-semibold text-gray-700 text-[13.5px] transition-colors"><span class="w-7 text-center text-base">📝</span> Register</a></li>
                     </NotAuthorized>
                     <Authorized>
-                        <li class="px-3 pt-4 pb-1.5"><p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Account</p></li>
-                        <li><a href="/account" @onclick="ToggleMobileDrawer" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-light hover:text-brand font-semibold text-gray-700 text-sm transition-colors"><span class="text-lg w-7 text-center">👤</span> My Account</a></li>
-                        <li><button @onclick="Logout" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-red-50 hover:text-red-600 font-semibold text-gray-700 text-sm transition-colors text-left"><span class="text-lg w-7 text-center">🚪</span> Logout</button></li>
+                        <li class="px-3.5 pt-5 pb-2"><p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">My Account</p></li>
+                        <li><a href="/account" @onclick="ToggleMobileDrawer" class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-blue-50 hover:text-brand font-semibold text-gray-700 text-[13.5px] transition-colors"><span class="w-7 text-center text-base">👤</span> My Account</a></li>
+                        <li><a href="/cart" @onclick="ToggleMobileDrawer" class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-blue-50 hover:text-brand font-semibold text-gray-700 text-[13.5px] transition-colors"><span class="w-7 text-center text-base">🛒</span> My Cart</a></li>
+                        <li><button @onclick="Logout" class="w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-red-50 hover:text-red-600 font-semibold text-gray-700 text-[13.5px] transition-colors text-left"><span class="w-7 text-center text-base">🚪</span> Logout</button></li>
                     </Authorized>
                 </AuthorizeView>
 
                 @if (_navCategories.Any())
                 {
-                    <li class="px-3 pt-4 pb-1.5"><p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Categories</p></li>
+                    <li class="px-3.5 pt-5 pb-2"><p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Categories</p></li>
                     @foreach (var cat in _navCategories)
                     {
-                        <li><a href="/category/@cat.Slug" @onclick="ToggleMobileDrawer" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-light hover:text-brand font-semibold text-gray-700 text-sm transition-colors"><span class="text-lg w-7 text-center">@GetCategoryEmoji(cat.Name)</span>@cat.Name</a></li>
+                        <li>
+                            <a href="/category/@cat.Slug" @onclick="ToggleMobileDrawer"
+                               class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-blue-50 hover:text-brand font-semibold text-gray-700 text-[13.5px] transition-colors">
+                                <span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-base flex-shrink-0">@GetCategoryEmoji(cat.Name)</span>
+                                @cat.Name
+                            </a>
+                        </li>
                     }
                 }
-                <li class="px-3 pt-4 pb-1.5"><p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Help</p></li>
-                <li><a href="/track" @onclick="ToggleMobileDrawer" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-light hover:text-brand font-semibold text-gray-700 text-sm transition-colors"><span class="text-lg w-7 text-center">📦</span> Track Order</a></li>
-                <li><a href="/contact" @onclick="ToggleMobileDrawer" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-light hover:text-brand font-semibold text-gray-700 text-sm transition-colors"><span class="text-lg w-7 text-center">📞</span> Contact Us</a></li>
+                <li class="px-3.5 pt-5 pb-2"><p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Help &amp; Support</p></li>
+                <li><a href="/track" @onclick="ToggleMobileDrawer" class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-blue-50 hover:text-brand font-semibold text-gray-700 text-[13.5px] transition-colors"><span class="w-7 text-center text-base">📦</span> Track Order</a></li>
+                <li><a href="/contact" @onclick="ToggleMobileDrawer" class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-blue-50 hover:text-brand font-semibold text-gray-700 text-[13.5px] transition-colors"><span class="w-7 text-center text-base">📬</span> Contact Us</a></li>
+                <li><a href="/about" @onclick="ToggleMobileDrawer" class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl hover:bg-blue-50 hover:text-brand font-semibold text-gray-700 text-[13.5px] transition-colors"><span class="w-7 text-center text-base">ℹ️</span> About Us</a></li>
             </ul>
         </div>
-        <div class="border-t border-gray-100 p-4 bg-gray-50">
-            <a href="https://wa.me/2348162809886" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2.5 w-full h-12 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition-colors shadow-sm">
+
+        <div class="border-t border-gray-100 p-4 bg-gray-50 flex-shrink-0 space-y-2.5">
+            <a href="https://wa.me/2348162809886" target="_blank" rel="noopener noreferrer"
+               class="flex items-center justify-center gap-2.5 w-full h-12 bg-green-500 text-white font-bold rounded-2xl hover:bg-green-600 transition-colors shadow-sm text-sm">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 WhatsApp Support
             </a>
-            <p class="text-center text-xs text-gray-400 mt-2.5">Mon–Sat · 8am–8pm</p>
+            <p class="text-center text-[11px] text-gray-400 font-semibold">Mon–Sat · 8am–8pm · Fast nationwide delivery</p>
         </div>
     </div>
 }
+
 <main class="flex-1 w-full p-0 m-0 overflow-x-hidden">@Body</main>
 
-<footer class="bg-gray-900 text-gray-400 pt-14 pb-6 mt-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+<footer class="bg-[#0a1628] text-gray-400 mt-16">
+    <div class="bg-gradient-to-r from-[#1A56DB] to-[#0c3494] py-10 px-4">
+        <div class="max-w-3xl mx-auto text-center">
+            <p class="text-[11px] font-extrabold uppercase tracking-widest text-white/60 mb-1">Stay in the loop</p>
+            <h2 class="font-serif font-bold text-white text-2xl sm:text-3xl mb-2">Get exclusive deals &amp; new arrivals</h2>
+            <p class="text-white/60 text-sm mb-6">Join thousands of happy shoppers across Nigeria.</p>
+            <div class="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto">
+                <input type="email" placeholder="Enter your WhatsApp number or email…"
+                       class="flex-1 h-12 px-4 rounded-2xl border-0 text-sm bg-white/15 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"/>
+                <button class="h-12 px-6 bg-accent hover:bg-accent-dark text-white font-bold rounded-2xl transition-colors text-sm flex-shrink-0 shadow-lg">Subscribe 🎉</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
             <div>
-                <div class="flex items-center gap-2.5 mb-4">
-                    <div class="bg-brand rounded-xl w-9 h-9 text-white font-black text-sm flex items-center justify-center">VJ</div>
-                    <span class="font-serif font-bold text-white text-base">Victoria James</span>
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-[#0c3494] flex items-center justify-center shadow-lg">
+                        <span class="font-black text-white text-sm">VJ</span>
+                    </div>
+                    <div>
+                        <p class="font-serif font-bold text-white text-base leading-none">Victoria James</p>
+                        <p class="text-brand text-[10px] font-extrabold tracking-widest uppercase mt-0.5">Store</p>
+                    </div>
                 </div>
-                <p class="text-sm leading-relaxed mb-6">Quality products delivered to your doorstep across Nigeria.</p>
-                <a href="https://wa.me/2348162809886" target="_blank" class="inline-flex items-center gap-2 text-sm font-bold text-white bg-green-600 hover:bg-green-500 px-4 py-2.5 rounded-xl transition-colors">
+                <p class="text-sm leading-relaxed mb-5 text-gray-500">Quality products delivered to your doorstep across Nigeria. Trusted by thousands of happy customers.</p>
+                <div class="flex flex-wrap gap-2 mb-5">
+                    <span class="inline-flex items-center gap-1.5 bg-gray-800 border border-gray-700 text-gray-300 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg">🏦 Bank Transfer</span>
+                    <span class="inline-flex items-center gap-1.5 bg-gray-800 border border-gray-700 text-gray-300 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg">🔒 Secure</span>
+                    <span class="inline-flex items-center gap-1.5 bg-gray-800 border border-gray-700 text-gray-300 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg">🇳🇬 Nigeria</span>
+                </div>
+                <a href="https://wa.me/2348162809886" target="_blank" rel="noopener noreferrer"
+                   class="inline-flex items-center gap-2 text-sm font-bold text-white bg-green-600 hover:bg-green-500 px-4 py-2.5 rounded-xl transition-colors shadow-sm">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                     Chat on WhatsApp
                 </a>
             </div>
+
             <div>
-                <h3 class="text-xs font-extrabold uppercase tracking-widest text-gray-500 mb-5">Quick Links</h3>
-                <ul class="space-y-3 text-sm font-semibold">
-                    <li><a href="/"      class="hover:text-white transition-colors">Home</a></li>
-                    <li><a href="/store" class="hover:text-white transition-colors">All Products</a></li>
+                <h3 class="text-[10.5px] font-extrabold uppercase tracking-widest text-gray-500 mb-5 flex items-center gap-2"><span class="w-4 h-0.5 bg-brand rounded inline-block"></span>Quick Links</h3>
+                <ul class="space-y-3 text-[13.5px] font-semibold">
+                    <li><a href="/"       class="hover:text-white transition-colors flex items-center gap-2 group"><span class="text-brand opacity-0 group-hover:opacity-100 transition-opacity">›</span>Home</a></li>
+                    <li><a href="/store"  class="hover:text-white transition-colors flex items-center gap-2 group"><span class="text-brand opacity-0 group-hover:opacity-100 transition-opacity">›</span>All Products</a></li>
+                    <li><a href="/deals"  class="hover:text-white transition-colors flex items-center gap-2 group"><span class="text-accent opacity-0 group-hover:opacity-100 transition-opacity">›</span>Hot Deals 🔥</a></li>
                     @foreach (var cat in _navCategories.Take(4))
                     {
-                        <li><a href="/category/@cat.Slug" class="hover:text-white transition-colors">@cat.Name</a></li>
+                        <li><a href="/category/@cat.Slug" class="hover:text-white transition-colors flex items-center gap-2 group"><span class="text-brand opacity-0 group-hover:opacity-100 transition-opacity">›</span>@cat.Name</a></li>
                     }
-                    <li><a href="/about" class="hover:text-white transition-colors">About Us</a></li>
+                    <li><a href="/about"  class="hover:text-white transition-colors flex items-center gap-2 group"><span class="text-brand opacity-0 group-hover:opacity-100 transition-opacity">›</span>About Us</a></li>
                 </ul>
             </div>
+
             <div>
-                <h3 class="text-xs font-extrabold uppercase tracking-widest text-gray-500 mb-5">Customer Service</h3>
-                <ul class="space-y-3 text-sm font-semibold">
-                    <li><a href="/track"   class="hover:text-white transition-colors">Order Tracking</a></li>
-                    <li><a href="/contact" class="hover:text-white transition-colors">Contact Us</a></li>
-                    <li><a href="/returns" class="hover:text-white transition-colors">Returns Policy</a></li>
+                <h3 class="text-[10.5px] font-extrabold uppercase tracking-widest text-gray-500 mb-5 flex items-center gap-2"><span class="w-4 h-0.5 bg-brand rounded inline-block"></span>Customer Service</h3>
+                <ul class="space-y-3 text-[13.5px] font-semibold">
+                    <li><a href="/track"   class="hover:text-white transition-colors flex items-center gap-2 group"><span class="text-brand opacity-0 group-hover:opacity-100 transition-opacity">›</span>Order Tracking</a></li>
+                    <li><a href="/contact" class="hover:text-white transition-colors flex items-center gap-2 group"><span class="text-brand opacity-0 group-hover:opacity-100 transition-opacity">›</span>Contact Us</a></li>
+                    <li><a href="/returns" class="hover:text-white transition-colors flex items-center gap-2 group"><span class="text-brand opacity-0 group-hover:opacity-100 transition-opacity">›</span>Returns Policy</a></li>
+                    <li><a href="/faq"     class="hover:text-white transition-colors flex items-center gap-2 group"><span class="text-brand opacity-0 group-hover:opacity-100 transition-opacity">›</span>FAQ</a></li>
                 </ul>
             </div>
+
             <div>
-                <h3 class="text-xs font-extrabold uppercase tracking-widest text-gray-500 mb-5">Contact Info</h3>
-                <ul class="space-y-3 text-sm">
-                    <li class="flex items-center gap-2"><span class="text-green-400 font-bold">WA:</span><span class="font-semibold text-gray-300">0816 280 9886</span></li>
-                    <li><span class="font-bold text-gray-300">Hours:</span> Mon–Sat · 8am–8pm</li>
-                    <li class="pt-1"><div class="inline-flex items-center gap-2.5 bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl"><span class="text-xl">🏦</span><span class="font-semibold text-sm text-gray-300">Bank Transfer Accepted</span></div></li>
+                <h3 class="text-[10.5px] font-extrabold uppercase tracking-widest text-gray-500 mb-5 flex items-center gap-2"><span class="w-4 h-0.5 bg-brand rounded inline-block"></span>Contact &amp; Hours</h3>
+                <ul class="space-y-3.5 text-[13.5px]">
+                    <li class="flex items-start gap-2.5">
+                        <span class="text-green-400 mt-0.5 flex-shrink-0">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </span>
+                        <div><p class="text-white font-bold">0816 280 9886</p><p class="text-gray-600 text-xs">WhatsApp &amp; Calls</p></div>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <span class="text-blue-400 mt-0.5 flex-shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </span>
+                        <div><p class="text-white font-bold">Mon – Sat · 8am–8pm</p><p class="text-gray-600 text-xs">Business hours (WAT)</p></div>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <span class="text-orange-400 mt-0.5 flex-shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </span>
+                        <div><p class="text-white font-bold">Nationwide Delivery</p><p class="text-gray-600 text-xs">All 36 states + FCT</p></div>
+                    </li>
                 </ul>
             </div>
         </div>
-        <div class="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-semibold text-gray-600">
+
+        <div class="footer-divider h-px mb-6"></div>
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] font-semibold text-gray-600">
             <p>© 2026 Victoria James Store. All rights reserved.</p>
-            <p>Made with ❤️ in Nigeria 🇳🇬</p>
+            <div class="flex items-center gap-4">
+                <a href="/privacy" class="hover:text-gray-400 transition-colors">Privacy Policy</a>
+                <span>·</span>
+                <a href="/terms" class="hover:text-gray-400 transition-colors">Terms of Use</a>
+                <span>·</span>
+                <p>Made with ❤️ in Nigeria 🇳🇬</p>
+            </div>
         </div>
     </div>
 </footer>
 
-<a href="https://wa.me/2348162809886?text=Hi%20Victoria%20James%20Store%2C%20I%20need%20help%20with..." target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-50 group" aria-label="Chat on WhatsApp">
-    <span class="absolute inset-0 bg-green-400 rounded-full vj-ping pointer-events-none"></span>
-    <span class="relative w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center transition-all hover:scale-110">
+<a href="https://wa.me/2348162809886?text=Hi%20Victoria%20James%20Store%2C%20I%20need%20help%20with..."
+   target="_blank" rel="noopener noreferrer"
+   class="fixed bottom-6 right-6 z-50 group flex items-center" aria-label="Chat on WhatsApp">
+    <span class="absolute inset-0 w-14 h-14 bg-green-400 rounded-full vj-ping pointer-events-none"></span>
+    <span class="relative w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-xl hover:shadow-2xl flex items-center justify-center transition-all hover:scale-110">
         <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
     </span>
-    <span class="absolute right-16 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Chat with us</span>
+    <span class="absolute right-16 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-[11px] font-bold px-3.5 py-2 rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all pointer-events-none shadow-xl">
+        💬 Chat with us
+    </span>
 </a>
 
 </div>
@@ -331,6 +453,10 @@
         var n when n.Contains("Gift",      StringComparison.OrdinalIgnoreCase) => "🎁",
         var n when n.Contains("Accessor",  StringComparison.OrdinalIgnoreCase) => "💍",
         var n when n.Contains("Household", StringComparison.OrdinalIgnoreCase) => "🏠",
+        var n when n.Contains("Beauty",    StringComparison.OrdinalIgnoreCase) => "💄",
+        var n when n.Contains("Food",      StringComparison.OrdinalIgnoreCase) => "🥘",
+        var n when n.Contains("Baby",      StringComparison.OrdinalIgnoreCase) => "🍼",
+        var n when n.Contains("Elect",     StringComparison.OrdinalIgnoreCase) => "📱",
         _ => "🛍️"
     };
 
@@ -355,14 +481,8 @@
     }
     private async Task Logout()
     {
-        // Remove the JWT token from local storage
         await LocalStorage.RemoveItemAsync("authToken");
-        
-        // Close the mobile drawer if it was open
         isMobileDrawerOpen = false;
-        
-        // Force a hard reload to clear the authentication state from memory 
-        // and redirect the user back to the login page
         NavManager.NavigateTo("/login", forceLoad: true);
     }
 }
