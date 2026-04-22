@@ -9,18 +9,18 @@
 
 <div class="flex items-center justify-between mb-6">
     <div>
-        <h1 class="text-2xl font-bold text-gray-900 font-serif">Orders</h1>
-        <p class="text-sm text-gray-500 mt-0.5">Manage customer orders and fulfillments.</p>
+        <h1 class="text-2xl font-bold text-on-surface font-serif">Orders</h1>
+        <p class="text-sm text-outline mt-0.5">Manage customer orders and fulfillments.</p>
     </div>
 </div>
 
 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 animate-fade-in">
     <!-- Filter Tabs -->
-    <div class="flex bg-white rounded-lg p-1 border border-gray-200 shadow-sm self-stretch sm:self-auto overflow-x-auto custom-scrollbar">
+    <div class="flex bg-surface-container-lowest rounded-lg p-1 border border-outline-variant/30 shadow-sm self-stretch sm:self-auto overflow-x-auto custom-scrollbar">
         @foreach (var tab in new[] {"All", "Pending", "Confirmed", "Shipped", "Delivered", "Cancelled"})
         {
             var value = tab == "All" ? "" : tab;
-            <button @onclick="() => statusFilter = value" class="px-4 py-1.5 text-sm font-semibold rounded-md whitespace-nowrap transition-all @(statusFilter == value ? "bg-brand text-white shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50")">
+            <button @onclick="() => statusFilter = value" class="px-4 py-1.5 text-sm font-semibold rounded-md whitespace-nowrap transition-all @(statusFilter == value ? "bg-primary text-white shadow-sm" : "text-outline hover:text-on-surface-variant hover:bg-surface-container-low")">
                 @tab
             </button>
         }
@@ -28,36 +28,36 @@
 
     <!-- Date Range & Export -->
     <div class="flex gap-3 w-full sm:w-auto">
-        <div class="relative flex-1 sm:flex-none flex items-center bg-white rounded-md border border-gray-300 shadow-sm px-2">
+        <div class="relative flex-1 sm:flex-none flex items-center bg-surface-container-lowest rounded-md border border-outline-variant/50 shadow-sm px-2">
             <input type="date" @bind="startDate" class="h-9 px-1 text-xs focus:outline-none bg-transparent" />
-            <span class="mx-1 text-gray-400 font-bold">-</span>
+            <span class="mx-1 text-outline-variant font-bold">-</span>
             <input type="date" @bind="endDate" class="h-9 px-1 text-xs focus:outline-none bg-transparent" />
         </div>
-        <button @onclick="ExportOrders" class="h-9 px-4 bg-white border border-gray-300 text-gray-700 font-bold text-xs rounded-md shadow-sm hover:bg-gray-50 transition-colors flex items-center gap-2">
+        <button @onclick="ExportOrders" class="h-9 px-4 bg-surface-container-lowest border border-outline-variant/50 text-on-surface-variant font-bold text-xs rounded-md shadow-sm hover:bg-surface-container-low transition-colors flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
             Export
         </button>
     </div>
 </div>
 
-<div class="bg-white rounded-t-xl border border-gray-200 border-b-0 p-4 shadow-sm relative z-10 animate-fade-in" style="animation-delay: 0.1s;">
+<div class="bg-surface-container-lowest rounded-t-xl border border-outline-variant/30 border-b-0 p-4 shadow-sm relative z-10 animate-fade-in" style="animation-delay: 0.1s;">
     <div class="relative w-full max-w-md">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search by Order ID or Customer..." class="h-10 w-full pl-10 pr-4 rounded-lg bg-gray-50 border border-transparent focus:border-brand focus:bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all font-medium" />
+        <span class="material-symbols-outlined text-[20px]">search</span>
+        <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search by Order ID or Customer..." class="h-10 w-full pl-10 pr-4 rounded-lg bg-surface-container-low border border-transparent focus:border-primary focus:bg-surface-container-lowest text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
     </div>
 </div>
 
-<div class="bg-white rounded-b-xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+<div class="bg-surface-container-lowest rounded-b-xl border border-outline-variant/30 shadow-sm overflow-hidden mb-8">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
-            <thead class="bg-gray-50">
+            <thead class="bg-surface-container-low">
                 <tr>
-                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Order ID</th>
-                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Customer</th>
-                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Date</th>
-                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Action</th>
+                    <th class="px-5 py-3 text-xs font-bold text-outline uppercase tracking-wider">Order ID</th>
+                    <th class="px-5 py-3 text-xs font-bold text-outline uppercase tracking-wider">Customer</th>
+                    <th class="px-5 py-3 text-xs font-bold text-outline uppercase tracking-wider">Date</th>
+                    <th class="px-5 py-3 text-xs font-bold text-outline uppercase tracking-wider">Amount</th>
+                    <th class="px-5 py-3 text-xs font-bold text-outline uppercase tracking-wider">Status</th>
+                    <th class="px-5 py-3 text-xs font-bold text-outline uppercase tracking-wider text-right">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -65,26 +65,26 @@
                 {
                     <tr>
                         <td colspan="6" class="px-5 py-12 text-center">
-                            <svg class="animate-spin h-8 w-8 text-brand mx-auto" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <svg class="animate-spin h-8 w-8 text-primary mx-auto" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                         </td>
                     </tr>
                 }
                 else if (!FilteredOrders.Any())
                 {
-                    <tr><td colspan="6" class="px-5 py-12 text-center text-gray-500">No orders found.</td></tr>
+                    <tr><td colspan="6" class="px-5 py-12 text-center text-outline">No orders found.</td></tr>
                 }
                 else
                 {
                     @foreach (var order in FilteredOrders)
                     {
-                        <tr class="hover:bg-gray-50 transition-colors duration-150 cursor-pointer" @onclick="() => OpenDrawer(order)">
-                            <td class="px-5 py-4 font-bold text-brand">@order.OrderNumber</td>
+                        <tr class="hover:bg-surface-container-low transition-colors duration-150 cursor-pointer" @onclick="() => OpenDrawer(order)">
+                            <td class="px-5 py-4 font-bold text-primary">@order.OrderNumber</td>
                             <td class="px-5 py-4">
-                                <div class="font-bold text-gray-900">@order.CustomerName</div>
-                                <div class="text-xs text-gray-500">@order.CustomerPhone</div>
+                                <div class="font-bold text-on-surface">@order.CustomerName</div>
+                                <div class="text-xs text-outline">@order.CustomerPhone</div>
                             </td>
-                            <td class="px-5 py-4 text-gray-600">@order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
-                            <td class="px-5 py-4 font-bold text-gray-900">₦@order.TotalAmount.ToString("N0")</td>
+                            <td class="px-5 py-4 text-on-surface-variant">@order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                            <td class="px-5 py-4 font-bold text-on-surface">₦@order.TotalAmount.ToString("N0")</td>
                             <td class="px-5 py-4">
                                 @if (order.Status == "Pending")
                                 {
@@ -107,7 +107,7 @@
                                 }
                             </td>
                             <td class="px-5 py-4 text-right">
-                                <button class="text-brand font-semibold hover:underline">View</button>
+                                <button class="text-primary font-semibold hover:underline">View</button>
                             </td>
                         </tr>
                     }
@@ -122,34 +122,34 @@
     <div class="fixed inset-0 z-[60] flex justify-end">
         <div class="fixed inset-0 bg-black/40 transition-opacity" @onclick="CloseDrawer"></div>
 
-        <div class="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-left">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white shadow-sm z-10 shrink-0">
+        <div class="relative w-full max-w-md bg-surface-container-lowest h-full shadow-2xl flex flex-col animate-slide-left">
+            <div class="px-6 py-4 border-b border-outline-variant/15 flex items-center justify-between bg-surface-container-lowest shadow-sm z-10 shrink-0">
                 <div>
-                    <h2 class="text-lg font-bold text-gray-900 font-serif">Order @selectedOrder.OrderNumber</h2>
-                    <p class="text-xs text-gray-500 font-semibold mt-0.5">@selectedOrder.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy • HH:mm tt")</p>
+                    <h2 class="text-lg font-bold text-on-surface font-serif">Order @selectedOrder.OrderNumber</h2>
+                    <p class="text-xs text-outline font-semibold mt-0.5">@selectedOrder.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy • HH:mm tt")</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <a href="https://wa.me/@(selectedOrder.CustomerPhone.Replace("+",""))" target="_blank" title="Chat on WhatsApp" class="w-8 h-8 flex items-center justify-center rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition-colors">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.183-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.765-5.77z..."/></svg>
                     </a>
-                    <button @onclick="CloseDrawer" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <button @onclick="CloseDrawer" class="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
                     </button>
                 </div>
             </div>
 
             <div class="flex-1 overflow-y-auto p-6 space-y-6">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Update Status</label>
+                    <label class="block text-sm font-semibold text-on-surface-variant mb-2">Update Status</label>
                     <div class="flex gap-2">
-                        <select @bind="selectedOrder.Status" class="h-10 px-3 flex-1 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand">
+                        <select @bind="selectedOrder.Status" class="h-10 px-3 flex-1 rounded-lg border border-outline-variant/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                             <option value="Pending">Pending</option>
                             <option value="Confirmed">Confirmed</option>
                             <option value="Shipped">Shipped</option>
                             <option value="Delivered">Delivered</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
-                        <button @onclick="UpdateOrderStatus" class="h-10 px-4 bg-brand text-white text-sm font-bold rounded-lg hover:bg-brand-dark transition-colors disabled:bg-gray-400">Save</button>
+                        <button @onclick="UpdateOrderStatus" class="h-10 px-4 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary-dark transition-colors disabled:bg-gray-400">Save</button>
                     </div>
                     @if (updateSuccess)
                     {
@@ -157,43 +157,43 @@
                     }
                 </div>
 
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                    <h3 class="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Customer Details</h3>
+                <div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant/15">
+                    <h3 class="text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">Customer Details</h3>
                     <div class="space-y-2 text-sm">
-                        <p><span class="text-gray-500">Name:</span> <span class="font-semibold">@selectedOrder.CustomerName</span></p>
-                        <p><span class="text-gray-500">Phone:</span> <span class="font-semibold">@selectedOrder.CustomerPhone</span></p>
-                        <p><span class="text-gray-500">Email:</span> <span class="font-semibold">@selectedOrder.CustomerEmail</span></p>
-                        <p><span class="text-gray-500">Address:</span> <span class="font-semibold">@selectedOrder.ShippingAddress</span></p>
+                        <p><span class="text-outline">Name:</span> <span class="font-semibold">@selectedOrder.CustomerName</span></p>
+                        <p><span class="text-outline">Phone:</span> <span class="font-semibold">@selectedOrder.CustomerPhone</span></p>
+                        <p><span class="text-outline">Email:</span> <span class="font-semibold">@selectedOrder.CustomerEmail</span></p>
+                        <p><span class="text-outline">Address:</span> <span class="font-semibold">@selectedOrder.ShippingAddress</span></p>
                     </div>
                 </div>
 
                 <div>
-                    <h3 class="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Items Ordered</h3>
+                    <h3 class="text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">Items Ordered</h3>
                     <div class="space-y-3">
                         @foreach (var item in selectedOrder.Items)
                         {
                             <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-gray-100 rounded flex-shrink-0">
+                                <div class="w-12 h-12 bg-surface-container rounded flex-shrink-0">
                                     @if (!string.IsNullOrEmpty(item.ImageUrl))
                                     {
                                         <img src="@item.ImageUrl" class="w-full h-full object-cover rounded mix-blend-multiply" />
                                     }
                                 </div>
                                 <div class="flex-1">
-                                    <p class="text-sm font-bold text-gray-900 line-clamp-1">@item.ProductName</p>
-                                    <p class="text-xs text-gray-500">@item.Quantity x ₦@item.UnitPrice.ToString("N0")</p>
+                                    <p class="text-sm font-bold text-on-surface line-clamp-1">@item.ProductName</p>
+                                    <p class="text-xs text-outline">@item.Quantity x ₦@item.UnitPrice.ToString("N0")</p>
                                 </div>
-                                <p class="text-sm font-bold text-brand">₦@((item.Quantity * item.UnitPrice).ToString("N0"))</p>
+                                <p class="text-sm font-bold text-primary">₦@((item.Quantity * item.UnitPrice).ToString("N0"))</p>
                             </div>
                         }
                     </div>
                 </div>
             </div>
 
-            <div class="p-6 border-t border-gray-100 bg-white">
+            <div class="p-6 border-t border-outline-variant/15 bg-surface-container-lowest">
                 <div class="flex justify-between items-center text-lg">
-                    <span class="font-bold text-gray-700">Total</span>
-                    <span class="font-extrabold text-brand text-2xl">₦@selectedOrder.TotalAmount.ToString("N0")</span>
+                    <span class="font-bold text-on-surface-variant">Total</span>
+                    <span class="font-extrabold text-primary text-2xl">₦@selectedOrder.TotalAmount.ToString("N0")</span>
                 </div>
             </div>
         </div>

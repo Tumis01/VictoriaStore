@@ -17,8 +17,8 @@
     <!-- Dot grid -->
     <div class="absolute inset-0 pointer-events-none opacity-25" style="background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,.18) 1px,transparent 0);background-size:24px 24px"></div>
     <!-- Atmospheric blobs -->
-    <div class="absolute -top-16 -right-16 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-accent/10 rounded-full blur-2xl pointer-events-none"></div>
+    <div class="absolute -top-16 -right-16 w-64 h-64 bg-surface-container-lowest/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-tertiary/10 rounded-full blur-2xl pointer-events-none"></div>
     <div class="relative z-10 text-center px-4">
         <p class="text-white/55 text-[11px] font-extrabold uppercase tracking-widest mb-2">
             @(CurrentCategory != null ? "Category" : "Store")
@@ -26,7 +26,7 @@
         <h1 class="font-serif text-3xl md:text-5xl font-bold text-white mb-3 drop-shadow-lg">
             @(CurrentCategory?.Name ?? "All Products")
         </h1>
-        <span class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white/90 text-xs font-bold px-4 py-1.5 rounded-full border border-white/20">
+        <span class="inline-flex items-center gap-1.5 bg-surface-container-lowest/15 backdrop-blur-sm text-white/90 text-xs font-bold px-4 py-1.5 rounded-full border border-white/20">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
             @FilteredProducts.Count() @(FilteredProducts.Count() == 1 ? "item" : "items") available
         </span>
@@ -42,18 +42,18 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
 
     <!-- Breadcrumb -->
-    <nav class="flex text-sm text-gray-500 mb-8 font-semibold items-center gap-1.5">
-        <a href="/" class="hover:text-brand transition-colors">Home</a>
+    <nav class="flex text-sm text-outline mb-8 font-semibold items-center gap-1.5">
+        <a href="/" class="hover:text-primary transition-colors">Home</a>
         <span class="text-gray-300">/</span>
         @if (CurrentCategory != null)
         {
-            <a href="/store" class="hover:text-brand transition-colors">Store</a>
+            <a href="/store" class="hover:text-primary transition-colors">Store</a>
             <span class="text-gray-300">/</span>
-            <span class="text-gray-900">@CurrentCategory.Name</span>
+            <span class="text-on-surface">@CurrentCategory.Name</span>
         }
         else
         {
-            <span class="text-gray-900">All Products</span>
+            <span class="text-on-surface">All Products</span>
         }
     </nav>
 
@@ -67,25 +67,25 @@
             <div>
                 <p class="font-semibold">Could not load products</p>
                 <p class="text-red-600 mt-0.5">@errorMessage</p>
-                <button @onclick="RetryLoad" class="mt-2 text-brand font-bold hover:underline text-xs">↻ Try again</button>
+                <button @onclick="RetryLoad" class="mt-2 text-primary font-bold hover:underline text-xs">↻ Try again</button>
             </div>
         </div>
     }
 
     <!-- Mobile filter button -->
     <div class="lg:hidden mb-5">
-        <div class="flex items-center justify-between bg-white rounded-xl border border-gray-200 shadow-sm px-4 py-3">
-            <button @onclick="() => showMobileFilters = true" class="flex items-center gap-2 text-gray-700 font-bold text-sm">
+        <div class="flex items-center justify-between bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm px-4 py-3">
+            <button @onclick="() => showMobileFilters = true" class="flex items-center gap-2 text-on-surface-variant font-bold text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
                 </svg>
                 Filter & Sort
                 @if (activeFilterCount > 0)
                 {
-                    <span class="bg-brand text-white text-[10px] font-extrabold rounded-full px-1.5 py-0.5">@activeFilterCount</span>
+                    <span class="bg-primary text-white text-[10px] font-extrabold rounded-full px-1.5 py-0.5">@activeFilterCount</span>
                 }
             </button>
-            <span class="text-sm font-semibold text-gray-400">@FilteredProducts.Count() results</span>
+            <span class="text-sm font-semibold text-outline-variant">@FilteredProducts.Count() results</span>
         </div>
     </div>
 
@@ -95,20 +95,20 @@
         @if (showMobileFilters)
         {
             <div class="fixed inset-0 z-50 flex" @onclick="() => showMobileFilters = false">
-                <div class="w-4/5 max-w-sm h-full bg-white shadow-2xl overflow-y-auto p-6 flex flex-col" @onclick:stopPropagation="true">
-                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-                        <h2 class="font-bold text-lg text-gray-900">Filters & Sort</h2>
-                        <button @onclick="() => showMobileFilters = false" class="text-gray-400 hover:text-gray-700 p-1">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                <div class="w-4/5 max-w-sm h-full bg-surface-container-lowest shadow-2xl overflow-y-auto p-6 flex flex-col" @onclick:stopPropagation="true">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-outline-variant/15">
+                        <h2 class="font-bold text-lg text-on-surface">Filters & Sort</h2>
+                        <button @onclick="() => showMobileFilters = false" class="text-outline-variant hover:text-on-surface-variant p-1">
+                            <span class="material-symbols-outlined text-[20px]">close</span>
                         </button>
                     </div>
                     @FilterSidebarContent()
                     <div class="mt-auto pt-4">
                         <button @onclick="() => showMobileFilters = false"
-                                class="w-full h-12 bg-brand text-white font-bold rounded-xl shadow-sm text-sm">
+                                class="w-full h-12 bg-primary text-white font-bold rounded-xl shadow-sm text-sm">
                             Show @FilteredProducts.Count() Results
                         </button>
-                        <button @onclick="ClearAllFilters" class="w-full mt-2 h-10 text-gray-500 font-semibold text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
+                        <button @onclick="ClearAllFilters" class="w-full mt-2 h-10 text-outline font-semibold text-sm rounded-xl border border-outline-variant/30 hover:bg-surface-container-low transition-colors">
                             Clear All Filters
                         </button>
                     </div>
@@ -119,7 +119,7 @@
 
         <!-- Desktop sidebar -->
         <aside class="hidden lg:block w-64 flex-shrink-0 sticky top-24">
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm p-5">
                 @FilterSidebarContent()
             </div>
         </aside>
@@ -128,25 +128,25 @@
         <div class="flex-1 min-w-0">
 
             <!-- Toolbar (desktop) -->
-            <div class="hidden lg:flex justify-between items-center mb-6 bg-white rounded-2xl border border-gray-200 shadow-sm px-5 py-3.5">
-                <span class="text-sm font-semibold text-gray-500">
-                    Showing <span class="text-gray-900 font-bold">@DisplayedProducts.Count()</span> of <span class="text-gray-900 font-bold">@FilteredProducts.Count()</span> products
+            <div class="hidden lg:flex justify-between items-center mb-6 bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm px-5 py-3.5">
+                <span class="text-sm font-semibold text-outline">
+                    Showing <span class="text-on-surface font-bold">@DisplayedProducts.Count()</span> of <span class="text-on-surface font-bold">@FilteredProducts.Count()</span> products
                 </span>
                 <div class="flex items-center gap-3">
                     <!-- Grid / List toggle -->
-                    <div class="flex border border-gray-200 rounded-xl overflow-hidden">
+                    <div class="flex border border-outline-variant/30 rounded-xl overflow-hidden">
                         <button @onclick="() => isGridView = true"
-                                class="px-3 py-2 transition-colors @(isGridView ? "bg-gradient-to-r from-[#1A56DB] to-[#1e4fd8] text-white" : "bg-white text-gray-400 hover:text-gray-600")"
+                                class="px-3 py-2 transition-colors @(isGridView ? "bg-gradient-to-r from-primary to-[#1e4fd8] text-white" : "bg-surface-container-lowest text-outline-variant hover:text-on-surface-variant")"
                                 aria-label="Grid view">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                         </button>
                         <button @onclick="() => isGridView = false"
-                                class="px-3 py-2 transition-colors @(!isGridView ? "bg-gradient-to-r from-[#1A56DB] to-[#1e4fd8] text-white" : "bg-white text-gray-400 hover:text-gray-600")"
+                                class="px-3 py-2 transition-colors @(!isGridView ? "bg-gradient-to-r from-primary to-[#1e4fd8] text-white" : "bg-surface-container-lowest text-outline-variant hover:text-on-surface-variant")"
                                 aria-label="List view">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                            <span class="material-symbols-outlined text-[20px]">menu</span>
                         </button>
                     </div>
-                    <select @bind="sortOrder" class="h-9 px-3 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:border-brand text-gray-700 font-semibold">
+                    <select @bind="sortOrder" class="h-9 px-3 rounded-xl border border-outline-variant/30 text-sm bg-surface-container-lowest focus:outline-none focus:border-primary text-on-surface-variant font-semibold">
                         <option value="newest">Newest First</option>
                         <option value="price_asc">Price: Low → High</option>
                         <option value="price_desc">Price: High → Low</option>
@@ -161,19 +161,19 @@
                 <div class="flex flex-wrap gap-2 mb-5">
                     @if (inStockOnly)
                     {
-                        <span class="inline-flex items-center gap-1.5 bg-brand-light text-brand rounded-full px-3 py-1 text-xs font-bold">
+                        <span class="inline-flex items-center gap-1.5 bg-primary-light text-primary rounded-full px-3 py-1 text-xs font-bold">
                             In Stock
-                            <button @onclick="() => inStockOnly = false" class="hover:text-brand-dark ml-0.5">✕</button>
+                            <button @onclick="() => inStockOnly = false" class="hover:text-primary-dark ml-0.5">✕</button>
                         </span>
                     }
                     @if (minPrice > 0 || maxPrice < _maxPriceCap)
                     {
-                        <span class="inline-flex items-center gap-1.5 bg-brand-light text-brand rounded-full px-3 py-1 text-xs font-bold">
+                        <span class="inline-flex items-center gap-1.5 bg-primary-light text-primary rounded-full px-3 py-1 text-xs font-bold">
                             ₦@minPrice.ToString("N0") — ₦@maxPrice.ToString("N0")
-                            <button @onclick="ClearPriceFilter" class="hover:text-brand-dark ml-0.5">✕</button>
+                            <button @onclick="ClearPriceFilter" class="hover:text-primary-dark ml-0.5">✕</button>
                         </span>
                     }
-                    <button @onclick="ClearAllFilters" class="text-xs font-bold text-gray-400 hover:text-red-500 transition-colors ml-1">Clear all</button>
+                    <button @onclick="ClearAllFilters" class="text-xs font-bold text-outline-variant hover:text-red-500 transition-colors ml-1">Clear all</button>
                 </div>
             }
 
@@ -183,13 +183,13 @@
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
                     @for (int i = 0; i < 6; i++)
                     {
-                        <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-                            <div class="aspect-square w-full bg-gray-100 animate-pulse"></div>
+                        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/15 overflow-hidden shadow-sm">
+                            <div class="aspect-square w-full bg-surface-container animate-pulse"></div>
                             <div class="p-4 space-y-2.5">
-                                <div class="h-3 bg-gray-100 rounded-full animate-pulse w-1/3"></div>
-                                <div class="h-4 bg-gray-100 rounded-md animate-pulse w-3/4"></div>
-                                <div class="h-4 bg-gray-100 rounded-md animate-pulse w-1/2"></div>
-                                <div class="h-10 bg-gray-100 rounded-xl animate-pulse w-full mt-2"></div>
+                                <div class="h-3 bg-surface-container rounded-full animate-pulse w-1/3"></div>
+                                <div class="h-4 bg-surface-container rounded-md animate-pulse w-3/4"></div>
+                                <div class="h-4 bg-surface-container rounded-md animate-pulse w-1/2"></div>
+                                <div class="h-10 bg-surface-container rounded-xl animate-pulse w-full mt-2"></div>
                             </div>
                         </div>
                     }
@@ -198,10 +198,10 @@
             @* Empty state (no products in DB at all) *@
             else if (!allProducts.Any() && string.IsNullOrEmpty(errorMessage))
             {
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-14 text-center">
+                <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/15 shadow-sm p-14 text-center">
                     <div class="text-6xl mb-5 select-none">📦</div>
-                    <h3 class="font-serif text-xl font-bold text-gray-900 mb-2">No Products Yet</h3>
-                    <p class="text-gray-500 text-sm max-w-xs mx-auto mb-6">
+                    <h3 class="font-serif text-xl font-bold text-on-surface mb-2">No Products Yet</h3>
+                    <p class="text-outline text-sm max-w-xs mx-auto mb-6">
                         Products haven't been added to the store yet. Check back soon, or contact us on WhatsApp for availability.
                     </p>
                     <a href="https://wa.me/2348162809886" target="_blank"
@@ -213,13 +213,13 @@
             @* Empty state (filters too strict) *@
             else if (!FilteredProducts.Any())
             {
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
-                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/15 shadow-sm p-12 text-center">
+                    <div class="w-20 h-20 bg-surface-container-low rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
+                        <span class="material-symbols-outlined text-[20px]">search</span>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">No products match your filters</h3>
-                    <p class="text-gray-500 text-sm mb-6">Try adjusting your filters or browse all products.</p>
-                    <button @onclick="ClearAllFilters" class="inline-flex items-center gap-2 h-11 px-6 bg-brand text-white font-bold rounded-xl text-sm hover:bg-brand-dark transition-colors">
+                    <h3 class="text-lg font-bold text-on-surface mb-2">No products match your filters</h3>
+                    <p class="text-outline text-sm mb-6">Try adjusting your filters or browse all products.</p>
+                    <button @onclick="ClearAllFilters" class="inline-flex items-center gap-2 h-11 px-6 bg-primary text-white font-bold rounded-xl text-sm hover:bg-primary-dark transition-colors">
                         Clear Filters
                     </button>
                 </div>
@@ -238,11 +238,11 @@
                 {
                     <div class="mt-10 flex justify-center">
                         <button @onclick="LoadMore"
-                                class="inline-flex items-center gap-2 h-12 px-10 bg-white border-2 border-gray-200
-                            text-gray-700 font-bold text-sm rounded-2xl hover:border-brand hover:text-brand
+                                class="inline-flex items-center gap-2 h-12 px-10 bg-surface-container-lowest border-2 border-outline-variant/30
+                            text-on-surface-variant font-bold text-sm rounded-2xl hover:border-primary hover:text-primary
                             transition-all duration-200 shadow-sm hover:shadow-md">
                             Load More Products
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+                            <span class="material-symbols-outlined text-[20px]">expand_more</span>
                         </button>
                     </div>
                 }
@@ -299,51 +299,51 @@
     {
         <div>
             <div class="mb-7">
-                <h3 class="font-extrabold text-gray-900 text-sm mb-3.5 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                <h3 class="font-extrabold text-on-surface text-sm mb-3.5 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                     Categories
                 </h3>
                 <div class="space-y-1">
                     <a href="/store" class="flex items-center gap-2.5 text-sm font-semibold py-2 px-2.5 rounded-lg transition-colors
-                        @(string.IsNullOrEmpty(CategorySlug) ? "bg-brand-light text-brand border-l-2 border-brand" : "text-gray-600 hover:text-brand hover:bg-gray-50")">
+                        @(string.IsNullOrEmpty(CategorySlug) ? "bg-primary-light text-primary border-l-2 border-primary" : "text-on-surface-variant hover:text-primary hover:bg-surface-container-low")">
                         All Products
                     </a>
                     @foreach (var cat in allCategories)
                     {
                         <a href="/category/@cat.Slug" class="flex items-center gap-2.5 text-sm font-semibold py-2 px-2.5 rounded-lg transition-colors
-                            @(CategorySlug?.ToLower() == cat.Slug?.ToLower() ? "bg-brand-light text-brand border-l-2 border-brand" : "text-gray-600 hover:text-brand hover:bg-gray-50")">
+                            @(CategorySlug?.ToLower() == cat.Slug?.ToLower() ? "bg-primary-light text-primary border-l-2 border-primary" : "text-on-surface-variant hover:text-primary hover:bg-surface-container-low")">
                             @cat.Name
                         </a>
                     }
                 </div>
             </div>
 
-            <div class="border-t border-gray-100 pt-6 mb-7">
-                <h3 class="font-extrabold text-gray-900 text-sm mb-4">Price Range</h3>
+            <div class="border-t border-outline-variant/15 pt-6 mb-7">
+                <h3 class="font-extrabold text-on-surface text-sm mb-4">Price Range</h3>
                 <div class="flex items-center gap-2 mb-3">
                     <div class="flex-1 relative">
-                        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs font-bold">₦</span>
-                        <input type="number" @bind="minPrice" placeholder="Min" class="w-full h-9 pl-6 pr-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-brand" />
+                        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-xs font-bold">₦</span>
+                        <input type="number" @bind="minPrice" placeholder="Min" class="w-full h-9 pl-6 pr-2 rounded-lg border border-outline-variant/30 text-sm focus:outline-none focus:border-primary" />
                     </div>
-                    <span class="text-gray-400 text-sm">—</span>
+                    <span class="text-outline-variant text-sm">—</span>
                     <div class="flex-1 relative">
-                        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs font-bold">₦</span>
-                        <input type="number" @bind="maxPrice" placeholder="Max" class="w-full h-9 pl-6 pr-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-brand" />
+                        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-xs font-bold">₦</span>
+                        <input type="number" @bind="maxPrice" placeholder="Max" class="w-full h-9 pl-6 pr-2 rounded-lg border border-outline-variant/30 text-sm focus:outline-none focus:border-primary" />
                     </div>
                 </div>
             </div>
 
-            <div class="border-t border-gray-100 pt-6 mb-7">
-                <h3 class="font-extrabold text-gray-900 text-sm mb-4">Availability</h3>
+            <div class="border-t border-outline-variant/15 pt-6 mb-7">
+                <h3 class="font-extrabold text-on-surface text-sm mb-4">Availability</h3>
                 <label class="flex items-center gap-3 cursor-pointer group select-none">
-                    <input type="checkbox" @bind="inStockOnly" class="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand" />
-                    <span class="text-sm font-semibold text-gray-600 group-hover:text-gray-900">In Stock Only</span>
+                    <input type="checkbox" @bind="inStockOnly" class="w-4 h-4 rounded border-outline-variant/50 text-primary focus:ring-primary" />
+                    <span class="text-sm font-semibold text-on-surface-variant group-hover:text-on-surface">In Stock Only</span>
                 </label>
             </div>
 
-            <div class="border-t border-gray-100 pt-6">
-                <h3 class="font-extrabold text-gray-900 text-sm mb-4">Sort By</h3>
-                <select @bind="sortOrder" class="w-full h-10 px-3 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:border-brand text-gray-700 font-semibold">
+            <div class="border-t border-outline-variant/15 pt-6">
+                <h3 class="font-extrabold text-on-surface text-sm mb-4">Sort By</h3>
+                <select @bind="sortOrder" class="w-full h-10 px-3 rounded-lg border border-outline-variant/30 text-sm bg-surface-container-lowest focus:outline-none focus:border-primary text-on-surface-variant font-semibold">
                     <option value="newest">Newest First</option>
                     <option value="price_asc">Price: Low → High</option>
                     <option value="price_desc">Price: High → Low</option>

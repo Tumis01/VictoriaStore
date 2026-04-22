@@ -10,39 +10,39 @@
 @if (isLoading)
 {
     <div class="max-w-7xl mx-auto px-4 py-16 flex justify-center">
-        <svg class="animate-spin h-10 w-10 text-brand" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <svg class="animate-spin h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
     </div>
 }
 else if (product == null)
 {
     <div class="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h2>
-        <a href="/" class="text-brand hover:underline font-semibold">← Return to Home</a>
+        <h2 class="text-2xl font-bold text-on-surface mb-4">Product Not Found</h2>
+        <a href="/" class="text-primary hover:underline font-semibold">← Return to Home</a>
     </div>
 }
 else
 {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <nav class="flex text-sm text-gray-500 mb-8 font-semibold">
-            <a href="/" class="hover:text-brand transition-colors">Home</a>
+        <nav class="flex text-sm text-outline mb-8 font-semibold">
+            <a href="/" class="hover:text-primary transition-colors">Home</a>
             <span class="mx-2">/</span>
-            <a href="/category/@product.CategoryId" class="hover:text-brand transition-colors uppercase">@product.CategoryName</a>
+            <a href="/category/@product.CategoryId" class="hover:text-primary transition-colors uppercase">@product.CategoryName</a>
             <span class="mx-2">/</span>
-            <span class="text-gray-900">@product.Name</span>
+            <span class="text-on-surface">@product.Name</span>
         </nav>
 
         <div class="flex flex-col lg:flex-row gap-10 lg:gap-16 mb-16">
             
             <div class="w-full lg:w-1/2">
-                <div class="aspect-square bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden mb-4 relative flex items-center justify-center">
+                <div class="aspect-square bg-surface-container-low rounded-2xl border border-outline-variant/15 overflow-hidden mb-4 relative flex items-center justify-center">
                     @if (!string.IsNullOrEmpty(activeImageUrl))
                     {
                         <img src="https://localhost:7145@(activeImageUrl)" alt="@product.Name" class="w-full h-full object-cover p-4 mix-blend-multiply transition-opacity duration-300" />
                     }
                     else
                     {
-                        <svg class="w-20 h-20 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span class="material-symbols-outlined text-[20px]">image</span>
                     }
                 </div>
 
@@ -51,7 +51,7 @@ else
                     <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                         @foreach (var img in product.Images.OrderBy(i => i.DisplayOrder))
                         {
-                            <button @onclick="() => activeImageUrl = img.ImageUrl" class="w-20 h-20 rounded-xl border-2 flex-shrink-0 bg-gray-50 overflow-hidden transition-colors @(activeImageUrl == img.ImageUrl ? "border-brand" : "border-transparent hover:border-brand-light")">
+                            <button @onclick="() => activeImageUrl = img.ImageUrl" class="w-20 h-20 rounded-xl border-2 flex-shrink-0 bg-surface-container-low overflow-hidden transition-colors @(activeImageUrl == img.ImageUrl ? "border-primary" : "border-transparent hover:border-primary-light")">
                                 <img src="https://localhost:7145@(img.ImageUrl)" class="w-full h-full object-cover p-1 mix-blend-multiply" />
                             </button>
                         }
@@ -61,18 +61,18 @@ else
 
             <div class="w-full lg:w-1/2 flex flex-col">
                 <div class="mb-6">
-                    <a href="/category/@product.CategoryId" class="text-xs font-bold text-brand uppercase tracking-wider hover:underline">@product.CategoryName</a>
-                    <h1 class="font-serif text-3xl sm:text-4xl font-bold text-gray-900 mt-2 mb-4 leading-tight">@product.Name</h1>
+                    <a href="/category/@product.CategoryId" class="text-xs font-bold text-primary uppercase tracking-wider hover:underline">@product.CategoryName</a>
+                    <h1 class="font-serif text-3xl sm:text-4xl font-bold text-on-surface mt-2 mb-4 leading-tight">@product.Name</h1>
                     
                     <div class="flex items-center gap-4 flex-wrap">
                         <div class="flex items-center gap-1">
-                            <div class="flex text-accent">
+                            <div class="flex text-tertiary">
                                 @for (int i = 0; i < 5; i++)
                                 {
                                     <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                                 }
                             </div>
-                            <span class="text-sm text-brand font-semibold hover:underline cursor-pointer">(14 reviews)</span>
+                            <span class="text-sm text-primary font-semibold hover:underline cursor-pointer">(14 reviews)</span>
                         </div>
                         <span class="text-gray-300">|</span>
                         @if (product.StockQuantity > 10)
@@ -90,34 +90,34 @@ else
                     </div>
                 </div>
 
-                <hr class="border-gray-100 mb-6" />
+                <hr class="border-outline-variant/15 mb-6" />
 
                 <div class="mb-6">
                     <div class="flex items-end gap-3 mb-2">
                         @if (product.SalePrice.HasValue)
                         {
-                            <span class="text-4xl font-extrabold text-accent leading-none">₦@product.SalePrice.Value.ToString("N0")</span>
-                            <span class="text-xl text-gray-400 line-through leading-none mb-1">₦@product.Price.ToString("N0")</span>
+                            <span class="text-4xl font-extrabold text-tertiary leading-none">₦@product.SalePrice.Value.ToString("N0")</span>
+                            <span class="text-xl text-outline-variant line-through leading-none mb-1">₦@product.Price.ToString("N0")</span>
                             var savings = product.Price - product.SalePrice.Value;
                             <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded ml-2 mb-1">Save ₦@savings.ToString("N0")</span>
                         }
                         else
                         {
-                            <span class="text-4xl font-extrabold text-gray-900 leading-none">₦@product.Price.ToString("N0")</span>
+                            <span class="text-4xl font-extrabold text-on-surface leading-none">₦@product.Price.ToString("N0")</span>
                         }
                     </div>
                 </div>
 
-                <p class="text-gray-600 leading-relaxed mb-8">@product.Description</p>
+                <p class="text-on-surface-variant leading-relaxed mb-8">@product.Description</p>
 
                 @if (product.Colors != null && product.Colors.Any())
                 {
                     <div class="mb-8">
-                        <label class="block text-sm font-bold text-gray-900 mb-3">Color: <span class="text-gray-500 font-normal">@selectedColor</span></label>
+                        <label class="block text-sm font-bold text-on-surface mb-3">Color: <span class="text-outline font-normal">@selectedColor</span></label>
                         <div class="flex flex-wrap gap-3">
                             @foreach (var color in product.Colors)
                             {
-                                <button @onclick="() => selectedColor = color" class="px-4 py-2 rounded-lg border-2 text-sm font-semibold transition-all @(selectedColor == color ? "border-brand text-brand bg-brand-light/30" : "border-gray-200 text-gray-600 hover:border-gray-300")">
+                                <button @onclick="() => selectedColor = color" class="px-4 py-2 rounded-lg border-2 text-sm font-semibold transition-all @(selectedColor == color ? "border-primary text-primary bg-primary-light/30" : "border-outline-variant/30 text-on-surface-variant hover:border-outline-variant/50")">
                                     @color
                                 </button>
                             }
@@ -132,19 +132,19 @@ else
                             <div class="flex items-center gap-2">
                                 <span>✓</span> Added to cart successfully!
                             </div>
-                            <a href="/cart" class="text-brand hover:underline">View Cart</a>
+                            <a href="/cart" class="text-primary hover:underline">View Cart</a>
                         </div>
                     }
 
                     <div class="flex flex-col sm:flex-row gap-4 mb-6">
-                        <div class="flex items-center border-2 border-gray-200 rounded-xl h-14 w-full sm:w-36 bg-white overflow-hidden">
-                            <button @onclick="DecrementQty" class="w-12 h-full flex items-center justify-center text-gray-500 hover:text-brand hover:bg-gray-50 text-xl font-bold transition-colors">−</button>
-                            <input type="text" readonly value="@quantity" class="w-12 h-full text-center text-lg font-bold text-gray-900 border-x-2 border-gray-200 focus:outline-none" />
-                            <button @onclick="IncrementQty" class="w-12 h-full flex items-center justify-center text-gray-500 hover:text-brand hover:bg-gray-50 text-xl font-bold transition-colors">+</button>
+                        <div class="flex items-center border-2 border-outline-variant/30 rounded-xl h-14 w-full sm:w-36 bg-surface-container-lowest overflow-hidden">
+                            <button @onclick="DecrementQty" class="w-12 h-full flex items-center justify-center text-outline hover:text-primary hover:bg-surface-container-low text-xl font-bold transition-colors">−</button>
+                            <input type="text" readonly value="@quantity" class="w-12 h-full text-center text-lg font-bold text-on-surface border-x-2 border-outline-variant/30 focus:outline-none" />
+                            <button @onclick="IncrementQty" class="w-12 h-full flex items-center justify-center text-outline hover:text-primary hover:bg-surface-container-low text-xl font-bold transition-colors">+</button>
                         </div>
 
-                        <button @onclick="AddToCart" disabled="@(product.StockQuantity == 0)" class="flex-1 h-14 bg-brand text-white font-bold text-lg rounded-xl hover:bg-brand-dark active:scale-[0.98] transition-all shadow-md flex items-center justify-center gap-3 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <button @onclick="AddToCart" disabled="@(product.StockQuantity == 0)" class="flex-1 h-14 bg-primary text-white font-bold text-lg rounded-xl hover:bg-primary-dark active:scale-[0.98] transition-all shadow-md flex items-center justify-center gap-3 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                            <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
                             @(product.StockQuantity == 0 ? "Out of Stock" : "Add to Cart")
                         </button>
                     </div>
@@ -155,35 +155,35 @@ else
                     </a>
                 </div>
 
-                <div class="grid grid-cols-3 gap-4 mt-8 pt-8 border-t border-gray-100">
+                <div class="grid grid-cols-3 gap-4 mt-8 pt-8 border-t border-outline-variant/15">
                     <div class="flex flex-col items-center text-center gap-2">
-                        <span class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-brand text-lg">🚚</span>
-                        <span class="text-xs font-bold text-gray-600 uppercase tracking-wide">Fast Delivery</span>
+                        <span class="w-10 h-10 bg-surface-container-low rounded-full flex items-center justify-center text-primary text-lg">🚚</span>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Fast Delivery</span>
                     </div>
                     <div class="flex flex-col items-center text-center gap-2">
-                        <span class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-brand text-lg">🛡️</span>
-                        <span class="text-xs font-bold text-gray-600 uppercase tracking-wide">Quality Assured</span>
+                        <span class="w-10 h-10 bg-surface-container-low rounded-full flex items-center justify-center text-primary text-lg">🛡️</span>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Quality Assured</span>
                     </div>
                     <div class="flex flex-col items-center text-center gap-2">
-                        <span class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-brand text-lg">🏦</span>
-                        <span class="text-xs font-bold text-gray-600 uppercase tracking-wide">Bank Transfer</span>
+                        <span class="w-10 h-10 bg-surface-container-low rounded-full flex items-center justify-center text-primary text-lg">🏦</span>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Bank Transfer</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="mb-16">
-            <div class="border-b border-gray-200 flex gap-8 mb-6">
-                <button class="pb-3 text-brand font-bold border-b-2 border-brand text-lg">Description</button>
-                <button class="pb-3 text-gray-500 hover:text-gray-900 font-bold text-lg transition-colors">Specifications</button>
+            <div class="border-b border-outline-variant/30 flex gap-8 mb-6">
+                <button class="pb-3 text-primary font-bold border-b-2 border-primary text-lg">Description</button>
+                <button class="pb-3 text-outline hover:text-on-surface font-bold text-lg transition-colors">Specifications</button>
             </div>
-            <div class="prose max-w-none text-gray-600 leading-loose">
+            <div class="prose max-w-none text-on-surface-variant leading-loose">
                 @((MarkupString)(product.Description?.Replace("\n", "<br/>") ?? "No additional description available."))
             </div>
         </div>
 
-        <div class="border-t border-gray-200 pt-12 pb-8">
-            <h2 class="font-serif text-2xl font-bold text-gray-900 mb-8">Related Products</h2>
+        <div class="border-t border-outline-variant/30 pt-12 pb-8">
+            <h2 class="font-serif text-2xl font-bold text-on-surface mb-8">Related Products</h2>
             @if (relatedProducts.Any())
             {
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -195,7 +195,7 @@ else
             }
             else
             {
-                <p class="text-gray-500">No related products found.</p>
+                <p class="text-outline">No related products found.</p>
             }
         </div>
     </div>

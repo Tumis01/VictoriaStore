@@ -20,20 +20,20 @@
     {
         <div class="flex justify-center items-center h-64">
             <div class="animate-pulse flex flex-col items-center gap-4">
-                <div class="skeleton h-12 w-12 rounded-full bg-gray-200"></div>
-                <div class="skeleton h-4 w-32 rounded bg-gray-200"></div>
+                <div class="skeleton h-12 w-12 rounded-full bg-surface-container-high"></div>
+                <div class="skeleton h-4 w-32 rounded bg-surface-container-high"></div>
             </div>
         </div>
     }
     else if (profile == null)
     {
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center max-w-lg mx-auto">
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 p-12 text-center max-w-lg mx-auto">
             <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             </div>
-            <h2 class="font-serif text-2xl font-bold text-gray-900 mb-2">Could not load profile</h2>
-            <p class="text-sm text-gray-500 mb-6">There was a problem fetching your account details. Please check your connection.</p>
-            <button @onclick="LoadProfile" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-brand text-white font-semibold text-sm rounded-lg hover:bg-brand-dark active:scale-95 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2">
+            <h2 class="font-serif text-2xl font-bold text-on-surface mb-2">Could not load profile</h2>
+            <p class="text-sm text-outline mb-6">There was a problem fetching your account details. Please check your connection.</p>
+            <button @onclick="LoadProfile" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-primary text-white font-semibold text-sm rounded-lg hover:bg-primary-dark active:scale-95 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                 Try Again
             </button>
         </div>
@@ -43,51 +43,51 @@
         <div class="flex flex-col md:flex-row gap-6 lg:gap-8 items-start">
             
             <aside class="w-full md:w-64 lg:w-72 flex-shrink-0">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-2 md:p-5 mb-0 md:mb-6">
+                <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 p-2 md:p-5 mb-0 md:mb-6">
                     
-                    <div class="hidden md:flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
-                        <div class="w-12 h-12 bg-brand-light text-brand rounded-full flex items-center justify-center font-bold text-lg uppercase flex-shrink-0">
+                    <div class="hidden md:flex items-center gap-4 mb-6 pb-6 border-b border-outline-variant/15">
+                        <div class="w-12 h-12 bg-primary-light text-primary rounded-full flex items-center justify-center font-bold text-lg uppercase flex-shrink-0">
                             @(string.IsNullOrWhiteSpace(profile.Name) ? "U" : profile.Name.Substring(0, 1))
                         </div>
                         <div class="min-w-0">
-                            <h2 class="font-bold text-gray-900 truncate text-sm">@profile.Name</h2>
-                            <p class="text-xs text-gray-500 truncate mt-0.5">@profile.Email</p>
+                            <h2 class="font-bold text-on-surface truncate text-sm">@profile.Name</h2>
+                            <p class="text-xs text-outline truncate mt-0.5">@profile.Email</p>
                         </div>
                     </div>
                     
                     <nav class="flex overflow-x-auto md:flex-col gap-2 md:gap-1 snap-x hide-scrollbar items-center md:items-stretch">
                         
-                        <button @onclick="@(() => SwitchTab("dashboard"))" class="snap-start flex-shrink-0 flex items-center gap-2 h-10 md:h-11 px-4 rounded-lg font-semibold text-sm transition-all duration-150 @(activeTab == "dashboard" ? "bg-brand text-white shadow-sm" : "text-gray-600 hover:bg-gray-50 hover:text-brand")">
+                        <button @onclick="@(() => SwitchTab("dashboard"))" class="snap-start flex-shrink-0 flex items-center gap-2 h-10 md:h-11 px-4 rounded-lg font-semibold text-sm transition-all duration-150 @(activeTab == "dashboard" ? "bg-primary text-white shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-primary")">
                             <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                             Dashboard
                         </button>
 
-                        <button @onclick="@(() => SwitchTab("orders"))" class="snap-start flex-shrink-0 flex items-center justify-between gap-2 h-10 md:h-11 px-4 rounded-lg font-semibold text-sm transition-all duration-150 @(activeTab == "orders" ? "bg-brand text-white shadow-sm" : "text-gray-600 hover:bg-gray-50 hover:text-brand")">
+                        <button @onclick="@(() => SwitchTab("orders"))" class="snap-start flex-shrink-0 flex items-center justify-between gap-2 h-10 md:h-11 px-4 rounded-lg font-semibold text-sm transition-all duration-150 @(activeTab == "orders" ? "bg-primary text-white shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-primary")">
                             <div class="flex items-center gap-2 md:gap-3">
                                 <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                                 My Orders
                             </div>
                             @if (profile.OrdersCount > 0)
                             {
-                                <span class="px-2 py-0.5 rounded-full text-xs font-bold @(activeTab == "orders" ? "bg-white/20 text-white" : "bg-brand-light text-brand")">@profile.OrdersCount</span>
+                                <span class="px-2 py-0.5 rounded-full text-xs font-bold @(activeTab == "orders" ? "bg-surface-container-lowest/20 text-white" : "bg-primary-light text-primary")">@profile.OrdersCount</span>
                             }
                         </button>
 
-                        <button @onclick="@(() => SwitchTab("settings"))" class="snap-start flex-shrink-0 flex items-center gap-2 h-10 md:h-11 px-4 rounded-lg font-semibold text-sm transition-all duration-150 @(activeTab == "settings" ? "bg-brand text-white shadow-sm" : "text-gray-600 hover:bg-gray-50 hover:text-brand")">
+                        <button @onclick="@(() => SwitchTab("settings"))" class="snap-start flex-shrink-0 flex items-center gap-2 h-10 md:h-11 px-4 rounded-lg font-semibold text-sm transition-all duration-150 @(activeTab == "settings" ? "bg-primary text-white shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-primary")">
                             <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             Settings
                         </button>
 
-                        <div class="md:hidden w-px h-6 bg-gray-200 flex-shrink-0 mx-1"></div>
+                        <div class="md:hidden w-px h-6 bg-surface-container-high flex-shrink-0 mx-1"></div>
                         <button @onclick="Logout" class="md:hidden snap-start flex-shrink-0 flex items-center gap-2 h-10 px-4 rounded-lg font-semibold text-sm text-red-600 hover:bg-red-50 transition-all duration-150">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            <span class="material-symbols-outlined text-[20px]">logout</span>
                             Sign Out
                         </button>
                     </nav>
                 </div>
                 
                 <button @onclick="Logout" class="hidden md:flex items-center justify-center w-full gap-2 h-11 px-5 bg-red-600 text-white font-semibold text-sm rounded-lg hover:bg-red-700 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    <span class="material-symbols-outlined text-[20px]">logout</span>
                     Sign Out
                 </button>
             </aside>
@@ -97,69 +97,69 @@
                 @if (activeTab == "dashboard")
                 {
                     <div class="animate-fade-in">
-                        <h1 class="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-2">Welcome Back, @profile.Name.Split(' ').First()!</h1>
-                        <p class="text-sm text-gray-500 mb-8">Manage your orders, track deliveries, and update your account details.</p>
+                        <h1 class="font-serif text-3xl md:text-4xl font-bold text-on-surface mb-2">Welcome Back, @profile.Name.Split(' ').First()!</h1>
+                        <p class="text-sm text-outline mb-8">Manage your orders, track deliveries, and update your account details.</p>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-10">
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow duration-200">
+                            <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 p-5 hover:shadow-md transition-shadow duration-200">
                                 <div class="flex items-center justify-between mb-3">
-                                    <span class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Total Orders</span>
-                                    <span class="w-10 h-10 rounded-lg bg-brand-light flex items-center justify-center text-brand">
+                                    <span class="text-sm font-semibold text-outline uppercase tracking-wide">Total Orders</span>
+                                    <span class="w-10 h-10 rounded-lg bg-primary-light flex items-center justify-center text-primary">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                                     </span>
                                 </div>
-                                <p class="text-3xl font-extrabold text-gray-900 font-serif">@profile.OrdersCount</p>
+                                <p class="text-3xl font-extrabold text-on-surface font-serif">@profile.OrdersCount</p>
                             </div>
                             
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow duration-200">
+                            <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 p-5 hover:shadow-md transition-shadow duration-200">
                                 <div class="flex items-center justify-between mb-3">
-                                    <span class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Total Spent</span>
+                                    <span class="text-sm font-semibold text-outline uppercase tracking-wide">Total Spent</span>
                                     <span class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center text-green-600">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     </span>
                                 </div>
-                                <p class="text-3xl font-extrabold text-gray-900 font-serif">₦@profile.TotalSpent.ToString("N0")</p>
+                                <p class="text-3xl font-extrabold text-on-surface font-serif">₦@profile.TotalSpent.ToString("N0")</p>
                             </div>
                         </div>
 
                         <div class="flex items-center justify-between mb-4">
-                            <h2 class="font-serif text-2xl font-bold text-gray-900">Recent Orders</h2>
-                            <button @onclick="@(() => SwitchTab("orders"))" class="inline-flex items-center gap-1 text-brand font-semibold text-sm hover:underline">View All →</button>
+                            <h2 class="font-serif text-2xl font-bold text-on-surface">Recent Orders</h2>
+                            <button @onclick="@(() => SwitchTab("orders"))" class="inline-flex items-center gap-1 text-primary font-semibold text-sm hover:underline">View All →</button>
                         </div>
                         
                         @if (profile.RecentOrders == null || !profile.RecentOrders.Any())
                         {
-                            <div class="bg-white rounded-xl border border-gray-100 p-10 text-center shadow-sm">
+                            <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-10 text-center shadow-sm">
                                 <div class="text-4xl mb-3">🛒</div>
-                                <h3 class="font-serif font-bold text-lg text-gray-900 mb-1">No orders yet</h3>
-                                <p class="text-sm text-gray-500 mb-5">When you buy something, it will show up here.</p>
-                                <a href="/store" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-brand text-white font-semibold text-sm rounded-lg hover:bg-brand-dark active:scale-95 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2">
+                                <h3 class="font-serif font-bold text-lg text-on-surface mb-1">No orders yet</h3>
+                                <p class="text-sm text-outline mb-5">When you buy something, it will show up here.</p>
+                                <a href="/store" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-primary text-white font-semibold text-sm rounded-lg hover:bg-primary-dark active:scale-95 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                                     Start Shopping
                                 </a>
                             </div>
                         }
                         else
                         {
-                            <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+                            <div class="overflow-x-auto rounded-xl border border-outline-variant/30 bg-surface-container-lowest shadow-sm">
                                 <table class="min-w-full divide-y divide-gray-200 text-sm">
-                                    <thead class="bg-gray-50">
+                                    <thead class="bg-surface-container-low">
                                         <tr>
-                                            <th class="px-5 py-3.5 text-left text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Order ID</th>
-                                            <th class="px-5 py-3.5 text-left text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Date</th>
-                                            <th class="px-5 py-3.5 text-left text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Status</th>
-                                            <th class="px-5 py-3.5 text-right text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Total</th>
+                                            <th class="px-5 py-3.5 text-left text-xs font-bold text-outline uppercase tracking-wider whitespace-nowrap">Order ID</th>
+                                            <th class="px-5 py-3.5 text-left text-xs font-bold text-outline uppercase tracking-wider whitespace-nowrap">Date</th>
+                                            <th class="px-5 py-3.5 text-left text-xs font-bold text-outline uppercase tracking-wider whitespace-nowrap">Status</th>
+                                            <th class="px-5 py-3.5 text-right text-xs font-bold text-outline uppercase tracking-wider whitespace-nowrap">Total</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-100">
                                         @foreach (var order in profile.RecentOrders.Take(4))
                                         {
-                                            <tr @onclick="() => ViewOrderDetails(order.Id)" class="hover:bg-brand-light/30 transition-colors duration-100 group cursor-pointer">
-                                                <td class="px-5 py-4 whitespace-nowrap text-brand font-bold group-hover:underline">@order.OrderNumber</td>
-                                                <td class="px-5 py-4 whitespace-nowrap text-gray-500">@order.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                            <tr @onclick="() => ViewOrderDetails(order.Id)" class="hover:bg-primary-light/30 transition-colors duration-100 group cursor-pointer">
+                                                <td class="px-5 py-4 whitespace-nowrap text-primary font-bold group-hover:underline">@order.OrderNumber</td>
+                                                <td class="px-5 py-4 whitespace-nowrap text-outline">@order.CreatedAt.ToString("MMM dd, yyyy")</td>
                                                 <td class="px-5 py-4 whitespace-nowrap">
                                                     @GetStatusBadge(order.Status)
                                                 </td>
-                                                <td class="px-5 py-4 whitespace-nowrap text-right font-bold text-gray-900">₦@order.TotalAmount.ToString("N0")</td>
+                                                <td class="px-5 py-4 whitespace-nowrap text-right font-bold text-on-surface">₦@order.TotalAmount.ToString("N0")</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -175,21 +175,21 @@
                         @if (isLoadingDetails)
                         {
                             <div class="flex justify-center items-center h-64">
-                                <svg class="animate-spin h-10 w-10 text-brand" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                <svg class="animate-spin h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                             </div>
                         }
                         else if (selectedOrderDetails != null)
                         {
-                            <button @onclick="CloseOrderDetails" class="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-brand transition-colors mb-6">
+                            <button @onclick="CloseOrderDetails" class="inline-flex items-center gap-2 text-sm font-bold text-outline hover:text-primary transition-colors mb-6">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                                 Back to Orders
                             </button>
 
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6 animate-slide-up">
-                                <div class="p-5 sm:p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 overflow-hidden mb-6 animate-slide-up">
+                                <div class="p-5 sm:p-6 border-b border-outline-variant/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div>
-                                        <h2 class="text-xl font-serif font-bold text-gray-900">Order #@selectedOrderDetails.OrderNumber</h2>
-                                        <p class="text-sm text-gray-500 mt-1">Placed on @selectedOrderDetails.CreatedAt.ToLocalTime().ToString("MMMM dd, yyyy 'at' hh:mm tt")</p>
+                                        <h2 class="text-xl font-serif font-bold text-on-surface">Order #@selectedOrderDetails.OrderNumber</h2>
+                                        <p class="text-sm text-outline mt-1">Placed on @selectedOrderDetails.CreatedAt.ToLocalTime().ToString("MMMM dd, yyyy 'at' hh:mm tt")</p>
                                     </div>
                                     <div>
                                         @GetStatusBadge(selectedOrderDetails.Status)
@@ -197,13 +197,13 @@
                                 </div>
                                 
                                 <div class="p-5 sm:p-6">
-                                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Items Ordered</h3>
+                                    <h3 class="text-xs font-bold text-outline-variant uppercase tracking-wider mb-4">Items Ordered</h3>
                                     <div class="space-y-4">
                                         @foreach (var item in selectedOrderDetails.Items)
                                         {
                                             <div class="flex items-center justify-between gap-4">
                                                 <div class="flex items-center gap-4">
-                                                    <div class="w-16 h-16 bg-gray-50 rounded-lg border border-gray-100 p-1 flex-shrink-0">
+                                                    <div class="w-16 h-16 bg-surface-container-low rounded-lg border border-outline-variant/15 p-1 flex-shrink-0">
                                                         @if (!string.IsNullOrEmpty(item.ImageUrl))
                                                         {
                                                             <img src="@item.ImageUrl" class="w-full h-full object-cover mix-blend-multiply" />
@@ -211,30 +211,30 @@
                                                         else
                                                         {
                                                             <div class="w-full h-full flex items-center justify-center text-gray-300">
-                                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                                                <span class="material-symbols-outlined text-[20px]">image</span>
                                                             </div>
                                                         }
                                                     </div>
                                                     <div>
-                                                        <p class="font-bold text-gray-900 text-sm line-clamp-1">@item.ProductName</p>
-                                                        <p class="text-xs text-gray-500 mt-0.5">Qty: @item.Quantity × ₦@item.UnitPrice.ToString("N0")</p>
+                                                        <p class="font-bold text-on-surface text-sm line-clamp-1">@item.ProductName</p>
+                                                        <p class="text-xs text-outline mt-0.5">Qty: @item.Quantity × ₦@item.UnitPrice.ToString("N0")</p>
                                                     </div>
                                                 </div>
-                                                <p class="font-extrabold text-gray-900 text-sm">₦@((item.Quantity * item.UnitPrice).ToString("N0"))</p>
+                                                <p class="font-extrabold text-on-surface text-sm">₦@((item.Quantity * item.UnitPrice).ToString("N0"))</p>
                                             </div>
                                         }
                                     </div>
                                 </div>
                                 
-                                <div class="bg-gray-50 p-5 sm:p-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6">
+                                <div class="bg-surface-container-low p-5 sm:p-6 border-t border-outline-variant/15 flex flex-col sm:flex-row items-center justify-between gap-6">
                                     <div class="text-center sm:text-left w-full sm:w-auto">
-                                        <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Total Amount</p>
-                                        <p class="text-3xl font-black text-brand leading-none">₦@selectedOrderDetails.TotalAmount.ToString("N0")</p>
+                                        <p class="text-[11px] font-bold text-outline uppercase tracking-wider mb-1">Total Amount</p>
+                                        <p class="text-3xl font-black text-primary leading-none">₦@selectedOrderDetails.TotalAmount.ToString("N0")</p>
                                     </div>
                                     
                                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                                        <a href="/track?orderNumber=@selectedOrderDetails.OrderNumber&phone=@profile.Phone" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-white text-gray-700 font-semibold text-sm rounded-lg border border-gray-300 hover:bg-gray-50 hover:text-brand active:scale-95 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-200">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                        <a href="/track?orderNumber=@selectedOrderDetails.OrderNumber&phone=@profile.Phone" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-surface-container-lowest text-on-surface-variant font-semibold text-sm rounded-lg border border-outline-variant/50 hover:bg-surface-container-low hover:text-primary active:scale-95 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-200">
+                                            <span class="material-symbols-outlined text-[20px]">chevron_right</span>
                                             Track Order
                                         </a>
                                         <a href="/confirmation/@selectedOrderDetails.Id" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-green-500 text-white font-semibold text-sm rounded-lg hover:bg-green-600 active:scale-95 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
@@ -247,16 +247,16 @@
                         }
                         else
                         {
-                            <h1 class="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-2">Order History</h1>
-                            <p class="text-sm text-gray-500 mb-8">View and track all your purchases.</p>
+                            <h1 class="font-serif text-3xl md:text-4xl font-bold text-on-surface mb-2">Order History</h1>
+                            <p class="text-sm text-outline mb-8">View and track all your purchases.</p>
 
                             @if (profile.RecentOrders == null || !profile.RecentOrders.Any())
                             {
-                                <div class="bg-white border border-gray-100 rounded-xl p-12 text-center shadow-sm">
+                                <div class="bg-surface-container-lowest border border-outline-variant/15 rounded-xl p-12 text-center shadow-sm">
                                     <div class="text-5xl mb-4">📦</div>
-                                    <h3 class="font-serif text-xl font-bold text-gray-900 mb-2">No order history</h3>
-                                    <p class="text-sm text-gray-500 mb-6">Looks like you haven't made any purchases yet.</p>
-                                    <a href="/store" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-brand text-white font-semibold text-sm rounded-lg hover:bg-brand-dark active:scale-95 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2">
+                                    <h3 class="font-serif text-xl font-bold text-on-surface mb-2">No order history</h3>
+                                    <p class="text-sm text-outline mb-6">Looks like you haven't made any purchases yet.</p>
+                                    <a href="/store" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-primary text-white font-semibold text-sm rounded-lg hover:bg-primary-dark active:scale-95 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                                         Browse Products
                                     </a>
                                 </div>
@@ -266,21 +266,21 @@
                                 <div class="space-y-4">
                                     @foreach (var order in profile.RecentOrders)
                                     {
-                                        <div @onclick="() => ViewOrderDetails(order.Id)" class="cursor-pointer bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:border-brand transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-5 group">
+                                        <div @onclick="() => ViewOrderDetails(order.Id)" class="cursor-pointer bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 p-5 hover:shadow-md hover:border-primary transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-5 group">
                                             <div class="flex-1">
                                                 <div class="flex items-center gap-3 mb-2">
-                                                    <span class="font-bold text-gray-900 text-base group-hover:text-brand transition-colors">@order.OrderNumber</span>
+                                                    <span class="font-bold text-on-surface text-base group-hover:text-primary transition-colors">@order.OrderNumber</span>
                                                     @GetStatusBadge(order.Status)
                                                 </div>
-                                                <p class="text-sm text-gray-500">Ordered on @order.CreatedAt.ToLocalTime().ToString("MMMM dd, yyyy 'at' hh:mm tt")</p>
+                                                <p class="text-sm text-outline">Ordered on @order.CreatedAt.ToLocalTime().ToString("MMMM dd, yyyy 'at' hh:mm tt")</p>
                                             </div>
-                                            <div class="flex items-center justify-between sm:justify-end gap-6 sm:w-1/3 border-t border-gray-100 pt-4 sm:pt-0 sm:border-0">
+                                            <div class="flex items-center justify-between sm:justify-end gap-6 sm:w-1/3 border-t border-outline-variant/15 pt-4 sm:pt-0 sm:border-0">
                                                 <div class="text-left sm:text-right">
-                                                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total</p>
-                                                    <p class="font-black text-lg text-gray-900 leading-none">₦@order.TotalAmount.ToString("N0")</p>
+                                                    <p class="text-[11px] font-bold text-outline-variant uppercase tracking-widest mb-1">Total</p>
+                                                    <p class="font-black text-lg text-on-surface leading-none">₦@order.TotalAmount.ToString("N0")</p>
                                                 </div>
-                                                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-50 text-gray-400 group-hover:bg-brand-light group-hover:text-brand transition-colors duration-150">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-low text-outline-variant group-hover:bg-primary-light group-hover:text-primary transition-colors duration-150">
+                                                    <span class="material-symbols-outlined text-[20px]">chevron_right</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -294,10 +294,10 @@
                 @if (activeTab == "settings")
                 {
                     <div class="animate-fade-in max-w-2xl">
-                        <h1 class="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-2">Account Settings</h1>
-                        <p class="text-sm text-gray-500 mb-8">Update your personal information and contact details.</p>
+                        <h1 class="font-serif text-3xl md:text-4xl font-bold text-on-surface mb-2">Account Settings</h1>
+                        <p class="text-sm text-outline mb-8">Update your personal information and contact details.</p>
 
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 md:p-6 hover:shadow-md transition-shadow duration-200">
+                        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 p-5 md:p-6 hover:shadow-md transition-shadow duration-200">
                             
                             @if (updateSuccess)
                             {
@@ -311,26 +311,26 @@
                                 <DataAnnotationsValidator />
 
                                 <div class="flex flex-col gap-1.5">
-                                    <label class="text-sm font-semibold text-gray-700">Full Name <span class="text-red-500">*</span></label>
-                                    <InputText @bind-Value="updateModel.Name" class="h-11 w-full px-4 rounded-lg border border-gray-300 bg-white text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent hover:border-gray-400 transition-colors duration-150" placeholder="e.g. Chioma Okonkwo" />
+                                    <label class="text-sm font-semibold text-on-surface-variant">Full Name <span class="text-red-500">*</span></label>
+                                    <InputText @bind-Value="updateModel.Name" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-sm text-on-surface placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent hover:border-gray-400 transition-colors duration-150" placeholder="e.g. Chioma Okonkwo" />
                                     <ValidationMessage For="@(() => updateModel.Name)" class="text-xs text-red-600 mt-1" />
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div class="flex flex-col gap-1.5">
-                                        <label class="text-sm font-semibold text-gray-700">Email Address</label>
-                                        <input type="email" value="@profile.Email" disabled class="h-11 w-full px-4 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 text-sm cursor-not-allowed" />
-                                        <p class="text-xs text-gray-500 mt-0.5">Email cannot be changed.</p>
+                                        <label class="text-sm font-semibold text-on-surface-variant">Email Address</label>
+                                        <input type="email" value="@profile.Email" disabled class="h-11 w-full px-4 rounded-lg border border-outline-variant/30 bg-surface-container-low text-outline text-sm cursor-not-allowed" />
+                                        <p class="text-xs text-outline mt-0.5">Email cannot be changed.</p>
                                     </div>
                                     <div class="flex flex-col gap-1.5">
-                                        <label class="text-sm font-semibold text-gray-700">Phone Number <span class="text-red-500">*</span></label>
-                                        <InputText @bind-Value="updateModel.Phone" class="h-11 w-full px-4 rounded-lg border border-gray-300 bg-white text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent hover:border-gray-400 transition-colors duration-150" placeholder="08012345678" />
+                                        <label class="text-sm font-semibold text-on-surface-variant">Phone Number <span class="text-red-500">*</span></label>
+                                        <InputText @bind-Value="updateModel.Phone" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-sm text-on-surface placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent hover:border-gray-400 transition-colors duration-150" placeholder="08012345678" />
                                         <ValidationMessage For="@(() => updateModel.Phone)" class="text-xs text-red-600 mt-1" />
                                     </div>
                                 </div>
 
-                                <div class="pt-4 mt-2 border-t border-gray-100 flex justify-end">
-                                    <button type="submit" disabled="@isUpdating" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-brand text-white font-semibold text-sm rounded-lg hover:bg-brand-dark active:scale-95 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 disabled:opacity-75 disabled:cursor-not-allowed">
+                                <div class="pt-4 mt-2 border-t border-outline-variant/15 flex justify-end">
+                                    <button type="submit" disabled="@isUpdating" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-primary text-white font-semibold text-sm rounded-lg hover:bg-primary-dark active:scale-95 transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-75 disabled:cursor-not-allowed">
                                         @if (isUpdating)
                                         {
                                             <svg class="animate-spin w-4 h-4 mr-1 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>

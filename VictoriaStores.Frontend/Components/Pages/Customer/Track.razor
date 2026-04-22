@@ -10,13 +10,13 @@
 <div class="max-w-3xl mx-auto px-4 sm:px-6 py-12 md:py-16 min-h-[70vh]">
     
     <div class="text-center mb-10">
-        <h1 class="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-2">Track Your Order</h1>
-        <p class="text-gray-500">Enter your order number to see real-time updates.</p>
+        <h1 class="font-serif text-3xl md:text-4xl font-bold text-on-surface mb-2">Track Your Order</h1>
+        <p class="text-outline">Enter your order number to see real-time updates.</p>
     </div>
 
     @if (orderResult == null)
     {
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 max-w-xl mx-auto animate-fade-in">
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/15 p-6 md:p-8 max-w-xl mx-auto animate-fade-in">
             @if (!string.IsNullOrEmpty(errorMessage))
             {
                 <div class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm font-semibold flex items-start gap-3">
@@ -29,18 +29,18 @@
                 <DataAnnotationsValidator />
 
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Order Number</label>
-                    <InputText @bind-Value="trackingModel.OrderNumber" class="h-11 w-full px-4 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand uppercase transition-colors" placeholder="e.g. VJS-00127" />
+                    <label class="block text-sm font-bold text-on-surface-variant mb-1.5">Order Number</label>
+                    <InputText @bind-Value="trackingModel.OrderNumber" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-sm focus:outline-none focus:ring-2 focus:ring-primary uppercase transition-colors" placeholder="e.g. VJS-00127" />
                     <ValidationMessage For="@(() => trackingModel.OrderNumber)" class="text-xs text-red-500 mt-1" />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Phone Number</label>
-                    <InputText @bind-Value="trackingModel.Phone" type="tel" class="h-11 w-full px-4 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand transition-colors" placeholder="08012345678" />
+                    <label class="block text-sm font-bold text-on-surface-variant mb-1.5">Phone Number</label>
+                    <InputText @bind-Value="trackingModel.Phone" type="tel" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-colors" placeholder="08012345678" />
                     <ValidationMessage For="@(() => trackingModel.Phone)" class="text-xs text-red-500 mt-1" />
                 </div>
 
-                <button type="submit" disabled="@isLoading" class="w-full h-12 mt-4 bg-brand text-white font-bold text-sm rounded-lg hover:bg-brand-dark active:scale-[0.98] transition-all shadow-sm flex items-center justify-center gap-2 disabled:bg-gray-400">
+                <button type="submit" disabled="@isLoading" class="w-full h-12 mt-4 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dark active:scale-[0.98] transition-all shadow-sm flex items-center justify-center gap-2 disabled:bg-gray-400">
                     @if (isLoading)
                     {
                         <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -57,18 +57,18 @@
     else
     {
         <div class="animate-slide-up">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-8 relative overflow-hidden">
+            <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/15 p-6 md:p-8 mb-8 relative overflow-hidden">
                 
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                     <div>
-                        <div class="inline-block bg-brand-light text-brand text-xs font-bold px-3 py-1.5 rounded-full mb-2 uppercase tracking-widest">
+                        <div class="inline-block bg-primary-light text-primary text-xs font-bold px-3 py-1.5 rounded-full mb-2 uppercase tracking-widest">
                             Order @orderResult.OrderNumber
                         </div>
-                        <h2 class="text-xl font-bold text-gray-900">@orderResult.CustomerName</h2>
-                        <p class="text-sm text-gray-500 mt-1">Ordered on @orderResult.CreatedAt.ToString("MMM dd, yyyy")</p>
+                        <h2 class="text-xl font-bold text-on-surface">@orderResult.CustomerName</h2>
+                        <p class="text-sm text-outline mt-1">Ordered on @orderResult.CreatedAt.ToString("MMM dd, yyyy")</p>
                     </div>
                     
-                    <button @onclick="ResetTracking" class="text-sm font-semibold text-gray-500 hover:text-brand transition-colors underline">
+                    <button @onclick="ResetTracking" class="text-sm font-semibold text-outline hover:text-primary transition-colors underline">
                         Track Another Order
                     </button>
                 </div>
@@ -81,7 +81,7 @@
                     </div>
                 </div>
 
-                <h3 class="font-serif text-lg font-bold text-gray-900 mb-6">Delivery Progress</h3>
+                <h3 class="font-serif text-lg font-bold text-on-surface mb-6">Delivery Progress</h3>
                 
                 <div class="relative pl-4 space-y-8 before:absolute before:inset-0 before:ml-[23px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-green-500 before:via-gray-200 before:to-gray-200">
                     
@@ -89,14 +89,14 @@
                         <div class="flex items-center justify-center w-6 h-6 rounded-full border-white border-4 bg-green-500 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute -left-3 md:left-1/2 z-10">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>
-                        <div class="w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl border border-gray-100 @(IsStepComplete("Pending") ? "bg-gray-50" : "bg-white opacity-60")">
-                            <h4 class="font-bold text-gray-900 text-sm">1. Pending</h4>
-                            <p class="text-xs text-gray-500 mt-1">Order received. Awaiting payment confirmation.</p>
+                        <div class="w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl border border-outline-variant/15 @(IsStepComplete("Pending") ? "bg-surface-container-low" : "bg-surface-container-lowest opacity-60")">
+                            <h4 class="font-bold text-on-surface text-sm">1. Pending</h4>
+                            <p class="text-xs text-outline mt-1">Order received. Awaiting payment confirmation.</p>
                         </div>
                     </div>
 
                     <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                        <div class="flex items-center justify-center w-6 h-6 rounded-full border-white border-4 @(IsStepComplete("Confirmed") ? "bg-green-500 text-white" : (orderResult.Status == "Confirmed" ? "bg-brand text-white animate-pulse" : "bg-gray-200 text-gray-500")) shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute -left-3 md:left-1/2 z-10">
+                        <div class="flex items-center justify-center w-6 h-6 rounded-full border-white border-4 @(IsStepComplete("Confirmed") ? "bg-green-500 text-white" : (orderResult.Status == "Confirmed" ? "bg-primary text-white animate-pulse" : "bg-surface-container-high text-outline")) shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute -left-3 md:left-1/2 z-10">
                             @if (IsStepComplete("Confirmed"))
                             {
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
@@ -104,17 +104,17 @@
                             else
                             {
 
-                                <span class="w-2 h-2 bg-white rounded-full"></span>
+                                <span class="w-2 h-2 bg-surface-container-lowest rounded-full"></span>
                             }
                         </div>
-                        <div class="w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl border border-gray-100 @(IsStepComplete("Confirmed") || orderResult.Status == "Confirmed" ? "bg-gray-50 border-brand/30" : "bg-white opacity-60")">
-                            <h4 class="font-bold text-gray-900 text-sm">2. Payment Confirmed</h4>
-                            <p class="text-xs text-gray-500 mt-1">Payment verified. We are preparing your order.</p>
+                        <div class="w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl border border-outline-variant/15 @(IsStepComplete("Confirmed") || orderResult.Status == "Confirmed" ? "bg-surface-container-low border-primary/30" : "bg-surface-container-lowest opacity-60")">
+                            <h4 class="font-bold text-on-surface text-sm">2. Payment Confirmed</h4>
+                            <p class="text-xs text-outline mt-1">Payment verified. We are preparing your order.</p>
                         </div>
                     </div>
 
                     <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                        <div class="flex items-center justify-center w-6 h-6 rounded-full border-white border-4 @(IsStepComplete("Shipped") ? "bg-green-500 text-white" : (orderResult.Status == "Shipped" ? "bg-brand text-white animate-pulse" : "bg-gray-200 text-gray-500")) shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute -left-3 md:left-1/2 z-10">
+                        <div class="flex items-center justify-center w-6 h-6 rounded-full border-white border-4 @(IsStepComplete("Shipped") ? "bg-green-500 text-white" : (orderResult.Status == "Shipped" ? "bg-primary text-white animate-pulse" : "bg-surface-container-high text-outline")) shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute -left-3 md:left-1/2 z-10">
                             @if (IsStepComplete("Shipped"))
                             {
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
@@ -122,17 +122,17 @@
                             else
                             {
 
-                                <span class="w-2 h-2 bg-white rounded-full"></span>
+                                <span class="w-2 h-2 bg-surface-container-lowest rounded-full"></span>
                             }
                         </div>
-                        <div class="w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl border border-gray-100 @(IsStepComplete("Shipped") || orderResult.Status == "Shipped" ? "bg-gray-50 border-brand/30" : "bg-white opacity-60")">
-                            <h4 class="font-bold text-gray-900 text-sm">3. Order Shipped</h4>
-                            <p class="text-xs text-gray-500 mt-1">Your order is on the way to you!</p>
+                        <div class="w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl border border-outline-variant/15 @(IsStepComplete("Shipped") || orderResult.Status == "Shipped" ? "bg-surface-container-low border-primary/30" : "bg-surface-container-lowest opacity-60")">
+                            <h4 class="font-bold text-on-surface text-sm">3. Order Shipped</h4>
+                            <p class="text-xs text-outline mt-1">Your order is on the way to you!</p>
                         </div>
                     </div>
 
                     <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                        <div class="flex items-center justify-center w-6 h-6 rounded-full border-white border-4 @(IsStepComplete("Delivered") ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500") shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute -left-3 md:left-1/2 z-10">
+                        <div class="flex items-center justify-center w-6 h-6 rounded-full border-white border-4 @(IsStepComplete("Delivered") ? "bg-green-500 text-white" : "bg-surface-container-high text-outline") shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute -left-3 md:left-1/2 z-10">
                             @if (IsStepComplete("Delivered"))
                             {
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
@@ -140,12 +140,12 @@
                             else
                             {
 
-                                <span class="w-2 h-2 bg-white rounded-full"></span>
+                                <span class="w-2 h-2 bg-surface-container-lowest rounded-full"></span>
                             }
                         </div>
-                        <div class="w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl border border-gray-100 @(IsStepComplete("Delivered") ? "bg-green-50 border-green-200" : "bg-white opacity-60")">
-                            <h4 class="font-bold text-gray-900 text-sm">4. Delivered</h4>
-                            <p class="text-xs text-gray-500 mt-1">Enjoy your purchase!</p>
+                        <div class="w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl border border-outline-variant/15 @(IsStepComplete("Delivered") ? "bg-green-50 border-green-200" : "bg-surface-container-lowest opacity-60")">
+                            <h4 class="font-bold text-on-surface text-sm">4. Delivered</h4>
+                            <p class="text-xs text-outline mt-1">Enjoy your purchase!</p>
                         </div>
                     </div>
 
@@ -238,11 +238,11 @@
         return status.ToLower() switch
         {
             "pending" => "bg-amber-50 border-amber-200 text-amber-800",
-            "confirmed" => "bg-brand-light border-brand/20 text-brand",
+            "confirmed" => "bg-primary-light border-primary/20 text-primary",
             "shipped" => "bg-indigo-50 border-indigo-200 text-indigo-800",
             "delivered" => "bg-green-50 border-green-200 text-green-800",
             "cancelled" => "bg-red-50 border-red-200 text-red-800",
-            _ => "bg-gray-50 border-gray-200 text-gray-800"
+            _ => "bg-surface-container-low border-outline-variant/30 text-on-surface"
         };
     }
 

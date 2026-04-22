@@ -4,7 +4,7 @@
 <div class="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
     @foreach (var toast in toasts)
     {
-        <div class="w-80 bg-white rounded-lg shadow-lg border-l-4 pointer-events-auto overflow-hidden animate-slide-up hover:shadow-xl transition-all @GetBorderColor(toast.Type)" @key="toast.Id">
+        <div class="w-80 bg-surface-container-lowest rounded-lg shadow-lg border-l-4 pointer-events-auto overflow-hidden animate-slide-up hover:shadow-xl transition-all @GetBorderColor(toast.Type)" @key="toast.Id">
             <div class="p-4 flex items-start gap-3">
                 <div class="flex-shrink-0 mt-0.5">
                     @if (toast.Type == "success")
@@ -21,11 +21,11 @@
                     }
                 </div>
                 <div class="flex-1">
-                    <h4 class="text-sm font-bold text-gray-900">@toast.Title</h4>
-                    <p class="text-xs text-gray-500 mt-1">@toast.Message</p>
+                    <h4 class="text-sm font-bold text-on-surface">@toast.Title</h4>
+                    <p class="text-xs text-outline mt-1">@toast.Message</p>
                 </div>
-                <button @onclick="() => RemoveToast(toast.Id)" class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button @onclick="() => RemoveToast(toast.Id)" class="flex-shrink-0 text-outline-variant hover:text-on-surface-variant transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
                 </button>
             </div>
         </div>

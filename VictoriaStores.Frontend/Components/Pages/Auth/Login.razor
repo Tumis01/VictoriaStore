@@ -10,11 +10,11 @@
 <PageTitle>Sign In - Victoria James Store</PageTitle>
 
 <div class="max-w-md mx-auto my-12 px-4 sm:px-6">
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/15 p-8">
         
         <div class="text-center mb-8">
-            <h1 class="font-serif text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-            <p class="text-gray-500 text-sm">Sign in to view your orders and fast checkout.</p>
+            <h1 class="font-serif text-3xl font-bold text-on-surface mb-2">Welcome Back</h1>
+            <p class="text-outline text-sm">Sign in to view your orders and fast checkout.</p>
         </div>
 
         @if (isRegistered)
@@ -37,28 +37,28 @@
             <DataAnnotationsValidator />
 
             <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1.5">Email Address</label>
-                <InputText @bind-Value="loginModel.Email" type="email" class="h-11 w-full px-4 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-colors" placeholder="your@email.com" />
+                <label class="block text-sm font-bold text-on-surface-variant mb-1.5">Email Address</label>
+                <InputText @bind-Value="loginModel.Email" type="email" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors" placeholder="your@email.com" />
                 <ValidationMessage For="@(() => loginModel.Email)" class="text-xs text-red-500 mt-1" />
             </div>
 
             <div>
                 <div class="flex justify-between items-center mb-1.5">
-                    <label class="block text-sm font-bold text-gray-700">Password</label>
-                    <a href="/forgot-password" class="text-xs font-bold text-brand hover:underline">Forgot password?</a>
+                    <label class="block text-sm font-bold text-on-surface-variant">Password</label>
+                    <a href="/forgot-password" class="text-xs font-bold text-primary hover:underline">Forgot password?</a>
                 </div>
-                <InputText @bind-Value="loginModel.Password" type="password" class="h-11 w-full px-4 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-colors" placeholder="••••••••" />
+                <InputText @bind-Value="loginModel.Password" type="password" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors" placeholder="••••••••" />
                 <ValidationMessage For="@(() => loginModel.Password)" class="text-xs text-red-500 mt-1" />
             </div>
 
-            <button type="submit" disabled="@isSubmitting" class="w-full h-12 mt-4 bg-brand text-white font-bold text-sm rounded-lg hover:bg-brand-dark active:scale-[0.98] transition-all shadow-sm disabled:bg-gray-400">
+            <button type="submit" disabled="@isSubmitting" class="w-full h-12 mt-4 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dark active:scale-[0.98] transition-all shadow-sm disabled:bg-gray-400">
                 @(isSubmitting ? "Signing in..." : "Sign In")
             </button>
         </EditForm>
 
-        <div class="mt-8 text-center text-sm font-semibold text-gray-600">
+        <div class="mt-8 text-center text-sm font-semibold text-on-surface-variant">
             Don't have an account?
-            <a href="/register" class="text-brand hover:underline">Create one here</a>
+            <a href="/register" class="text-primary hover:underline">Create one here</a>
         </div>
     </div>
 </div>

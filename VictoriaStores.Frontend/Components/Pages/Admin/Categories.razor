@@ -10,11 +10,11 @@
 
 <div class="flex items-center justify-between mb-6">
     <div>
-        <h2 class="text-2xl font-semibold text-gray-800">Categories</h2>
-        <p class="text-sm text-gray-500 mt-1">Organize your store's product catalog.</p>
+        <h2 class="text-2xl font-semibold text-on-surface">Categories</h2>
+        <p class="text-sm text-outline mt-1">Organize your store's product catalog.</p>
     </div>
     <button @onclick="ToggleAddForm" class="flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-        <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        <span class="material-symbols-outlined text-[20px]">add</span>
         @(showAddForm && editingCategoryId.HasValue ? "Cancel Edit" : "Add Category")
     </button>
 </div>
@@ -35,24 +35,24 @@
 
 @if (showAddForm)
 {
-    <div class="mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all">
-        <h3 class="mb-4 text-lg font-medium text-gray-900">@(editingCategoryId.HasValue ? "Edit Category" : "Create New Category")</h3>
+    <div class="mb-8 rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-sm transition-all">
+        <h3 class="mb-4 text-lg font-medium text-on-surface">@(editingCategoryId.HasValue ? "Edit Category" : "Create New Category")</h3>
         <EditForm Model="newCategory" OnValidSubmit="HandleSubmit" FormName="categoryForm" class="space-y-4">
             <DataAnnotationsValidator />
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Category Name <span class="text-red-500">*</span></label>
-                    <InputText @bind-Value="newCategory.Name" class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="e.g., Household Items" />
+                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Category Name <span class="text-red-500">*</span></label>
+                    <InputText @bind-Value="newCategory.Name" class="block w-full rounded-md border border-outline-variant/50 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="e.g., Household Items" />
                     <ValidationMessage For="@(() => newCategory.Name)" class="text-xs text-red-500 mt-1" />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <InputText @bind-Value="newCategory.Description" class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="Short description..." />
+                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Description</label>
+                    <InputText @bind-Value="newCategory.Description" class="block w-full rounded-md border border-outline-variant/50 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="Short description..." />
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Category Banner Image</label>
-                    <div class="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6 relative overflow-hidden">
+                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Category Banner Image</label>
+                    <div class="mt-1 flex justify-center rounded-md border-2 border-dashed border-outline-variant/50 px-6 pt-5 pb-6 relative overflow-hidden">
                         <div class="space-y-1 text-center">
                             @if (!string.IsNullOrEmpty(imagePreviewUrl))
                             {
@@ -65,22 +65,22 @@
                             }
                             else
                             {
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                <svg class="mx-auto h-12 w-12 text-outline-variant" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
                             }
-                            <div class="flex text-sm text-gray-600 justify-center mt-2">
-                                <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-medium text-blue-600 focus-within:outline-none hover:text-blue-500 px-3 py-1 border border-blue-100">
+                            <div class="flex text-sm text-on-surface-variant justify-center mt-2">
+                                <label for="file-upload" class="relative cursor-pointer rounded-md bg-surface-container-lowest font-medium text-blue-600 focus-within:outline-none hover:text-blue-500 px-3 py-1 border border-blue-100">
                                     <span>Upload a file</span>
                                     <InputFile id="file-upload" OnChange="HandleFileChange" class="sr-only" accept="image/*" />
                                 </label>
                             </div>
-                            <p class="text-xs text-gray-500 mt-2">PNG, JPG, GIF up to 2MB</p>
+                            <p class="text-xs text-outline mt-2">PNG, JPG, GIF up to 2MB</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="flex justify-end space-x-3 pt-2">
-                <button type="button" @onclick="CloseForm" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+                <button type="button" @onclick="CloseForm" class="rounded-md border border-outline-variant/50 bg-surface-container-lowest px-4 py-2 text-sm font-medium text-on-surface-variant shadow-sm hover:bg-surface-container-low">
                     Cancel
                 </button>
                 <button type="submit" disabled="@isSubmitting" class="flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:bg-blue-400">
@@ -104,14 +104,14 @@
     {
         @for (int i = 0; i < 4; i++)
         {
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-64 animate-pulse">
-                <div class="bg-gray-200 h-32 w-full"></div>
+            <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 overflow-hidden h-64 animate-pulse">
+                <div class="bg-surface-container-high h-32 w-full"></div>
                 <div class="p-4 flex flex-col flex-1">
-                    <div class="bg-gray-200 h-4 w-1/2 mb-2 rounded"></div>
-                    <div class="bg-gray-200 h-3 w-3/4 mb-4 rounded"></div>
+                    <div class="bg-surface-container-high h-4 w-1/2 mb-2 rounded"></div>
+                    <div class="bg-surface-container-high h-3 w-3/4 mb-4 rounded"></div>
                     <div class="mt-auto flex justify-end gap-2">
-                        <div class="bg-gray-200 h-4 w-10 rounded"></div>
-                        <div class="bg-gray-200 h-4 w-10 rounded"></div>
+                        <div class="bg-surface-container-high h-4 w-10 rounded"></div>
+                        <div class="bg-surface-container-high h-4 w-10 rounded"></div>
                     </div>
                 </div>
             </div>
@@ -120,12 +120,12 @@
     else if (!categories.Any())
     {
         <div class="col-span-full">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center max-w-2xl mx-auto">
-                <div class="w-20 h-20 bg-brand-light/30 rounded-full flex items-center justify-center mx-auto mb-4 text-brand">
+            <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/15 p-12 text-center max-w-2xl mx-auto">
+                <div class="w-20 h-20 bg-primary-light/30 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">No categories found</h3>
-                <p class="text-gray-500 mb-6">Start by adding your first product category.</p>
+                <h3 class="text-xl font-bold text-on-surface mb-2">No categories found</h3>
+                <p class="text-outline mb-6">Start by adding your first product category.</p>
                 <button @onclick="ToggleAddForm" class="text-blue-600 font-bold hover:underline">Add Category</button>
             </div>
         </div>
@@ -134,28 +134,26 @@
     {
         @foreach (var category in categories)
         {
-            <div class="bg-white rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 overflow-hidden flex flex-col hover:shadow-lg transition-all hover:scale-[1.02]">
+            <div class="bg-surface-container-lowest rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-outline-variant/15 overflow-hidden flex flex-col hover:shadow-lg transition-all hover:scale-[1.02]">
                 @if (!string.IsNullOrEmpty(category.BannerImageUrl))
                 {
                     <img src="https://localhost:7145@(category.BannerImageUrl)" alt="@category.Name" class="h-40 w-full object-cover" />
                 }
                 else
                 {
-                    <div class="h-40 w-full bg-gradient-to-br from-gray-100 to-gray-50 flex flex-col items-center justify-center text-gray-400 border-b border-gray-100">
-                        <svg class="h-10 w-10 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">No Image</span>
+                    <div class="h-40 w-full bg-gradient-to-br from-gray-100 to-gray-50 flex flex-col items-center justify-center text-outline-variant border-b border-outline-variant/15">
+                        <span class="material-symbols-outlined text-[20px]">image</span>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-outline-variant">No Image</span>
                     </div>
                 }
                 <div class="p-5 flex-1 flex flex-col">
-                    <h4 class="font-bold text-gray-900 text-lg mb-1">@category.Name</h4>
-                    <p class="text-sm text-gray-500 mb-4 line-clamp-2 flex-1">@(string.IsNullOrEmpty(category.Description) ? "No description provided." : category.Description)</p>
+                    <h4 class="font-bold text-on-surface text-lg mb-1">@category.Name</h4>
+                    <p class="text-sm text-outline mb-4 line-clamp-2 flex-1">@(string.IsNullOrEmpty(category.Description) ? "No description provided." : category.Description)</p>
                     
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
-                        <span class="text-xs font-semibold text-gray-400">Order: @category.DisplayOrder</span>
+                    <div class="flex items-center justify-between pt-4 border-t border-outline-variant/15 mt-auto">
+                        <span class="text-xs font-semibold text-outline-variant">Order: @category.DisplayOrder</span>
                         <div class="flex items-center gap-3">
-                            <button @onclick="() => EditCategory(category)" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">Edit</button>
+                            <button @onclick="() => EditCategory(category)" class="text-xs font-bold text-blue-600 hover:text-on-primary-container transition-colors">Edit</button>
                             <button @onclick="() => DeleteCategory(category.Id)" class="text-xs font-bold text-red-500 hover:text-red-700 transition-colors">Delete</button>
                         </div>
                     </div>
