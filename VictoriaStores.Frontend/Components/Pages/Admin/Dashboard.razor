@@ -1,6 +1,7 @@
 @page "/admin"
 @layout Layout.AdminLayout
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
 @using VictoriaStores.Frontend.Models
 @using VictoriaStores.Frontend.Services
 @inject VictoriaStores.Frontend.Services.ProductApiClient ProductApi
@@ -36,22 +37,20 @@ else
         <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 p-5">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-sm font-semibold text-outline uppercase tracking-wide">Total Revenue</span>
-                <span class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center text-green-600">₦</span>
+                <span class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center text-green-600 font-bold">₦</span>
             </div>
             <p class="text-3xl font-extrabold text-on-surface flex items-end gap-2">
                 ₦@totalRevenue.ToString("N0")
-                <span class="text-xs text-green-500 font-bold mb-1 flex items-center"><svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg> 12.5%</span>
             </p>
         </div>
 
         <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 p-5">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-sm font-semibold text-outline uppercase tracking-wide">Total Orders</span>
-                <span class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-blue-600">📦</span>
+                <span class="w-10 h-10 rounded-lg bg-primary-light/20 flex items-center justify-center text-primary">📦</span>
             </div>
             <p class="text-3xl font-extrabold text-on-surface flex items-end gap-2">
                 @orders.Count
-                <span class="text-xs text-green-500 font-bold mb-1 flex items-center"><svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg> 8.2%</span>
             </p>
         </div>
 
@@ -90,22 +89,15 @@ else
 
     <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 p-5 mb-8 animate-fade-in" style="animation-delay: 0.1s;">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-lg font-bold text-on-surface font-serif">Revenue Trend <span class="text-xs text-outline font-normal ml-2 tracking-wide font-body uppercase">Last 30 Days</span></h3>
-            <select class="text-xs font-bold text-on-surface-variant bg-surface-container-low border border-outline-variant/30 rounded px-2 py-1 outline-none">
-                <option>This Month</option>
-                <option>Last Month</option>
-                <option>This Year</option>
+            <h3 class="text-lg font-bold text-on-surface font-serif">Revenue Trend</h3>
+            <select @bind="SelectedChartRange" class="text-xs font-bold text-on-surface-variant bg-surface-container-low border border-outline-variant/30 rounded px-2 py-1 outline-none">
+                <option value="7days">Last 7 Days</option>
+                <option value="30days">Last 30 Days</option>
+                <option value="thismonth">This Month</option>
             </select>
         </div>
-        <div class="h-64 w-full bg-surface-container-low border border-dashed border-outline-variant/30 rounded-lg flex items-center justify-center relative overflow-hidden">
-            <svg class="absolute inset-x-0 bottom-0 h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 100">
-                <polyline points="0,95 10,90 20,60 30,70 40,40 50,45 60,25 70,30 80,15 90,20 100,5" fill="none" stroke="#1A56DB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-                <polygon points="0,100 0,95 10,90 20,60 30,70 40,40 50,45 60,25 70,30 80,15 90,20 100,5 100,100" fill="#1A56DB" fill-opacity="0.05" />
-            </svg>
-            <div class="text-primary font-bold text-xs z-10 bg-surface-container-lowest/70 px-4 py-2 rounded-lg backdrop-blur-sm shadow-sm flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                Chart.js Plugin Stub
-            </div>
+        <div class="h-64 w-full relative">
+            <canvas id="revenueChart"></canvas>
         </div>
     </div>
 
@@ -118,6 +110,7 @@ else
             <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
                 <thead class="bg-surface-container-low">
                     <tr>
+                        <th class="px-5 py-3.5 text-xs font-bold text-outline uppercase tracking-wider w-16">S/N</th>
                         <th class="px-5 py-3.5 text-xs font-bold text-outline uppercase tracking-wider">Order #</th>
                         <th class="px-5 py-3.5 text-xs font-bold text-outline uppercase tracking-wider">Customer</th>
                         <th class="px-5 py-3.5 text-xs font-bold text-outline uppercase tracking-wider">Date</th>
@@ -127,9 +120,13 @@ else
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
+                    @{
+                        int index = 1;
+                    }
                     @foreach (var order in recentOrders)
                     {
-                        <tr class="hover:bg-primary-light/30 transition-colors duration-100">
+                        <tr class="hover:bg-primary-light/10 transition-colors duration-100">
+                            <td class="px-5 py-4 text-sm font-semibold text-outline-variant">@(index++)</td>
                             <td class="px-5 py-4 font-bold text-primary whitespace-nowrap">@order.OrderNumber</td>
                             <td class="px-5 py-4">
                                 <div class="font-semibold text-on-surface">@order.CustomerName</div>
@@ -139,27 +136,31 @@ else
                             <td class="px-5 py-4">
                                 @if (order.Status == "Pending")
                                 {
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Pending</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 uppercase tracking-wide">Pending</span>
                                 }
-                                else if (order.Status == "Confirmed" || order.Status == "Shipped")
+                                else if (order.Status == "Delivered")
                                 {
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">@order.Status</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 uppercase tracking-wide">Delivered</span>
+                                }
+                                else if (order.Status == "Cancelled")
+                                {
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 uppercase tracking-wide">Cancelled</span>
                                 }
                                 else
                                 {
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">@order.Status</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 uppercase tracking-wide">@order.Status</span>
                                 }
                             </td>
-                            <td class="px-5 py-4 font-bold text-on-surface">₦@order.TotalAmount.ToString("N2")</td>
+                            <td class="px-5 py-4 font-bold text-on-surface">₦@order.TotalAmount.ToString("N0")</td>
                             <td class="px-5 py-4">
-                                <a href="/admin/orders/@order.Id" class="text-primary font-semibold hover:underline">View</a>
+                                <a href="/admin/orders?search=@order.OrderNumber" class="text-primary font-semibold hover:underline">View</a>
                             </td>
                         </tr>
                     }
                     @if (!recentOrders.Any())
                     {
                         <tr>
-                            <td colspan="6" class="px-5 py-8 text-center text-outline">No recent orders found.</td>
+                            <td colspan="7" class="px-5 py-8 text-center text-outline">No recent orders found.</td>
                         </tr>
                     }
                 </tbody>
@@ -167,10 +168,10 @@ else
         </div>
     </div>
 }
-
 @code {
-    // ... keep exact same @code block as you currently have
     private bool isLoading = true;
+    private bool isChartRendered = false; // Tracks if we've successfully drawn the chart
+    
     private List<OrderResponseDto> orders = new();
     private List<OrderResponseDto> recentOrders = new();
     private List<ProductDto> products = new();
@@ -179,30 +180,94 @@ else
     private int pendingOrdersCount = 0;
     private int outOfStockCount = 0;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private string _selectedChartRange = "30days";
+    private string SelectedChartRange
     {
-        if (firstRender)
+        get => _selectedChartRange;
+        set
         {
-            try
+            if (_selectedChartRange != value)
             {
-                orders = await Http.GetFromJsonAsync<List<OrderResponseDto>>("api/order") ?? new List<OrderResponseDto>();
-                products = await ProductApi.GetActiveProductsAsync() ?? new List<ProductDto>();
-
-                totalRevenue = orders.Where(o => o.Status != "Cancelled").Sum(o => o.TotalAmount);
-                pendingOrdersCount = orders.Count(o => o.Status == "Pending");
-                recentOrders = orders.OrderByDescending(o => o.CreatedAt).Take(10).ToList();
-                outOfStockCount = products.Count(p => p.StockQuantity <= 0);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading dashboard data: {ex.Message}");
-            }
-            finally
-            {
-                isLoading = false;
-                StateHasChanged();
+                _selectedChartRange = value;
+                _ = RenderChartData(); // Re-render the chart when the dropdown changes
             }
         }
+    }
+
+    // 1. Fetch data BEFORE the HTML renders
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            orders = await Http.GetFromJsonAsync<List<OrderResponseDto>>("api/order") ?? new List<OrderResponseDto>();
+            products = await ProductApi.GetActiveProductsAsync() ?? new List<ProductDto>();
+
+            totalRevenue = orders
+                .Where(o => o.Status == "Confirmed" || o.Status == "Shipped" || o.Status == "Delivered")
+                .Sum(o => o.TotalAmount);
+                
+            pendingOrdersCount = orders.Count(o => o.Status == "Pending");
+            
+            // FIX: Set to exactly 5 most recent orders
+            recentOrders = orders.OrderByDescending(o => o.CreatedAt).Take(5).ToList();
+            
+            outOfStockCount = products.Count(p => p.StockQuantity <= 0);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading dashboard data: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false; // This removes the spinner and adds the <canvas> to the screen
+        }
+    }
+
+    // 2. Draw the chart AFTER the HTML renders
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Only attempt to draw if data is loaded, the canvas exists, and we haven't drawn it yet
+        if (!isLoading && !isChartRendered)
+        {
+            isChartRendered = true;
+            await RenderChartData();
+        }
+    }
+
+    private async Task RenderChartData()
+    {
+        if (orders == null) return;
+
+        DateTime startDate = DateTime.UtcNow.Date;
+
+        if (SelectedChartRange == "7days")
+            startDate = DateTime.UtcNow.Date.AddDays(-6);
+        else if (SelectedChartRange == "30days")
+            startDate = DateTime.UtcNow.Date.AddDays(-29);
+        else if (SelectedChartRange == "thismonth")
+            startDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+
+        // Filter valid revenue orders
+        var validOrders = orders.Where(o => o.Status == "Confirmed" || o.Status == "Shipped" || o.Status == "Delivered");
+
+        // Group by Date
+        var groupedOrders = validOrders
+            .Where(o => o.CreatedAt.Date >= startDate)
+            .GroupBy(o => o.CreatedAt.Date)
+            .ToDictionary(g => g.Key, g => g.Sum(o => o.TotalAmount));
+
+        var labels = new List<string>();
+        var data = new List<decimal>();
+
+        // Loop through every day in the range to ensure zero-revenue days are plotted
+        for (var d = startDate; d <= DateTime.UtcNow.Date; d = d.AddDays(1))
+        {
+            labels.Add(d.ToString("MMM dd"));
+            data.Add(groupedOrders.ContainsKey(d) ? groupedOrders[d] : 0);
+        }
+
+        // Call the Javascript function
+        await JSRuntime.InvokeVoidAsync("renderDashboardChart", "revenueChart", labels, data);
     }
 
     public class OrderResponseDto

@@ -1,0 +1,51 @@
+﻿@if (IsVisible)
+{
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 animate-fade-in">
+        
+        <div class="bg-surface-container-lowest rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 relative animate-slide-up">
+            
+            <button @onclick="Close" aria-label="Close modal" class="absolute top-4 right-4 text-outline-variant hover:text-on-surface rounded-lg p-1 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary-light/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path>
+                    </svg>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-on-surface font-serif mb-2">Sign In Required</h3>
+                
+                <p class="text-sm text-on-surface-variant mb-6">You need to be logged into your account to add items to your cart and checkout securely.</p>
+                
+                <div class="flex flex-col gap-3">
+                    <a href="/login" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-primary text-white font-semibold text-sm rounded-lg hover:bg-primary-dark active:scale-[0.98] transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+                        Sign In
+                    </a>
+                    
+                    <a href="/register" class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-transparent text-primary font-semibold text-sm rounded-lg border-2 border-primary hover:bg-primary-light/10 active:scale-[0.98] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                        Create an Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    private async Task Close()
+    {
+        IsVisible = false;
+        await IsVisibleChanged.InvokeAsync(IsVisible);
+    }
+}

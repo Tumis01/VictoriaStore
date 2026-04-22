@@ -89,6 +89,8 @@
             }
         }
     </script>
+    
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f9f9ff; color: #141b2b; }
         h1, h2, h3, h4, h5, h6, .font-serif { font-family: 'Newsreader', serif; }
@@ -100,5 +102,45 @@
     <Routes @rendermode="new InteractiveServerRenderMode(prerender: false)" />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    window.renderDashboardChart = (canvasId, labels, data) => {
+        const ctx = document.getElementById(canvasId);
+        if (!ctx) return;
+        
+        if (window.dashboardChart) {
+            window.dashboardChart.destroy();
+        }
+        
+        window.dashboardChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Revenue (₦)',
+                    data: data,
+                    borderColor: '#1A56DB',
+                    backgroundColor: 'rgba(26, 86, 219, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#1A56DB'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    };
+</script>
 </body>
 </html>

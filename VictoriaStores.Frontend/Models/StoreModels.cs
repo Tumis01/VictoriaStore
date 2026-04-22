@@ -135,7 +135,7 @@ public class OrderDto
     public string CustomerName { get; set; } = string.Empty;
     public string CustomerPhone { get; set; } = string.Empty;
     public string CustomerEmail { get; set; } = string.Empty;
-    public string ShippingAddress { get; set; } = string.Empty;
+    public string DeliveryAddress { get; set; } = string.Empty;
     public string Status { get; set; } = "Pending"; // Pending, Confirmed, Shipped, Delivered, Cancelled
     public decimal TotalAmount { get; set; }
     public DateTime CreatedAt { get; set; }

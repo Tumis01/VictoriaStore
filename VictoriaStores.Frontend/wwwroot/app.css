@@ -13,8 +13,11 @@ html, body {
 /* ── Bootstrap Overrides ────────────────────── */
 a, .btn-link {
     color: #1A56DB;
+    text-decoration: none !important;
 }
-
+a:hover {
+    text-decoration: none;
+ }
 .btn-primary {
     color: #fff;
     background-color: #1A56DB;

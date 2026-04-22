@@ -3,6 +3,8 @@
 @inject HttpClient Http
 @inject VictoriaStores.Frontend.Services.CartService CartService
 @inject NavigationManager NavManager
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
 @using Microsoft.AspNetCore.Components.Forms
 @using VictoriaStores.Frontend.Models
 
@@ -69,20 +71,20 @@
                     <div class="space-y-5">
                         <div>
                             <label class="block text-sm font-bold text-on-surface-variant mb-1.5">Full Name <span class="text-red-500">*</span></label>
-                            <InputText @bind-Value="checkoutModel.CustomerName" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors" placeholder="e.g. Chioma Okonkwo" />
+                            <InputText @bind-Value="checkoutModel.CustomerName" readonly="true" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-high opacity-70 text-on-surface text-sm focus:outline-none cursor-not-allowed" placeholder="e.g. Chioma Okonkwo" />
                             <ValidationMessage For="@(() => checkoutModel.CustomerName)" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label class="block text-sm font-bold text-on-surface-variant mb-1.5">Phone Number <span class="text-red-500">*</span></label>
-                                <InputText @bind-Value="checkoutModel.CustomerPhone" type="tel" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors" placeholder="08012345678" />
+                                <InputText @bind-Value="checkoutModel.CustomerPhone" type="tel" readonly="true" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-high opacity-70 text-on-surface text-sm focus:outline-none cursor-not-allowed" placeholder="08012345678" />
                                 <p class="text-xs text-outline mt-1">We'll contact you to confirm delivery.</p>
                                 <ValidationMessage For="@(() => checkoutModel.CustomerPhone)" class="text-xs text-red-500 mt-1" />
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-on-surface-variant mb-1.5">Email Address <span class="text-red-500">*</span></label>
-                                <InputText @bind-Value="checkoutModel.CustomerEmail" type="email" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors" placeholder="your@email.com" />
+                                <InputText @bind-Value="checkoutModel.CustomerEmail" type="email" readonly="true" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 bg-surface-container-high opacity-70 text-on-surface text-sm focus:outline-none cursor-not-allowed" placeholder="your@email.com" />
                                 <ValidationMessage For="@(() => checkoutModel.CustomerEmail)" class="text-xs text-red-500 mt-1" />
                             </div>
                         </div>
@@ -183,6 +185,25 @@
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+        
+        // 1. Check if User is Logged In & Auto-Fill Data
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            checkoutModel.CustomerEmail = user.Claims.FirstOrDefault(c => c.Type.Contains("email"))?.Value 
+                                       ?? user.Identity.Name ?? string.Empty;
+                                       
+            // FIX: Using exact match to prevent accidentally grabbing the NameIdentifier (ID)
+            checkoutModel.CustomerName = user.Claims.FirstOrDefault(c => c.Type == "FullName")?.Value 
+                                      ?? user.Identity.Name ?? string.Empty;
+                                      
+            checkoutModel.CustomerPhone = user.Claims.FirstOrDefault(c => c.Type.Contains("mobilephone") || c.Type.Contains("phone"))?.Value 
+                                       ?? string.Empty;
+        }
+
+        // 2. Load Cart
         cartItems = await CartService.GetCartAsync();
         
         if (cartItems.Any())
@@ -198,64 +219,61 @@
     }
 
     private async Task PlaceOrder()
-{
-    isSubmitting = true;
-    errorMessage = null;
-
-    try
     {
-        var response = await Http.PostAsJsonAsync("api/order", checkoutModel);
+        isSubmitting = true;
+        errorMessage = null;
 
-        if (response.IsSuccessStatusCode)
+        try
         {
-            var result = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
-            
-            if (result != null)
+            var response = await Http.PostAsJsonAsync("api/order", checkoutModel);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Clear the cart on successful order!
-                await CartService.ClearCartAsync();
+                var result = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
                 
-                // Redirect to the success page
-                NavManager.NavigateTo($"/confirmation/{result.Id}");
+                if (result != null)
+                {
+                    // Clear the cart on successful order!
+                    await CartService.ClearCartAsync();
+                    
+                    // Redirect to the success page
+                    NavManager.NavigateTo($"/confirmation/{result.Id}");
+                }
+            }
+            else
+            {
+                var errorStr = await response.Content.ReadAsStringAsync();
+                
+                try 
+                {
+                    var json = System.Text.Json.JsonDocument.Parse(errorStr);
+                    
+                    if (json.RootElement.TryGetProperty("message", out var msg))
+                    {
+                        errorMessage = msg.GetString();
+                    }
+                    else if (json.RootElement.TryGetProperty("Message", out var capMsg))
+                    {
+                        errorMessage = capMsg.GetString();
+                    }
+                    else
+                    {
+                        errorMessage = "Validation error. Please check your form details.";
+                    }
+                }
+                catch
+                {
+                    errorMessage = "Server Error: " + errorStr;
+                }
             }
         }
-        else
+        catch (Exception ex)
         {
-            // Fetch the exact error string from your backend API!
-            var errorStr = await response.Content.ReadAsStringAsync();
-            
-            try 
-            {
-                // Parse the JSON error object sent by your OrderController
-                var json = System.Text.Json.JsonDocument.Parse(errorStr);
-                
-                if (json.RootElement.TryGetProperty("message", out var msg))
-                {
-                    errorMessage = msg.GetString();
-                }
-                else if (json.RootElement.TryGetProperty("Message", out var capMsg))
-                {
-                    errorMessage = capMsg.GetString();
-                }
-                else
-                {
-                    errorMessage = "Validation error. Please check your form details.";
-                }
-            }
-            catch
-            {
-                // Fallback if the error isn't JSON (e.g., a 500 Server Crash)
-                errorMessage = "Server Error: " + errorStr;
-            }
+            errorMessage = "A network error occurred. Please check your connection. " + ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
         }
     }
-    catch (Exception ex)
-    {
-        errorMessage = "A network error occurred. Please check your connection. " + ex.Message;
-    }
-    finally
-    {
-        isSubmitting = false;
-    }
-}
 }

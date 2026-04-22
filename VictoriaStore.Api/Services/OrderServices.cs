@@ -126,8 +126,26 @@ public class OrderService : IOrderService
 
     public async Task<bool> UpdateOrderStatusAsync(Guid orderId, string newStatus, string adminUsername, string? note = null)
     {
-        var order = await _context.Orders.FindAsync(orderId);
+        // 1. MUST Include Items so we can loop through them for the refund
+        var order = await _context.Orders
+            .Include(o => o.Items)
+            .FirstOrDefaultAsync(o => o.Id == orderId);
+
         if (order == null) return false;
+
+        // 2. Refund Stock Logic
+        if (newStatus == "Cancelled" && order.Status != "Cancelled")
+        {
+            foreach (var item in order.Items)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+                if (product != null)
+                {
+                    product.StockQuantity += item.Quantity; // Add it back to stock
+                    product.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+        }
 
         order.Status = newStatus;
         order.UpdatedAt = DateTime.UtcNow;
@@ -146,7 +164,6 @@ public class OrderService : IOrderService
 
         return true;
     }
-
     private static OrderResponseDto MapToDto(Order o)
     {
         return new OrderResponseDto

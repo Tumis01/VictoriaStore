@@ -1,0 +1,23 @@
+﻿@inherits LayoutComponentBase
+
+<div class="min-h-screen bg-surface-container-lowest sm:bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6 animate-fade-in">
+        <a href="/" class="inline-block group">
+            <h1 class="font-serif text-3xl md:text-4xl font-extrabold text-primary tracking-tight group-hover:opacity-80 transition-opacity">
+                Victoria James
+            </h1>
+            <span class="block text-xs font-bold text-outline tracking-widest uppercase mt-1">Store</span>
+        </a>
+    </div>
+
+    <div class="sm:mx-auto sm:w-full sm:max-w-md animate-slide-up">
+        @Body
+    </div>
+
+    <div class="mt-10 text-center text-sm text-outline-variant animate-fade-in">
+        <a href="/" class="hover:text-primary transition-colors font-semibold flex items-center justify-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Store
+        </a>
+    </div>
+</div>

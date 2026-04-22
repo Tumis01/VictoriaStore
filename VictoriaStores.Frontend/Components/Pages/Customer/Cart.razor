@@ -1,5 +1,7 @@
 @page "/cart"
 @layout Layout.StoreLayout
+
+@inject HttpClient Http
 @inject VictoriaStores.Frontend.Services.CartService CartService
 @inject NavigationManager NavManager
 @inject IJSRuntime JSRuntime
@@ -67,7 +69,7 @@
                             </div>
 
                             <div class="flex items-center justify-between w-full sm:w-auto gap-6 mt-4 sm:mt-0">
-                                <div class="flex items-center border border-outline-variant/50 rounded-lg h-10 w-28 bg-surface-container-lowest">
+                                <div class="flex items-center border border-outline-variant/50 rounded-lg h-10 w-28 bg-surface-container-lowest @(isUpdatingQuantity ? "opacity-50 pointer-events-none" : "")">
                                     <button @onclick="() => UpdateQuantity(item.ProductId, item.Quantity - 1)" class="w-8 h-full flex items-center justify-center text-outline hover:text-primary hover:bg-surface-container-low font-bold transition-colors">−</button>
                                     <input type="text" readonly value="@item.Quantity" class="w-12 h-full text-center text-sm font-bold text-on-surface border-x border-outline-variant/50 focus:outline-none" />
                                     <button @onclick="() => UpdateQuantity(item.ProductId, item.Quantity + 1)" class="w-8 h-full flex items-center justify-center text-outline hover:text-primary hover:bg-surface-container-low font-bold transition-colors">+</button>
@@ -125,8 +127,39 @@
     }
 </div>
 
+@if (showStockLimitModal)
+{
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 animate-fade-in">
+        <div class="bg-surface-container-lowest rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 relative animate-slide-up">
+            <button @onclick="() => showStockLimitModal = false" class="absolute top-4 right-4 text-outline-variant hover:text-on-surface rounded-lg p-1 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            
+            <div class="text-center">
+                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-on-surface font-serif mb-2">Stock Limit Reached</h3>
+                <p class="text-sm text-on-surface-variant mb-6">@stockLimitMessage</p>
+                
+                <button @onclick="() => showStockLimitModal = false" class="inline-flex items-center justify-center w-full h-11 px-6 bg-primary text-white font-semibold text-sm rounded-lg hover:bg-primary-dark active:scale-[0.98] transition-all duration-150">
+                    Okay, got it
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private bool isLoading = true;
+    private bool isUpdatingQuantity = false;
+    private bool showStockLimitModal = false;
+    private string stockLimitMessage = string.Empty;
     private List<CartItemDto> cartItems = new();
 
     private decimal Subtotal => cartItems.Sum(i => i.LineTotal);
@@ -154,8 +187,40 @@
 
     private async Task UpdateQuantity(Guid productId, int newQuantity)
     {
-        // If they click minus when it's 1, we can prompt or just remove. Let's just update (which removes if <= 0).
-        await CartService.UpdateQuantityAsync(productId, newQuantity);
+        // Prevent going below 1 (satisfies the 'cannot be less than 0' requirement)
+        // Prevent spam-clicking by checking isUpdatingQuantity
+        if (newQuantity < 1 || isUpdatingQuantity) return;
+
+        isUpdatingQuantity = true;
+        StateHasChanged();
+
+        try
+        {
+            // Fetch product directly from API to check live stock
+            var product = await Http.GetFromJsonAsync<ProductDto>($"api/product/{productId}");
+            
+            if (product != null && newQuantity > product.StockQuantity)
+            {
+                // Trigger the stock limit pop up modal
+                stockLimitMessage = $"Sorry, you cannot add more than {product.StockQuantity}. That is all we currently have in stock for '{product.Name}'.";
+                showStockLimitModal = true;
+                return; // Stop the update here
+            }
+
+            // If we pass the check, update the cart via the service
+            await CartService.UpdateQuantityAsync(productId, newQuantity);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error verifying stock: {ex.Message}");
+            // Fallback in case of temporary API network issue
+            await CartService.UpdateQuantityAsync(productId, newQuantity);
+        }
+        finally
+        {
+            isUpdatingQuantity = false;
+            StateHasChanged();
+        }
     }
 
     private async Task RemoveItem(Guid productId)

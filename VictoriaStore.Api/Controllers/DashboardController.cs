@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VictoriaStore.Api.Data;
+using VictoriaStore.Api.Models;
 
 namespace VictoriaStore.Api.Controllers;
 
@@ -11,29 +13,34 @@ namespace VictoriaStore.Api.Controllers;
 public class DashboardController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public DashboardController(AppDbContext context)
+    public DashboardController(AppDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
     [HttpGet("stats")]
     public async Task<IActionResult> GetStats()
     {
-        var totalRevenue = await _context.Orders.Where(o => o.Status != "Cancelled").SumAsync(o => o.TotalAmount);
+        // 1. Only sum revenue for orders that are successfully processed
+        var totalRevenue = await _context.Orders
+            .Where(o => o.Status == "Confirmed" || o.Status == "Shipped" || o.Status == "Delivered")
+            .SumAsync(o => o.TotalAmount);
+
+        // 2. Count total orders placed
         var totalOrders = await _context.Orders.CountAsync();
-        var customerCount = await (from user in _context.Users
-                                   join userRole in _context.UserRoles on user.Id equals userRole.UserId
-                                   join role in _context.Roles on userRole.RoleId equals role.Id
-                                   where role.Name == "Customer"
-                                   select user.Id).CountAsync();
-        var customerCountFromOrders = await _context.Orders.Select(o => o.CustomerEmail).Distinct().CountAsync();
+
+        // 3. CORRECT IDENTITY APPROACH: Fetch users in the "Customer" role
+        var customers = await _userManager.GetUsersInRoleAsync("Customer");
+        var totalCustomers = customers.Count;
 
         return Ok(new
         {
             TotalRevenue = totalRevenue,
             TotalOrders = totalOrders,
-            TotalCustomers = customerCountFromOrders
+            TotalCustomers = totalCustomers
         });
     }
 }

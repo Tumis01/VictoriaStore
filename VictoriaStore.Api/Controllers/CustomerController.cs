@@ -29,18 +29,51 @@ public class CustomerController : ControllerBase
     [Authorize(Roles = "SuperAdmin")]
     public async Task<IActionResult> GetCustomers()
     {
-        var customers = await _context.Orders
-            .GroupBy(o => new { o.CustomerEmail, o.CustomerName, o.CustomerPhone })
-            .Select(g => new
+        // 1. Fetch ONLY explicitly registered users on the system
+        var registeredCustomers = await _userManager.GetUsersInRoleAsync("Customer");
+
+        // 2. Fetch all orders so we can match them to the registered users
+        var allOrders = await _context.Orders.ToListAsync();
+
+        // 3. Map the registered users and attach their respective order history
+        var customers = registeredCustomers.Select(user =>
+        {
+            // Match orders to this registered user by their email
+            var userOrders = allOrders
+                .Where(o => o.CustomerEmail?.ToLower() == user.Email?.ToLower())
+                .ToList();
+
+            return new
             {
-                Name = g.Key.CustomerName,
-                Email = g.Key.CustomerEmail,
-                Phone = g.Key.CustomerPhone,
-                OrderCount = g.Count(),
-                TotalSpent = g.Sum(o => o.TotalAmount),
-                LastOrderDate = g.Max(o => o.CreatedAt)
-            })
-            .ToListAsync();
+                Id = user.Id, // Use their actual registered Account ID
+                Name = user.FullName ?? user.UserName ?? "Unknown",
+                Email = user.Email,
+                Phone = user.PhoneNumber ?? "No phone provided",
+
+                OrdersCount = userOrders.Count,
+
+                TotalSpent = userOrders.Where(o => o.Status != "Cancelled").Sum(o => o.TotalAmount),
+
+                // If they haven't ordered yet, fallback to the current date 
+                // (Standard IdentityUser doesn't natively track registration date without custom props)
+                JoinedDate = userOrders.Any() ? userOrders.Min(o => o.CreatedAt) : DateTime.UtcNow,
+
+                // Populate the nested list for the accordion dropdown
+                RecentOrders = userOrders.OrderByDescending(o => o.CreatedAt)
+                                .Take(5)
+                                .Select(o => new
+                                {
+                                    Id = o.Id,
+                                    OrderNumber = o.OrderNumber,
+                                    CreatedAt = o.CreatedAt,
+                                    Status = o.Status,
+                                    TotalAmount = o.TotalAmount
+                                })
+                                .ToList()
+            };
+        })
+        .OrderByDescending(c => c.OrdersCount) // Sort by most active customers
+        .ToList();
 
         return Ok(customers);
     }

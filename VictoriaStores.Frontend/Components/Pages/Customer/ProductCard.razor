@@ -1,6 +1,12 @@
 @using VictoriaStores.Frontend.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using VictoriaStores.Frontend.Components.Layout
+
 @inject NavigationManager NavManager
 @inject VictoriaStores.Frontend.Services.CartService CartService
+@inject AuthenticationStateProvider AuthStateProvider
+
+@rendermode InteractiveServer
 
 <style>
     .pc-img{transition:transform .5s cubic-bezier(.16,1,.3,1)}
@@ -16,7 +22,6 @@
 <div class="pc-wrap group bg-surface-container-lowest rounded-2xl border border-outline-variant/15 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden flex @(IsListView ? "flex-row h-36 sm:h-52" : "flex-col") relative cursor-pointer"
      @onclick="GoToDetails">
 
-    <!-- ── Image area ──────────────────────────────────────── -->
     <div class="@(IsListView ? "w-36 sm:w-52 h-full flex-shrink-0" : "aspect-square") bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
 
         @if (!string.IsNullOrEmpty(Product.MainImageUrl))
@@ -33,7 +38,6 @@
             </div>
         }
 
-        <!-- Discount / New badge -->
         @if (Product.SalePrice.HasValue && Product.Price > 0)
         {
             var discount = (int)Math.Round(((Product.Price - Product.SalePrice.Value) / Product.Price) * 100);
@@ -44,7 +48,6 @@
             <span class="absolute top-2.5 left-2.5 bg-gradient-to-r from-primary to-blue-500 text-white text-[10px] font-extrabold px-2 py-1 rounded-lg shadow-md tracking-wide">NEW</span>
         }
 
-        <!-- Wishlist button -->
         <button class="pc-wish absolute top-2.5 right-2.5 w-8 h-8 bg-surface-container-lowest/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-300 hover:text-red-500 shadow-sm border border-white/60 z-10"
                 @onclick:stopPropagation="true" aria-label="Add to wishlist">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +55,6 @@
             </svg>
         </button>
 
-        <!-- Quick view slide-up overlay -->
         @if (!IsListView)
         {
             <div class="pc-quick absolute bottom-0 left-0 right-0 p-2.5 translate-y-full opacity-0">
@@ -64,22 +66,17 @@
         }
     </div>
 
-    <!-- ── Info area ───────────────────────────────────────── -->
     <div class="p-3.5 sm:p-4 flex flex-col flex-1 @(IsListView ? "justify-center gap-1" : "gap-2")">
 
-        <!-- Category label -->
         <span class="text-[10.5px] font-extrabold text-primary uppercase tracking-widest">@Product.CategoryName</span>
 
-        <!-- Product name -->
         <h3 class="text-[13.5px] sm:text-[14.5px] font-semibold text-on-surface line-clamp-2 leading-snug flex-1 group-hover:text-primary transition-colors duration-200">@Product.Name</h3>
 
-        <!-- Description (list view only) -->
         @if (IsListView && !string.IsNullOrEmpty(Product.Description))
         {
             <p class="hidden sm:block text-xs text-outline line-clamp-2">@Product.Description</p>
         }
 
-        <!-- Stars -->
         <div class="flex items-center gap-1.5">
             <div class="flex text-tertiary gap-0.5">
                 @for (int i = 0; i < 5; i++)
@@ -92,7 +89,6 @@
             <span class="text-[11px] text-outline-variant font-medium">(12)</span>
         </div>
 
-        <!-- Price + CTA -->
         <div class="@(IsListView ? "flex items-center justify-between mt-1" : "mt-auto") flex-wrap gap-2">
 
             <div class="flex items-end flex-wrap gap-1.5">
@@ -107,9 +103,17 @@
                 }
             </div>
 
-            <button class="@(IsListView ? "h-9 px-4 sm:px-5 text-xs" : "w-full h-10 text-sm mt-1") @(_justAdded ? "bg-green-600 added-pop" : "bg-gradient-to-r from-primary to-[#1e4fd8] hover:from-[#1E40AF] hover:to-[#1A56DB]") text-white font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 shadow-sm flex-shrink-0"
+            <button class="@(IsListView ? "h-9 px-4 sm:px-5 text-xs" : "w-full h-10 text-sm mt-1") 
+                           @(Product.StockQuantity == 0 ? "bg-gray-400 cursor-not-allowed" : (_justAdded ? "bg-green-600 added-pop" : "bg-gradient-to-r from-primary to-[#1e4fd8] hover:from-[#1E40AF] hover:to-[#1A56DB] active:scale-95")) 
+                           text-white font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm flex-shrink-0"
+                    disabled="@(Product.StockQuantity == 0)"
                     @onclick:stopPropagation="true" @onclick="AddToCart">
-                @if (_justAdded)
+                @if (Product.StockQuantity == 0)
+                {
+                    <span class="material-symbols-outlined text-[20px]">production_quantity_limits</span>
+                    <span class="@(IsListView ? "hidden sm:inline" : "")">Out of Stock</span>
+                }
+                else if (_justAdded)
                 {
                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                     <span class="@(IsListView ? "hidden sm:inline" : "")">Added!</span>
@@ -124,31 +128,49 @@
     </div>
 </div>
 
+<SignInModal @bind-IsVisible="showSignInModal" />
+
 @code {
     [Parameter] public ProductDto Product { get; set; } = default!;
     [Parameter] public bool IsListView { get; set; } = false;
 
     private bool _justAdded = false;
+    private bool showSignInModal = false;
 
     private void GoToDetails() => NavManager.NavigateTo($"/product/{Product.Id}");
 
     private async Task AddToCart()
     {
-        var cartItem = new CartItemDto
-        {
-            ProductId = Product.Id,
-            ProductName = Product.Name,
-            UnitPrice = Product.SalePrice ?? Product.Price,
-            Quantity = 1,
-            ImageUrl = Product.MainImageUrl
-        };
-        await CartService.AddToCartAsync(cartItem);
+        // Guard clause: Do nothing if out of stock
+        if (Product.StockQuantity == 0) return;
 
-        // Green flash feedback
-        _justAdded = true;
-        StateHasChanged();
-        await Task.Delay(1600);
-        _justAdded = false;
-        StateHasChanged();
+        // 1. Get the current user's authentication state
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        
+        // 2. Check if the user is logged in
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            var cartItem = new CartItemDto
+            {
+                ProductId = Product.Id,
+                ProductName = Product.Name,
+                UnitPrice = Product.SalePrice ?? Product.Price,
+                Quantity = 1,
+                ImageUrl = Product.MainImageUrl
+            };
+            await CartService.AddToCartAsync(cartItem);
+
+            // Green flash feedback
+            _justAdded = true;
+            StateHasChanged();
+            await Task.Delay(1600);
+            _justAdded = false;
+            StateHasChanged();
+        }
+        else
+        {
+            // 3. Trigger the sign-in modal
+            showSignInModal = true;
+        }
     }
 }
