@@ -76,68 +76,98 @@
                 </div>
 
                 <!-- Stats -->
-                <div class="hero-4 inline-flex items-stretch divide-x divide-white/20 rounded-2xl overflow-hidden bg-surface-container-lowest/10 backdrop-blur-sm border border-white/15 shadow-lg">
-                    <div class="text-center px-5 py-3.5">
-                        <p class="text-white font-extrabold text-2xl leading-none">500+</p>
-                        <p class="text-white/55 text-xs mt-1 font-semibold">Products</p>
-                    </div>
-                    <div class="text-center px-5 py-3.5">
-                        <p class="text-white font-extrabold text-2xl leading-none">1,000+</p>
-                        <p class="text-white/55 text-xs mt-1 font-semibold">Customers</p>
-                    </div>
-                    <div class="text-center px-5 py-3.5">
-                        <p class="text-yellow-400 font-extrabold text-2xl leading-none">4.9★</p>
-                        <p class="text-white/55 text-xs mt-1 font-semibold">Rating</p>
-                    </div>
-                </div>
+                <div class="hero-4 grid grid-cols-3 w-full sm:w-auto sm:flex sm:inline-flex items-stretch divide-x divide-white/20 rounded-2xl overflow-hidden bg-surface-container-lowest/10 backdrop-blur-sm border border-white/15 shadow-lg">
+    <div class="text-center py-3 sm:px-6 sm:py-4">
+        <p class="text-white font-extrabold text-[17px] sm:text-2xl leading-none">500+</p>
+        <p class="text-white/60 text-[9px] sm:text-xs mt-1 font-bold tracking-widest uppercase">Products</p>
+    </div>
+    <div class="text-center py-3 sm:px-6 sm:py-4">
+        <p class="text-white font-extrabold text-[17px] sm:text-2xl leading-none">1k+</p>
+        <p class="text-white/60 text-[9px] sm:text-xs mt-1 font-bold tracking-widest uppercase">Customers</p>
+    </div>
+    <div class="text-center py-3 sm:px-6 sm:py-4">
+        <p class="text-yellow-400 font-extrabold text-[17px] sm:text-2xl leading-none">4.9★</p>
+        <p class="text-white/60 text-[9px] sm:text-xs mt-1 font-bold tracking-widest uppercase">Rating</p>
+    </div>
+</div>
             </div>
 
             <!-- Hero product collage (desktop) -->
             <div class="w-full md:w-2/5 hidden md:flex items-center justify-center" aria-hidden="true">
-                <div class="relative w-[340px] h-[340px]">
-                    <!-- Card 1 -->
-                    <div class="hero-card absolute top-0 left-0 w-[154px]" style="--r:-4deg;transform:rotate(-4deg)">
-                        <div class="bg-surface-container-lowest/12 backdrop-blur-xl rounded-2xl p-3 shadow-2xl border border-white/25 hover:border-white/50">
-                            <div class="w-full aspect-square bg-surface-container-lowest/10 rounded-xl overflow-hidden flex items-center justify-center">
-                                <img src="/images/hero-kitchen.jpg" alt="Kitchen" class="w-full h-full object-cover rounded-xl" loading="eager" onerror="this.parentElement.innerHTML='<span style=font-size:3rem>🍳</span>'"/>
-                            </div>
-                            <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Kitchen Utensils</p>
-                        </div>
-                    </div>
-                    <!-- Card 2 -->
-                    <div class="hero-card absolute top-0 right-0 w-[140px]" style="--r:4deg;transform:rotate(4deg) translateY(20px)">
-                        <div class="bg-surface-container-lowest/12 backdrop-blur-xl rounded-2xl p-3 shadow-2xl border border-white/25 hover:border-white/50">
-                            <div class="w-full aspect-square bg-surface-container-lowest/10 rounded-xl overflow-hidden flex items-center justify-center">
-                                <img src="/images/hero-fashion.jpg" alt="Fashion" class="w-full h-full object-cover rounded-xl" loading="eager" onerror="this.parentElement.innerHTML='<span style=font-size:3rem>👗</span>'"/>
-                            </div>
-                            <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Fashion &amp; Gifts</p>
-                        </div>
-                    </div>
-                    <!-- Card 3 -->
-                    <div class="hero-card absolute bottom-0 left-4 w-[142px]" style="--r:2.5deg;transform:rotate(2.5deg)">
-                        <div class="bg-surface-container-lowest/12 backdrop-blur-xl rounded-2xl p-3 shadow-2xl border border-white/25 hover:border-white/50">
-                            <div class="w-full aspect-square bg-surface-container-lowest/10 rounded-xl overflow-hidden flex items-center justify-center">
-                                <img src="/images/hero-household.jpg" alt="Household" class="w-full h-full object-cover rounded-xl" loading="eager" onerror="this.parentElement.innerHTML='<span style=font-size:3rem>🏠</span>'"/>
-                            </div>
-                            <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Household Items</p>
-                        </div>
-                    </div>
-                    <!-- Card 4 -->
-                    <div class="hero-card absolute bottom-2 right-0 w-[154px]" style="--r:-2deg;transform:rotate(-2deg)">
-                        <div class="bg-surface-container-lowest/12 backdrop-blur-xl rounded-2xl p-3 shadow-2xl border border-white/25 hover:border-white/50">
-                            <div class="w-full aspect-square bg-surface-container-lowest/10 rounded-xl overflow-hidden flex items-center justify-center">
-                                <img src="/images/hero-accessories.jpg" alt="Accessories" class="w-full h-full object-cover rounded-xl" loading="eager" onerror="this.parentElement.innerHTML='<span style=font-size:3rem>💍</span>'"/>
-                            </div>
-                            <p class="text-white text-[11px] font-semibold mt-2 text-center truncate">Accessories</p>
-                        </div>
-                    </div>
-                    <!-- Floating sale badge -->
-                    <div class="float-badge absolute -top-5 -right-5 w-[64px] h-[64px] bg-gradient-to-br from-accent to-orange-600 rounded-full shadow-2xl flex flex-col items-center justify-center z-20 border-2 border-white/40">
-                        <span class="text-white text-sm font-extrabold leading-none">50%</span>
-                        <span class="text-white/75 text-[9px] font-bold leading-none mt-0.5">OFF</span>
+    <div class="relative w-[340px] h-[340px]">
+        
+        @{
+            var cardConfigs = new[]
+            {
+                new { Css = "top-0 left-0 w-[154px]", Style = "--r:-4deg;transform:rotate(-4deg)" },
+                new { Css = "top-0 right-0 w-[140px]", Style = "--r:4deg;transform:rotate(4deg) translateY(20px)" },
+                new { Css = "bottom-0 left-4 w-[142px]", Style = "--r:2.5deg;transform:rotate(2.5deg)" },
+                new { Css = "bottom-2 right-0 w-[154px]", Style = "--r:-2deg;transform:rotate(-2deg)" }
+            };
+        }
+
+        @if (isLoading)
+        {
+            @foreach (var config in cardConfigs)
+            {
+                <div class="hero-card absolute @config.Css" style="@config.Style">
+                    <div class="bg-surface-container-lowest/10 backdrop-blur-xl rounded-2xl p-3 shadow-2xl border border-white/10">
+                        <div class="w-full aspect-square bg-white/10 rounded-xl overflow-hidden animate-pulse"></div>
+                        <div class="h-2.5 bg-white/20 rounded-full mt-3 w-3/4 mx-auto animate-pulse"></div>
+                        <div class="h-2 bg-white/20 rounded-full mt-1.5 w-1/2 mx-auto animate-pulse"></div>
                     </div>
                 </div>
+            }
+        }
+        else if (bestSellers.Any())
+        {
+            var heroProducts = bestSellers.Take(4).ToList();
+
+            for (int i = 0; i < Math.Min(heroProducts.Count, 4); i++)
+            {
+                var product = heroProducts[i];
+                var config = cardConfigs[i];
+                
+                <a href="/product/@product.Id" class="hero-card absolute @config.Css block group" style="@config.Style">
+                    <div class="bg-surface-container-lowest/12 backdrop-blur-xl rounded-2xl p-3 shadow-2xl border border-white/25 group-hover:border-white/60 group-hover:bg-surface-container-lowest/20 transition-all duration-300">
+                        <div class="w-full aspect-square bg-surface-container-lowest/10 rounded-xl overflow-hidden flex items-center justify-center relative">
+                            @if (!string.IsNullOrEmpty(product.MainImageUrl))
+                            {
+                                <img src="https://localhost:7145@(product.MainImageUrl)" 
+                                     alt="@product.Name" 
+                                     class="absolute inset-0 w-full h-full object-cover rounded-xl" 
+                                     loading="eager" 
+                                     onerror="this.parentElement.innerHTML='<span style=\'font-size:3rem\'>📦</span>'" />
+                            }
+                            else
+                            {
+                                <span style="font-size:3rem">📦</span>
+                            }
+                        </div>
+                        <p class="text-white text-[11px] font-semibold mt-2 text-center truncate px-1">@product.Name</p>
+                        <p class="text-tertiary text-[10px] font-extrabold text-center mt-0.5">₦@((product.SalePrice ?? product.Price).ToString("N0"))</p>
+                    </div>
+                </a>
+            }
+        }
+
+        @if (promoProduct != null && promoProduct.SalePrice.HasValue)
+        {
+            var topDiscount = Math.Round((1 - (promoProduct.SalePrice.Value / promoProduct.Price)) * 100);
+            <div class="float-badge absolute -top-5 -right-5 w-[64px] h-[64px] bg-gradient-to-br from-accent to-orange-600 rounded-full shadow-2xl flex flex-col items-center justify-center z-20 border-2 border-white/40 pointer-events-none">
+                <span class="text-white text-sm font-extrabold leading-none">@topDiscount%</span>
+                <span class="text-white/75 text-[9px] font-bold leading-none mt-0.5">OFF</span>
             </div>
+        }
+        else
+        {
+            <div class="float-badge absolute -top-5 -right-5 w-[64px] h-[64px] bg-gradient-to-br from-accent to-orange-600 rounded-full shadow-2xl flex flex-col items-center justify-center z-20 border-2 border-white/40 pointer-events-none">
+                <span class="text-white text-[10px] font-extrabold leading-none mb-0.5">SHOP</span>
+                <span class="text-white font-black leading-none">NOW</span>
+            </div>
+        }
+    </div>
+</div>
         </div>
     </div>
 

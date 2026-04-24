@@ -103,9 +103,9 @@
                 }
             </div>
 
-            <button class="@(IsListView ? "h-9 px-4 sm:px-5 text-xs" : "w-full h-10 text-sm mt-1") 
+            <button class="@(IsListView ? " h-9 px-4 sm:px-5 text-xs" : "w-full h-10 text-sm mt-1") 
                            @(Product.StockQuantity == 0 ? "bg-gray-400 cursor-not-allowed" : (_justAdded ? "bg-green-600 added-pop" : "bg-gradient-to-r from-primary to-[#1e4fd8] hover:from-[#1E40AF] hover:to-[#1A56DB] active:scale-95")) 
-                           text-white font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm flex-shrink-0"
+                           border-none outline-none focus:outline-none focus:ring-0 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm flex-shrink-0"
                     disabled="@(Product.StockQuantity == 0)"
                     @onclick:stopPropagation="true" @onclick="AddToCart">
                 @if (Product.StockQuantity == 0)

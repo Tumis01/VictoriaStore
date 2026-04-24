@@ -64,18 +64,25 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateOrderStatusRequest request)
     {
         var adminUser = User.FindFirstValue(ClaimTypes.Name) ?? "Admin";
+
+        // Call the service and get the success state and message
         var result = await _orderService.UpdateOrderStatusAsync(id, request.Status, adminUser, request.Note);
 
-        if (!result) return NotFound();
+        if (!result.Success)
+        {
+            if (result.Message == "Order not found.") return NotFound(new { message = result.Message });
 
-        // If status changes, notify customer (Placeholder logic)
+            // Return the specific stock error message to the frontend
+            return BadRequest(new { message = result.Message });
+        }
+
         var order = await _orderService.GetByIdAsync(id);
         if (order != null)
         {
             _ = _emailService.SendEmailAsync(order.CustomerEmail, "Order Status Update", $"Your order {order.OrderNumber} is now {request.Status}.");
         }
 
-        return Ok(new { Message = "Status updated successfully" });
+        return Ok(new { message = result.Message });
     }
 
     // 3. The newly added Tracking Endpoint

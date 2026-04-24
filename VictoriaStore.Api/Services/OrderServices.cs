@@ -10,7 +10,7 @@ public interface IOrderService
     Task<OrderResponseDto> PlaceOrderAsync(CheckoutRequest request);
     Task<OrderResponseDto?> GetByIdAsync(Guid id);
     Task<IEnumerable<OrderResponseDto>> GetAllAdminAsync();
-    Task<bool> UpdateOrderStatusAsync(Guid orderId, string newStatus, string adminUsername, string? note = null);
+    Task<(bool Success, string Message)> UpdateOrderStatusAsync(Guid orderId, string newStatus, string adminUsername, string? note = null); 
 }
 public class OrderService : IOrderService
 {
@@ -124,16 +124,16 @@ public class OrderService : IOrderService
             .ToListAsync();
     }
 
-    public async Task<bool> UpdateOrderStatusAsync(Guid orderId, string newStatus, string adminUsername, string? note = null)
+    public async Task<(bool Success, string Message)> UpdateOrderStatusAsync(Guid orderId, string newStatus, string adminUsername, string? note = null)
     {
-        // 1. MUST Include Items so we can loop through them for the refund
+        // 2. MUST Include Items so we can loop through them for the refund/deduction
         var order = await _context.Orders
             .Include(o => o.Items)
             .FirstOrDefaultAsync(o => o.Id == orderId);
 
-        if (order == null) return false;
+        if (order == null) return (false, "Order not found.");
 
-        // 2. Refund Stock Logic
+        // 3. Transition TO Cancelled: Refund Stock
         if (newStatus == "Cancelled" && order.Status != "Cancelled")
         {
             foreach (var item in order.Items)
@@ -141,7 +141,32 @@ public class OrderService : IOrderService
                 var product = await _context.Products.FindAsync(item.ProductId);
                 if (product != null)
                 {
-                    product.StockQuantity += item.Quantity; // Add it back to stock
+                    product.StockQuantity += item.Quantity; // Add back to stock
+                    product.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+        }
+        // 4. Transition FROM Cancelled to anything else: Deduct Stock
+        else if (order.Status == "Cancelled" && newStatus != "Cancelled")
+        {
+            // First loop: PRE-CHECK if we have enough stock before making any database changes
+            foreach (var item in order.Items)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+                if (product != null && product.StockQuantity < item.Quantity)
+                {
+                    // Block the change and warn the admin
+                    return (false, $"Cannot un-cancel order: Insufficient stock for '{product.Name}'. You need {item.Quantity} but only {product.StockQuantity} are available. Please update inventory.");
+                }
+            }
+
+            // Second loop: Since the pre-check passed, we can safely deduct the stock again
+            foreach (var item in order.Items)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+                if (product != null)
+                {
+                    product.StockQuantity -= item.Quantity; // Deduct stock again
                     product.UpdatedAt = DateTime.UtcNow;
                 }
             }
@@ -162,7 +187,7 @@ public class OrderService : IOrderService
         _context.OrderStatusHistory.Add(history);
         await _context.SaveChangesAsync();
 
-        return true;
+        return (true, "Status updated successfully.");
     }
     private static OrderResponseDto MapToDto(Order o)
     {
