@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using VictoriaStore.Api.Models;
+using VictoriaStore.API.Models;
 
 namespace VictoriaStore.Api.Data;
 public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
@@ -14,10 +15,12 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<OrderStatusHistory> OrderStatusHistory => Set<OrderStatusHistory>();
+    public DbSet<StoreSettings> StoreSettings { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder); // Essential for Identity tables setup
+        base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Price).HasColumnType("decimal(10,2)");
@@ -30,6 +33,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
 
         modelBuilder.Entity<OrderItem>()
             .Property(oi => oi.UnitPrice).HasColumnType("decimal(10,2)");
+
+        modelBuilder.Entity<StoreSettings>()
+            .HasKey(x => x.Id);
 
         modelBuilder.Entity<Product>().HasIndex(p => p.Slug).IsUnique();
         modelBuilder.Entity<Product>().HasIndex(p => p.IsActive);

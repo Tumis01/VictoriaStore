@@ -15,20 +15,27 @@
 
 <PageTitle>@(IsEditMode ? "Edit Product" : "Add New Product") - Victoria Admin</PageTitle>
 
-<div class="flex items-center gap-4 mb-6">
-    <button @onclick='() => NavManager.NavigateTo("/admin/products")' class="p-2 rounded-full hover:bg-surface-container-high text-outline transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-    </button>
-    <div>
-        <h1 class="text-2xl font-bold text-on-surface font-serif">@(IsEditMode ? "Edit Product" : "Add New Product")</h1>
-        <p class="text-sm text-outline mt-0.5">Fill out the details below to update your catalog.</p>
+<div class="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-4">
+        <button type="button" @onclick='() => NavManager.NavigateTo("/admin/products")' class="p-2 rounded-full hover:bg-surface-container-high text-outline transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+        </button>
+        <div>
+            <h1 class="text-2xl font-bold text-on-surface font-serif">@(IsEditMode ? "Edit Product" : "Add New Product")</h1>
+            <p class="text-sm text-outline mt-0.5">Fill out the details below to update your catalog.</p>
+        </div>
     </div>
 </div>
 
 @if (isLoading)
 {
     <div class="flex h-64 items-center justify-center">
-        <svg class="animate-spin h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <svg class="animate-spin h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
     </div>
 }
 else
@@ -70,7 +77,7 @@ else
                             {
                                 <button type="button"
                                         @onclick="() => ToggleColor(color)"
-                                        class="@(productModel.Colors.Contains(color) ? "bg-primary text-white border-primary" : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/50 hover:bg-surface-container-low") px-4 py-1.5 rounded-full border text-sm font-semibold transition-colors shadow-sm">
+                                        class="@(productModel.Colors.Contains(color) ? "bg-primary text-white" : "bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low") px-4 py-1.5 rounded-full text-sm font-semibold transition-colors shadow-sm">
                                     @color
                                 </button>
                             }
@@ -80,12 +87,27 @@ else
             </div>
 
             <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-bold text-on-surface font-serif">Media</h3>
-                    <span class="text-xs font-semibold text-outline">Up to @MaxFileCount images, optimized before upload</span>
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-on-surface font-serif">Media</h3>
+                        <p class="text-xs font-semibold text-outline mt-1">Up to @MaxFileCount images per product</p>
+                    </div>
+
+                    <div class="sm:text-right">
+                        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold @(TotalImageCount >= MaxFileCount ? "bg-amber-100 text-amber-700" : "bg-surface-container-low text-outline")">
+                            @TotalImageCount / @MaxFileCount images
+                        </span>
+
+                        @if (TotalImageCount >= MaxFileCount)
+                        {
+                            <p class="text-xs font-medium text-amber-700 mt-2 max-w-xs">
+                                Maximum image limit reached. Remove one image before adding another.
+                            </p>
+                        }
+                    </div>
                 </div>
 
-                <label for="product-images" class="block border-2 border-dashed border-outline-variant/50 rounded-xl p-8 text-center hover:bg-surface-container-low transition-colors cursor-pointer">
+                <label for="product-images" class="block border-2 border-dashed rounded-xl p-6 sm:p-8 text-center transition-colors @(TotalImageCount >= MaxFileCount ? "border-amber-300 bg-amber-50/60 cursor-not-allowed opacity-70" : "border-outline-variant/50 hover:bg-surface-container-low cursor-pointer")">
                     <div class="mx-auto w-12 h-12 bg-primary-light text-primary rounded-full flex items-center justify-center mb-3">
                         <span class="material-symbols-outlined text-[20px]">image</span>
                     </div>
@@ -94,7 +116,22 @@ else
                     <p class="text-xs text-outline-variant mt-1">Images are resized to 1024px and converted to JPEG before upload</p>
                 </label>
 
-                <InputFile id="product-images" OnChange="HandleFilesSelected" accept="image/*" multiple class="hidden" />
+                <InputFile id="product-images" OnChange="HandleFilesSelected" accept="image/*" multiple class="hidden" disabled="@(TotalImageCount >= MaxFileCount)" />
+
+                @if (TotalImageCount < MaxFileCount)
+                {
+                    <p class="mt-3 text-xs text-outline-variant">
+                        You can still add @(MaxFileCount - TotalImageCount) more image(s).
+                    </p>
+                }
+                else
+                {
+                    <div class="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                        <p class="text-sm font-medium text-amber-800">
+                            This product already has the maximum of @MaxFileCount images.
+                        </p>
+                    </div>
+                }
 
                 @if (!string.IsNullOrWhiteSpace(uploadStatus))
                 {
@@ -106,13 +143,24 @@ else
                 @if (selectedFiles.Any())
                 {
                     <div class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
-                        <p class="text-sm font-semibold text-green-800 mb-3">Prepared files</p>
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <p class="text-sm font-semibold text-green-800">Prepared files</p>
+                            <span class="text-xs text-green-700">@selectedFiles.Count new image(s)</span>
+                        </div>
+
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            @foreach (var file in selectedFiles)
+                            @foreach (var item in selectedFiles.Select((file, index) => new { file, index }))
                             {
-                                <div class="rounded-lg border border-green-200 bg-surface-container-lowest px-3 py-2">
-                                    <p class="text-sm font-medium text-on-surface truncate">@file.UploadName</p>
-                                    <p class="text-xs text-outline">@FormatFileSize(file.Content.Length)</p>
+                                <div class="relative rounded-lg border border-green-200 bg-surface-container-lowest px-3 py-3 pr-10">
+                                    <button type="button"
+                                            @onclick="() => RemovePreparedFile(item.index)"
+                                            class="absolute right-2 top-2 h-7 w-7 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors flex items-center justify-center"
+                                            aria-label="Remove file">
+                                        <span class="text-sm leading-none">×</span>
+                                    </button>
+
+                                    <p class="text-sm font-medium text-on-surface truncate">@item.file.UploadName</p>
+                                    <p class="text-xs text-outline">@FormatFileSize(item.file.Content.Length)</p>
                                 </div>
                             }
                         </div>
@@ -123,13 +171,22 @@ else
                 {
                     <div class="mt-6">
                         <p class="text-sm font-semibold text-on-surface-variant mb-3">Current gallery</p>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                             @foreach (var image in productModel.Images.OrderBy(i => i.DisplayOrder))
                             {
-                                <div class="rounded-xl border border-outline-variant/30 overflow-hidden bg-surface-container-lowest">
+                                <div class="relative rounded-xl border border-outline-variant/30 overflow-hidden bg-surface-container-lowest">
+                                    <button type="button"
+                                            @onclick="() => RemoveExistingImageAsync(image)"
+                                            class="absolute right-2 top-2 z-10 h-8 w-8 rounded-full bg-red-500/95 text-white shadow hover:bg-red-600 transition-colors flex items-center justify-center"
+                                            disabled="@isDeletingImage"
+                                            aria-label="Delete image">
+                                        <span class="text-base leading-none">×</span>
+                                    </button>
+
                                     <div class="aspect-square bg-surface-container-low">
-                                        <img src="@($"https://localhost:7145{image.ImageUrl}")" alt="@productModel.Name" class="h-full w-full object-cover" />
+                                        <img src="@BuildImageUrl(image.ImageUrl)" alt="@productModel.Name" class="h-full w-full object-cover" />
                                     </div>
+
                                     <div class="p-3">
                                         <div class="flex items-center justify-between gap-2">
                                             <span class="text-xs text-outline">Order: @image.DisplayOrder</span>
@@ -171,7 +228,7 @@ else
                     <div>
                         <label class="block text-sm font-semibold text-on-surface-variant mb-1">Category <span class="text-red-500">*</span></label>
                         <InputSelect @bind-Value="productModel.CategoryId" TValue="Guid" class="h-11 w-full px-4 rounded-lg border border-outline-variant/50 focus:ring-2 focus:ring-primary outline-none bg-surface-container-lowest">
-                            <option value="">Select a category</option>
+                            <option value="@Guid.Empty">Select a category</option>
                             @foreach (var cat in categories)
                             {
                                 <option value="@cat.Id">@cat.Name</option>
@@ -202,7 +259,7 @@ else
                     @SaveButtonText
                 </button>
 
-                <button type="button" @onclick='() => NavManager.NavigateTo("/admin/products")' class="h-12 w-full bg-surface-container-lowest border border-outline-variant/50 text-on-surface-variant font-bold rounded-xl shadow-sm hover:bg-surface-container-low transition-colors">
+                <button type="button" @onclick='() => NavManager.NavigateTo("/admin/products")' class="h-12 w-full bg-surface-container-lowest text-on-surface-variant font-bold rounded-xl shadow-sm hover:bg-surface-container-low transition-colors">
                     Cancel
                 </button>
             </div>
@@ -216,6 +273,7 @@ else
     private bool IsEditMode => Id.HasValue;
     private bool isLoading = true;
     private bool isSubmitting = false;
+    private bool isDeletingImage = false;
     private string? errorMessage;
     private string? uploadStatus;
 
@@ -230,6 +288,8 @@ else
     {
         "Black", "White", "Red", "Blue", "Green", "Yellow", "Silver", "Gold", "Pink", "Brown", "Grey"
     };
+
+    private int TotalImageCount => (productModel.Images?.Count ?? 0) + selectedFiles.Count;
 
     private string SaveButtonText =>
         isSubmitting
@@ -251,6 +311,9 @@ else
                     productModel = fetched;
                 }
             }
+
+            productModel.Colors ??= new List<string>();
+            productModel.Images ??= new List<ProductImageDto>();
         }
         catch (Exception ex)
         {
@@ -278,17 +341,25 @@ else
     {
         errorMessage = null;
         uploadStatus = null;
-        selectedFiles.Clear();
+
+        var existingImageCount = productModel.Images?.Count ?? 0;
+        var currentPreparedCount = selectedFiles.Count;
+        var remainingSlots = MaxFileCount - existingImageCount - currentPreparedCount;
+
+        if (remainingSlots <= 0)
+        {
+            errorMessage = $"This product already has the maximum of {MaxFileCount} images. Remove one before adding another.";
+            return;
+        }
 
         IReadOnlyList<IBrowserFile> files;
-
         try
         {
-            files = e.GetMultipleFiles(MaxFileCount);
+            files = e.GetMultipleFiles(remainingSlots);
         }
         catch (InvalidOperationException)
         {
-            errorMessage = $"Please select no more than {MaxFileCount} images.";
+            errorMessage = $"You can only add {remainingSlots} more image(s). Maximum allowed per product is {MaxFileCount}.";
             return;
         }
 
@@ -299,11 +370,11 @@ else
         {
             current++;
             uploadStatus = $"Preparing image {current} of {files.Count}...";
+            await InvokeAsync(StateHasChanged);
 
             if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
             {
                 errorMessage = $"'{file.Name}' is not a valid image file.";
-                selectedFiles.Clear();
                 uploadStatus = null;
                 return;
             }
@@ -313,7 +384,6 @@ else
             if (resizedFile.Size > MaxFileSize)
             {
                 errorMessage = $"'{file.Name}' is still too large after optimization. Please use a smaller image.";
-                selectedFiles.Clear();
                 uploadStatus = null;
                 return;
             }
@@ -325,23 +395,87 @@ else
             var safeBaseName = Path.GetFileNameWithoutExtension(file.Name);
             preparedFiles.Add(new PreparedUploadFile
             {
-                UploadName = $"{safeBaseName}.jpg",
+                UploadName = $"{safeBaseName}-{Guid.NewGuid():N}.jpg",
                 ContentType = "image/jpeg",
                 Content = memoryStream.ToArray()
             });
         }
 
-        selectedFiles = preparedFiles;
-        uploadStatus = $"{selectedFiles.Count} optimized image(s) ready to upload.";
+        selectedFiles.AddRange(preparedFiles);
+
+        var totalCount = existingImageCount + selectedFiles.Count;
+        uploadStatus = $"{selectedFiles.Count} new image(s) ready. Total product images after save: {totalCount}/{MaxFileCount}.";
     }
 
-    private async Task<HttpRequestMessage> CreateAuthorizedRequest(HttpMethod method, string url, HttpContent content)
+    private void RemovePreparedFile(int index)
+    {
+        if (index < 0 || index >= selectedFiles.Count)
+            return;
+
+        selectedFiles.RemoveAt(index);
+        uploadStatus = selectedFiles.Any()
+            ? $"{selectedFiles.Count} new image(s) ready. Total product images after save: {TotalImageCount}/{MaxFileCount}."
+            : null;
+    }
+
+    private async Task RemoveExistingImageAsync(ProductImageDto image)
+    {
+        if (!IsEditMode || image == null)
+            return;
+
+        if (image.Id == Guid.Empty)
+        {
+            productModel.Images.Remove(image);
+            return;
+        }
+
+        isDeletingImage = true;
+        errorMessage = null;
+
+        try
+        {
+            var token = await LocalStorage.GetItemAsync<string>("authToken");
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/product/{Id}/images/{image.Id}");
+
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+
+            using var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                productModel.Images.Remove(image);
+                uploadStatus = selectedFiles.Any()
+                    ? $"{selectedFiles.Count} new image(s) ready. Total product images after save: {TotalImageCount}/{MaxFileCount}."
+                    : null;
+            }
+            else
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                errorMessage = $"Failed to delete image. {body}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Failed to delete image. " + ex.Message;
+        }
+        finally
+        {
+            isDeletingImage = false;
+        }
+    }
+
+    private async Task<HttpRequestMessage> CreateAuthorizedRequest(HttpMethod method, string url, HttpContent? content = null)
     {
         var token = await LocalStorage.GetItemAsync<string>("authToken");
-        var request = new HttpRequestMessage(method, url)
+        var request = new HttpRequestMessage(method, url);
+
+        if (content != null)
         {
-            Content = content
-        };
+            request.Content = content;
+        }
 
         if (!string.IsNullOrWhiteSpace(token))
         {
@@ -370,6 +504,12 @@ else
             if (productModel.CategoryId == Guid.Empty)
             {
                 errorMessage = "Please select a category.";
+                return;
+            }
+
+            if (TotalImageCount > MaxFileCount)
+            {
+                errorMessage = $"A product can only have a maximum of {MaxFileCount} images. Please remove some images before saving.";
                 return;
             }
 
@@ -483,6 +623,17 @@ else
             return $"{Math.Round(bytes / 1024d, 1)} KB";
 
         return $"{Math.Round(bytes / 1024d / 1024d, 1)} MB";
+    }
+
+    private static string BuildImageUrl(string? imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            return string.Empty;
+
+        if (imageUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            return imageUrl;
+
+        return $"https://localhost:7145{imageUrl}";
     }
 
     private sealed class PreparedUploadFile

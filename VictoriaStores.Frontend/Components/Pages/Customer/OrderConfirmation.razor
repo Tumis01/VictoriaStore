@@ -1,8 +1,8 @@
 ﻿@page "/confirmation/{Id:guid}"
 @layout Layout.StoreLayout
 @inject HttpClient Http
-@inject NavigationManager NavManager
 @inject IJSRuntime JS
+@using System.Net.Http.Json
 @using VictoriaStores.Frontend.Models
 
 <PageTitle>Order Confirmed - Victoria James Store</PageTitle>
@@ -19,45 +19,43 @@
         <div class="text-center py-16">
             <h2 class="text-2xl font-bold text-on-surface mb-4">Order Not Found</h2>
             <p class="text-outline mb-6">We couldn't find the order you're looking for.</p>
-            <a href="/" class="text-primary font-semibold hover:underline">← Return to Shop</a>
+            <a href="/" class="text-primary font-semibold hover:underline">Return to Shop</a>
         </div>
     }
     else
     {
-        <div class="text-center mb-12 animate-slide-up">
+        <div class="text-center mb-12">
             <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
             </div>
-            <h1 class="font-serif text-3xl md:text-4xl font-bold text-primary mb-4">🎉 Order Placed Successfully!</h1>
+            <h1 class="font-serif text-3xl md:text-4xl font-bold text-primary mb-4">Order Placed Successfully</h1>
             <div class="inline-block bg-surface-container text-on-surface text-lg font-bold px-4 py-1.5 rounded-lg mb-4 shadow-sm border border-outline-variant/30 tracking-wider">
                 Order #@order.OrderNumber
             </div>
             <p class="text-on-surface-variant text-lg">Thank you, @GetFirstName(order.CustomerName)! We'll confirm your order via WhatsApp or phone shortly.</p>
         </div>
 
-        <div class="mb-10 animate-fade-in" style="animation-delay: 0.1s;">
+        <div class="mb-10">
             <div class="flex items-start gap-3 p-4 rounded-t-2xl bg-primary-container border-x border-t border-blue-200 text-on-primary-container text-sm">
                 <svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <p class="font-semibold">To complete your order, please transfer the exact amount below:</p>
             </div>
 
-            <div class="bg-primary-light rounded-b-2xl p-6 md:p-8 border border-primary/20 shadow-sm relative overflow-hidden">
-                <svg class="absolute -right-6 -bottom-6 w-48 h-48 text-primary opacity-5 pointer-events-none" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" /></svg>
-
-                <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
+            <div class="bg-primary-light rounded-b-2xl p-6 md:p-8 border border-primary/20 shadow-sm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
                     <div>
                         <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Bank Name</p>
-                        <p class="text-lg font-bold text-on-surface">First Bank Nigeria</p>
+                        <p class="text-lg font-bold text-on-surface">@GetBankName()</p>
                     </div>
                     <div>
                         <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Account Name</p>
-                        <p class="text-lg font-bold text-on-surface">VICTORIA JAMES</p>
+                        <p class="text-lg font-bold text-on-surface">@GetAccountName()</p>
                     </div>
                     <div>
                         <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Account Number</p>
-                        <div class="flex items-center gap-2">
-                            <p class="text-2xl font-black text-primary tracking-widest">1234567890</p>
-                            <button @onclick='() => CopyToClipboard("1234567890", "account")' class="text-xs font-bold px-2 py-1 rounded bg-surface-container-lowest text-on-surface-variant hover:text-primary border border-outline-variant/30 transition-colors">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <p class="text-2xl font-black text-primary tracking-widest">@GetAccountNumber()</p>
+                            <button @onclick='() => CopyToClipboard(GetAccountNumber(), "account")' class="text-xs font-bold px-3 py-1.5 rounded bg-surface-container-lowest text-on-surface-variant hover:text-primary transition-colors">
                                 @(copiedAccount ? "Copied!" : "Copy")
                             </button>
                         </div>
@@ -68,9 +66,9 @@
                     </div>
                     <div class="sm:col-span-2">
                         <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Payment Reference</p>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <p class="text-lg font-bold text-on-surface">@order.OrderNumber</p>
-                            <button @onclick='() => CopyToClipboard(order.OrderNumber, "ref")' class="text-xs font-bold px-2 py-1 rounded bg-surface-container-lowest text-on-surface-variant hover:text-primary border border-outline-variant/30 transition-colors">
+                            <button @onclick='() => CopyToClipboard(order.OrderNumber, "ref")' class="text-xs font-bold px-3 py-1.5 rounded bg-surface-container-lowest text-on-surface-variant hover:text-primary transition-colors">
                                 @(copiedRef ? "Copied!" : "Copy")
                             </button>
                         </div>
@@ -79,53 +77,34 @@
 
                 <div class="mt-8 pt-6 border-t border-primary/20">
                     <a href="@GetWhatsAppLink()" target="_blank" class="flex items-center justify-center w-full h-14 bg-green-500 text-white font-bold text-lg rounded-xl hover:bg-green-600 active:scale-[0.98] transition-all shadow-md gap-3">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.183-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.765-5.77z..." /></svg>
+                        <span class="material-symbols-outlined text-[24px]">chat</span>
                         Send Payment Proof on WhatsApp
                     </a>
                 </div>
             </div>
         </div>
 
-        <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/15 p-6 md:p-8 mb-10 animate-fade-in" style="animation-delay: 0.2s;">
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/15 p-6 md:p-8 mb-10">
             <h3 class="font-serif text-xl font-bold text-on-surface mb-6">What Happens Next?</h3>
-            
-            <div class="relative pl-4 space-y-8 before:absolute before:inset-0 before:ml-[23px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-green-500 before:via-gray-200 before:to-gray-200">
-                
-                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                    <div class="flex items-center justify-center w-6 h-6 rounded-full border-white border-4 bg-green-500 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute -left-3 md:left-1/2">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                    </div>
-                    <div class="w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl bg-surface-container-low border border-outline-variant/15">
-                        <h4 class="font-bold text-on-surface text-sm">1. Order Received</h4>
-                        <p class="text-xs text-outline mt-1">We've received your order and are waiting for payment.</p>
-                    </div>
-                </div>
 
-                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                    <div class="flex items-center justify-center w-6 h-6 rounded-full border-white border-4 bg-surface-container-high text-outline shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute -left-3 md:left-1/2">
-                        <span class="w-2 h-2 bg-surface-container-lowest rounded-full"></span>
-                    </div>
-                    <div class="w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/15 opacity-60">
-                        <h4 class="font-bold text-on-surface text-sm">2. Payment Confirmed</h4>
-                        <p class="text-xs text-outline mt-1">After you transfer and we verify your payment.</p>
-                    </div>
+            <div class="space-y-4">
+                <div class="rounded-xl bg-surface-container-low p-4">
+                    <h4 class="font-bold text-on-surface text-sm">1. Order Received</h4>
+                    <p class="text-xs text-outline mt-1">We've received your order and are waiting for payment.</p>
                 </div>
-
-                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                    <div class="flex items-center justify-center w-6 h-6 rounded-full border-white border-4 bg-surface-container-high text-outline shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute -left-3 md:left-1/2">
-                        <span class="w-2 h-2 bg-surface-container-lowest rounded-full"></span>
-                    </div>
-                    <div class="w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/15 opacity-60">
-                        <h4 class="font-bold text-on-surface text-sm">3. Order Shipped</h4>
-                        <p class="text-xs text-outline mt-1">We'll send an SMS/WhatsApp update with tracking info.</p>
-                    </div>
+                <div class="rounded-xl bg-surface-container-lowest border border-outline-variant/15 p-4 opacity-70">
+                    <h4 class="font-bold text-on-surface text-sm">2. Payment Confirmed</h4>
+                    <p class="text-xs text-outline mt-1">After you transfer and we verify your payment.</p>
                 </div>
-
+                <div class="rounded-xl bg-surface-container-lowest border border-outline-variant/15 p-4 opacity-70">
+                    <h4 class="font-bold text-on-surface text-sm">3. Order Shipped</h4>
+                    <p class="text-xs text-outline mt-1">We'll send an SMS or WhatsApp update with tracking info.</p>
+                </div>
             </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style="animation-delay: 0.3s;">
-            <a href="/track?order=@order.OrderNumber" class="flex items-center justify-center h-12 px-8 bg-surface-container-lowest border-2 border-primary text-primary font-bold text-sm rounded-xl hover:bg-primary-light transition-colors shadow-sm">
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/track?order=@order.OrderNumber" class="flex items-center justify-center h-12 px-8 bg-surface-container-lowest text-primary font-bold text-sm rounded-xl hover:bg-primary-light transition-colors shadow-sm">
                 Track My Order
             </a>
             <a href="/store" class="flex items-center justify-center h-12 px-8 bg-gray-900 text-white font-bold text-sm rounded-xl hover:bg-gray-800 transition-colors shadow-sm">
@@ -140,7 +119,8 @@
 
     private bool isLoading = true;
     private OrderResponseDto? order;
-    
+    private StoreConfig storeSettings = new();
+
     private bool copiedAccount = false;
     private bool copiedRef = false;
 
@@ -150,10 +130,11 @@
         {
             isLoading = true;
             order = await Http.GetFromJsonAsync<OrderResponseDto>($"api/order/{Id}");
+            storeSettings = await Http.GetFromJsonAsync<StoreConfig>("api/store-settings") ?? new StoreConfig();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading order confirmation: {ex.Message}");
+            Console.WriteLine($"Error loading confirmation page: {ex.Message}");
         }
         finally
         {
@@ -164,23 +145,41 @@
     private string GetFirstName(string fullName)
     {
         if (string.IsNullOrWhiteSpace(fullName)) return "Customer";
-        return fullName.Split(' ')[0];
+        return fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "Customer";
     }
+
+    private string GetBankName() =>
+        string.IsNullOrWhiteSpace(storeSettings.BankName) ? "Bank details unavailable" : storeSettings.BankName;
+
+    private string GetAccountName() =>
+        string.IsNullOrWhiteSpace(storeSettings.AccountName) ? "Account name unavailable" : storeSettings.AccountName;
+
+    private string GetAccountNumber() =>
+        string.IsNullOrWhiteSpace(storeSettings.AccountNumber) ? "Not available" : storeSettings.AccountNumber;
 
     private string GetWhatsAppLink()
     {
-        if (order == null) return "https://wa.me/2348162809886";
+        var number = string.IsNullOrWhiteSpace(storeSettings.WhatsAppNumber) ? "2348162809886" : new string(storeSettings.WhatsAppNumber.Where(char.IsDigit).ToArray());
+        if (number.StartsWith("0"))
+        {
+            number = "234" + number[1..];
+        }
+
+        if (order == null)
+        {
+            return $"https://wa.me/{number}";
+        }
+
         var msg = Uri.EscapeDataString($"Hi! I just paid ₦{order.TotalAmount:N0} for order {order.OrderNumber}");
-        return $"https://wa.me/2348162809886?text={msg}";
+        return $"https://wa.me/{number}?text={msg}";
     }
 
     private async Task CopyToClipboard(string text, string type)
     {
         try
         {
-            // Use JS Interop to copy to clipboard
             await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
-            
+
             if (type == "account")
             {
                 copiedAccount = true;
@@ -193,12 +192,20 @@
                 await Task.Delay(2000);
                 copiedRef = false;
             }
+
             StateHasChanged();
         }
         catch
         {
-            // Fallback if clipboard API fails
             Console.WriteLine("Clipboard API not available.");
         }
+    }
+
+    public class StoreConfig
+    {
+        public string BankName { get; set; } = string.Empty;
+        public string AccountNumber { get; set; } = string.Empty;
+        public string AccountName { get; set; } = string.Empty;
+        public string WhatsAppNumber { get; set; } = string.Empty;
     }
 }

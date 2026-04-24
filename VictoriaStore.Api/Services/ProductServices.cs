@@ -13,12 +13,15 @@ public interface IProductService
     Task<ProductDto> CreateAsync(CreateProductRequest request);
     Task<bool> SoftDeleteAsync(Guid id);
     Task<ProductDto> UpdateAsync(Guid id, CreateProductRequest request);
+    Task<bool> DeleteImageAsync(Guid productId, Guid imageId);
+
 }
 
 public class ProductService : IProductService
 {
     private readonly AppDbContext _context;
     private readonly IWebHostEnvironment _env;
+
 
     public ProductService(AppDbContext context, IWebHostEnvironment env)
     {
@@ -136,7 +139,6 @@ public class ProductService : IProductService
         if (product == null)
             throw new KeyNotFoundException("Product not found.");
 
-        // 1. Update basic properties
         product.Name = request.Name.Trim();
         product.Slug = request.Slug.Trim();
         product.Description = request.Description;
@@ -148,8 +150,6 @@ public class ProductService : IProductService
         product.IsActive = request.IsActive;
         product.UpdatedAt = DateTime.UtcNow;
 
-        // Safely update primitive collections (Colors) by clearing and re-adding
-        // to prevent collection tracking reference errors
         var newColors = (request.Colors ?? new List<string>())
             .Where(c => !string.IsNullOrWhiteSpace(c))
             .Select(c => c.Trim())
@@ -157,24 +157,23 @@ public class ProductService : IProductService
             .ToList();
 
         product.Colors.Clear();
-        foreach (var c in newColors)
+        foreach (var color in newColors)
         {
-            product.Colors.Add(c);
+            product.Colors.Add(color);
         }
 
-        // 2. Handle New Images Safely
+        // Keep existing images untouched
+        foreach (var existingImage in product.Images)
+        {
+            existingImage.ProductId = product.Id;
+            _context.Entry(existingImage).State = EntityState.Unchanged;
+        }
+
+        // Re-mark the product as modified after touching image states
+        _context.Entry(product).State = EntityState.Modified;
+
         if (request.Images != null && request.Images.Any(f => f.Length > 0))
         {
-            // STEP A: Reset existing main images and force a save state 
-            // to prevent EF Core tracking confusion
-            foreach (var img in product.Images)
-            {
-                img.IsMain = false;
-                _context.Entry(img).State = EntityState.Modified;
-            }
-
-            await _context.SaveChangesAsync(); // Commit the UPDATEs first!
-
             var uploadsFolder = Path.Combine(
                 _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"),
                 "images",
@@ -183,20 +182,24 @@ public class ProductService : IProductService
             Directory.CreateDirectory(uploadsFolder);
 
             var allowedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"
-            };
+        {
+            ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"
+        };
 
-            var nextDisplayOrder = product.Images.Any() ? product.Images.Max(i => i.DisplayOrder) + 1 : 1;
-            var firstNewImage = true;
+            var nextDisplayOrder = product.Images.Any()
+                ? product.Images.Max(i => i.DisplayOrder) + 1
+                : 1;
 
-            // STEP B: Process and add the new images
+            var hasMainImage = product.Images.Any(i => i.IsMain);
+
             foreach (var file in request.Images)
             {
-                if (file.Length <= 0) continue;
+                if (file.Length <= 0)
+                    continue;
 
                 var extension = Path.GetExtension(file.FileName);
-                if (!allowedExtensions.Contains(extension)) continue;
+                if (!allowedExtensions.Contains(extension))
+                    continue;
 
                 var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
@@ -204,23 +207,26 @@ public class ProductService : IProductService
                 await using var fileStream = new FileStream(filePath, FileMode.Create);
                 await file.CopyToAsync(fileStream);
 
-                product.Images.Add(new ProductImage
+                var newImage = new ProductImage
                 {
+                    ProductId = product.Id,
                     ImageUrl = $"/images/products/{uniqueFileName}",
                     DisplayOrder = nextDisplayOrder++,
-                    IsMain = firstNewImage // First new image takes over as main
-                });
+                    IsMain = !hasMainImage
+                };
 
-                firstNewImage = false;
+                _context.ProductImages.Add(newImage);
+                hasMainImage = true;
             }
         }
 
-        // 3. Final save for the new images and standard properties
         await _context.SaveChangesAsync();
 
         return await GetByIdAsync(product.Id)
             ?? throw new Exception("Failed to retrieve updated product.");
     }
+
+
     private static ProductDto MapToDto(Product p)
     {
         return new ProductDto
@@ -263,5 +269,53 @@ public class ProductService : IProductService
         await _context.SaveChangesAsync();
         return true;
     }
+    public async Task<bool> DeleteImageAsync(Guid productId, Guid imageId)
+    {
+        var product = await _context.Products
+            .Include(p => p.Images)
+            .FirstOrDefaultAsync(p => p.Id == productId && !p.IsDeleted);
+
+        if (product == null)
+            throw new KeyNotFoundException("Product not found.");
+
+        var image = product.Images.FirstOrDefault(i => i.Id == imageId);
+
+        if (image == null)
+            return false;
+
+        if (!string.IsNullOrWhiteSpace(image.ImageUrl))
+        {
+            var relativePath = image.ImageUrl
+                .TrimStart('/')
+                .Replace("/", Path.DirectorySeparatorChar.ToString());
+
+            var rootPath = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            var fullPath = Path.Combine(rootPath, relativePath);
+
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+        }
+
+        _context.Set<ProductImage>().Remove(image);
+
+        var remainingImages = product.Images
+            .Where(i => i.Id != imageId)
+            .OrderBy(i => i.DisplayOrder)
+            .ToList();
+
+        for (int i = 0; i < remainingImages.Count; i++)
+        {
+            remainingImages[i].DisplayOrder = i + 1;
+            remainingImages[i].IsMain = i == 0;
+        }
+
+        product.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
 
 }
