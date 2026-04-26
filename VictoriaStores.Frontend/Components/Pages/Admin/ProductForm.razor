@@ -633,7 +633,7 @@ else
         if (imageUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
             return imageUrl;
 
-        return $"https://localhost:7145{imageUrl}";
+        return $"https://api.vjstores.shifts.com.ng{imageUrl}";
     }
 
     private sealed class PreparedUploadFile

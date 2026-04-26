@@ -62,7 +62,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorFrontend", policy =>
     {
-        policy.WithOrigins("https://localhost:7222", "http://localhost:5113")
+        policy.WithOrigins("https://vjstores.shifts.com.ng")
+        //policy.WithOrigins("https://localhost:7222", "http://localhost:5113")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });

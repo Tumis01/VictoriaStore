@@ -61,7 +61,7 @@
                             else if (!string.IsNullOrEmpty(newCategory.BannerImageUrl))
                             {
                                 // Show existing image from DB if editing
-                                <img src="https://localhost:7145@(newCategory.BannerImageUrl)" class="mx-auto h-32 w-auto object-contain mb-3 rounded" />
+                                <img src="https://api.vjstores.shifts.com.ng@(newCategory.BannerImageUrl)" class="mx-auto h-32 w-auto object-contain mb-3 rounded" />
                             }
                             else
                             {
@@ -137,7 +137,7 @@
             <div class="bg-surface-container-lowest rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-outline-variant/15 overflow-hidden flex flex-col hover:shadow-lg transition-all hover:scale-[1.02]">
                 @if (!string.IsNullOrEmpty(category.BannerImageUrl))
                 {
-                    <img src="https://localhost:7145@(category.BannerImageUrl)" alt="@category.Name" class="h-40 w-full object-cover" />
+                    <img src="https://api.vjstores.shifts.com.ng@(category.BannerImageUrl)" alt="@category.Name" class="h-40 w-full object-cover" />
                 }
                 else
                 {

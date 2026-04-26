@@ -20,7 +20,7 @@ builder.Services.AddScoped(sp =>
 
     var client = new HttpClient(authHandler)
     {
-        BaseAddress = new Uri("https://localhost:7145/"),
+        BaseAddress = new Uri("https://api.vjstores.shifts.com.ng/"),
         Timeout = TimeSpan.FromMinutes(10)
     };
 

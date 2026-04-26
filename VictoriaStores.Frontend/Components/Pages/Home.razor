@@ -133,7 +133,7 @@
                         <div class="w-full aspect-square bg-surface-container-lowest/10 rounded-xl overflow-hidden flex items-center justify-center relative">
                             @if (!string.IsNullOrEmpty(product.MainImageUrl))
                             {
-                                <img src="https://localhost:7145@(product.MainImageUrl)" 
+                                <img src="https://api.vjstores.shifts.com.ng@(product.MainImageUrl)" 
                                      alt="@product.Name" 
                                      class="absolute inset-0 w-full h-full object-cover rounded-xl" 
                                      loading="eager" 
@@ -216,7 +216,7 @@
 
                         @if (!string.IsNullOrEmpty(cat.BannerImageUrl))
                         {
-                            <img src="https://localhost:7145@(cat.BannerImageUrl)" alt="@cat.Name"
+                            <img src="https://api.vjstores.shifts.com.ng@(cat.BannerImageUrl)" alt="@cat.Name"
                                  class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                                  loading="lazy" decoding="async"
                                  onerror="this.style.display='none'" />
@@ -346,7 +346,7 @@
                     <div class="w-full md:w-1/2 relative min-h-[200px] md:min-h-[280px] overflow-hidden flex items-center justify-center bg-surface-container-lowest/5">
                         @if (!string.IsNullOrEmpty(promoProduct.MainImageUrl))
                         {
-                            <img src="https://localhost:7145@(promoProduct.MainImageUrl)" alt="@promoProduct.Name"
+                            <img src="https://api.vjstores.shifts.com.ng@(promoProduct.MainImageUrl)" alt="@promoProduct.Name"
                                  class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay" loading="lazy" onerror="this.style.display='none'" />
                         }
                         else
